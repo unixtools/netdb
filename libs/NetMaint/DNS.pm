@@ -93,7 +93,7 @@ sub TriggerUpdate {
 
     $self->{log}->Log( action => "triggered dns update", );
 
-    foreach my $server ("dns-m1") {
+    foreach my $server ("netmgr.spirenteng.com") {
         my $sock = IO::Socket::INET->new(
             PeerAddr => "${server}:2405",
             Proto    => "tcp"
