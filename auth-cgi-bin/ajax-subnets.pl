@@ -10,7 +10,6 @@ use lib "/local/perllib/libs";
 use lib "/local/spirentlib/libs";
 use Local::HTMLUtil;
 use JSON;
-use Local::OracleObject;
 
 use lib "/local/netdb/libs";
 use NetMaint::Network;
