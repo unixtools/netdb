@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -x
 
 /local/netdb/bin/dns-master/build-dns-zones.pl
 /local/amazon/sync.pl
