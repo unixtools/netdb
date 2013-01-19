@@ -134,7 +134,8 @@ foreach my $zone ( sort(@zones) ) {
 
     my $errorcnt = 0;
     print "  Checking new zone file for validity:\n";
-    open( my $checkh, "-|" ) || exec( "/local/bind/sbin/named-checkzone", $zone, "${fname}.tmp" );
+    # -k ignore - ignore underscores
+    open( my $checkh, "-|" ) || exec( "/local/bind/sbin/named-checkzone", "-k", "ignore", $zone, "${fname}.tmp" );
     my $saw_serial = 0;
     while ( defined( my $line = <$checkh> ) ) {
         if ( $line =~ /loaded serial/ ) {
