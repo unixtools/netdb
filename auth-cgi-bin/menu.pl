@@ -81,9 +81,6 @@ if (   $privs{"netdb-admin"} )
         print "<td><a href=\"edit-vlans.pl\">VLAN Editor</a></td>\n";
         $html->EndInnerRow();
         $html->StartInnerRow();
-        print "<td><a href=\"unreg-fw-rules.pl\">Unreg Range Firewall Rules</a></td>\n";
-        $html->EndInnerRow();
-        $html->StartInnerRow();
         print "<td><a href=\"edit-quotas.pl\">Edit Registration Quotas</a></td>\n";
         $html->EndInnerRow();
     }
