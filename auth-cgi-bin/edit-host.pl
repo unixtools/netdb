@@ -1066,7 +1066,7 @@ AUTOSUGGEST
             print "Extra admin options can be added to the host when specifically\n";
             print "required. Regular desktop systems should not require any ";
             print "special options. This functionality is limited to ";
-            print "security staff. Be sure and also lock the host if you are disabling it.\n";
+            print "EngOps staff. Be sure and also lock the host if you are disabling it.\n";
             $html->EndInnerRow();
             my %seen = ();
 

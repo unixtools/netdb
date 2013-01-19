@@ -727,8 +727,8 @@ sub SendAdminDisableNotice {
 
     my $info = $self->GetHostInfo($host);
 
-    open( my $sfh, "|/usr/lib/sendmail -t -fsecurity" );
-    print $sfh "From: security\@spirenteng.com\n";
+    open( my $sfh, "|/usr/lib/sendmail -t -fnetdb" );
+    print $sfh "From: netdb\@spirenteng.com\n";
     print $sfh "Subject: System Administratively Disabled\n";
     print $sfh "To: ", $info->{owner}, "\n";
     print $sfh "\n";

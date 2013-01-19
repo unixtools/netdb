@@ -59,9 +59,7 @@ if ( $mode eq "" ) {
     print "<p/>\n";
     print "Show Record Types: ";
     &HTMLStartSelect( "types", 8, 1 );
-    print "<option selected>desktop\n";
-    print "<option selected>printer\n";
-    print "<option>network\n";
+    print "<option selected>device\n";
     print "<option>server\n";
     print "<option>cname\n";
     &HTMLEndSelect();
@@ -86,7 +84,7 @@ elsif ( $mode eq "report" ) {
         push( @types, $db->SQL_QuoteString($type) );
     }
 
-    print "Only hosts of type 'desktop' or type 'printer' will be\n";
+    print "Only hosts of type 'device' will be\n";
     print "automatically expired.\n";
     print "<p/>\n";
 

@@ -798,7 +798,7 @@ sub UpdateUtilityCName {
         my $res = $hosts->CreateHost(
             host   => $host,
             domain => $domain,
-            owner  => "namesrv",
+            owner  => "netdb",
             type   => "cname",
         );
         if ($res) {

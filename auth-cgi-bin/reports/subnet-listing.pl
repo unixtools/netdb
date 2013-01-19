@@ -59,10 +59,7 @@ print " ";
 &HTMLEndForm();
 print "<br>\n";
 print "<a href=\"?filterexact=SRV\">Show server networks</a> | ";
-print "<a href=\"?filterexact=VOIP\">Show voip networks</a> | ";
-print "<a href=\"?filterexact=BL:\">Show building networks</a> | ";
-print "<a href=\"?filterexact=RESNET\">Show resnet networks</a> | ";
-print "<a href=\"?filterexact=CO\">Show core networks</a>\n";
+print "<a href=\"?filterexact=TEST\">Show test networks</a>\n";
 
 my $net = new NetMaint::Network;
 

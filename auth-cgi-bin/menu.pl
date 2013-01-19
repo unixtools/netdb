@@ -169,7 +169,6 @@ if ( $privs{"sysprog:netdb:reports"} ) {
     $html->EndInnerRow();
 
     $html->StartInnerRow();
-    print "<td><a href=\"reports/improper-ip-use.pl\">Improper IP Usage</a></td>\n";
     print "<td><a href=\"reports/lease-mismatches.pl\">DHCP Lease Ether Mismatches</a></td>\n";
     $html->EndInnerRow();
 

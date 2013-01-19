@@ -145,7 +145,7 @@ elsif ( $mode eq "ownername" ) {
 
     my $defowner = $ENV{REMOTE_USER};
     if ( $type eq "server" ) {
-        $defowner = "namesrv";
+        $defowner = "netdb";
     }
 
     print "Owner: ";
@@ -256,9 +256,9 @@ elsif ( $mode eq "hostname" && $nametype eq "customname" ) {
     my $defowner = $ENV{REMOTE_USER};
     if (   $type eq "server"
         || $type eq "cname"
-        || $type eq "network" )
+        )
     {
-        $defowner = "namesrv";
+        $defowner = "netdb";
     }
 
     print "  Owner: ";
