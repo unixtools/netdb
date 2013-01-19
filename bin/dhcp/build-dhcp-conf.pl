@@ -517,19 +517,10 @@ if ( $errcnt > 0 ) {
     close($mail);
 }
 
-# Build tftp area
-print "Building tftp area.\n";
-system("/local/netdb/bin/dhcp/build-tftp.pl");
-system("chown -R tftp:tftp /local/tftp");
-system("chmod -R go-w /local/tftp");
-
 print "\n";
 
 print "Importing new files into repository.\n";
 system("/local/netdb/bin/dhcp/archive-dhcp-config.pl");
-
-print "Synchronizing standby server.\n";
-system("/local/netdb/bin/dhcp/sync-standby.pl");
 
 exit(0);
 

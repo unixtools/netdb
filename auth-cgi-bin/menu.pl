@@ -166,7 +166,6 @@ if ( $privs{"sysprog:netdb:reports"} ) {
 
     $html->StartInnerRow();
     print "<td><a href=\"reports/disabled-hosts.pl\">Disabled Hosts</a></td>\n";
-    print "<td><a href=\"reports/duplicate-short-names.pl\">Duplicated Short Hostnames</a></td>\n";
     $html->EndInnerRow();
 
     $html->StartInnerRow();
