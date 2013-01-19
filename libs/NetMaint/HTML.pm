@@ -345,7 +345,6 @@ sub Display_ARP_History {
         print "<td><tt>", $self->SearchLink_IP( $entry->{ip} ),       "</tt></td>\n";
 
         my $rname = $util->ResolveIP( $entry->{router} );
-        $rname =~ s|\.network\.umr\.edu||gio;
 
         print "<td><tt>", $entry->{router}, " ($rname)</tt></td>\n";
         $self->EndInnerRow();
@@ -390,25 +389,19 @@ sub Display_DHCP_History {
                 && $entry->{ether}   eq $last_ether );
             next
                 if ( $entry->{gateway} eq "eth0"
-                && $last_gateway =~ /\.254$/o );
+                && $last_gateway =~ /\.1$/o );
             next
                 if ( $entry->{gateway} eq "0"
-                && $last_gateway =~ /\.254$/o );
+                && $last_gateway =~ /\.1$/o );
             next
                 if ( $last_gateway eq "eth0"
-                && $entry->{gateway} =~ /\.254$/o );
+                && $entry->{gateway} =~ /\.1$/o );
             next
                 if ( $last_gateway eq "0"
-                && $entry->{gateway} =~ /\.254$/o );
-            next
-                if ( $entry->{server} =~ /dhcpsrv[12]/o
-                && $last_server =~ /dhcpsrv[12]/o );
+                && $entry->{gateway} =~ /\.1$/o );
         }
 
         my $printserver = $entry->{server};
-        if ( $printserver eq "dhcpsrv1" || $printserver eq "dhcpsrv2" ) {
-            $printserver = "dhcpsrv1/2";
-        }
 
         $self->StartInnerRow();
         print "<td><tt>", $entry->{tstamp}, "</td>\n";

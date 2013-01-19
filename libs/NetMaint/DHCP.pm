@@ -98,7 +98,7 @@ sub TriggerUpdate {
 
     $log->Log( action => "triggered dhcp update", );
 
-    foreach my $server ( "dhcpsrv1", "dhcpsrv2" ) {
+    foreach my $server ( "fc-mgmt-ito.spirenteng.com", "fc-dhcp-ito.spirenteng.com", "fc-dhcp-ent.spirenteng.com" )
         my $sock = IO::Socket::INET->new(
             PeerAddr => "${server}:2405",
             Proto    => "tcp"
