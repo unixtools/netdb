@@ -605,8 +605,6 @@ sub CreateHost {
     my $type     = $opts{type};
     my $image    = $opts{image};
 
-    my %privs = &PrivSys_FetchPrivs( $ENV{REMOTE_USER} );
-
     if ( $owner && !$util->UserInfo($owner) ) {
         die "Invalid owner, userid does not exist.";
     }
@@ -639,7 +637,7 @@ sub CreateHost {
     }
 
     if ( $nametype eq "ownername" ) {
-        if ( !$privs{"sysprog:netdb:user-on-behalf"} ) {
+        if ( ! &PrivSys_CheckPriv($ENV{REMOTE_USER}, "sysprog:netdb:user-on-behalf") ) {
             if ( $owner ne $ENV{REMOTE_USER} ) {
                 die "Permission Denied (Owner mismatch).";
             }
