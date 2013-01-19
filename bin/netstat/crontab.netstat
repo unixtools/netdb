@@ -1,5 +1,0 @@
-#
-0-59/5 * * * * /local/netdb/bin/netstat/scan-router-arp-tables.pl 2>&1 | /usr/bin/logger -t scan-arp-tables
-#
-15 0-23/6 * * * /local/netdb/bin/netstat/build-switch-vlan-list.pl 2>&1 | /usr/bin/logger -t build-switch-vlan-list
-#
