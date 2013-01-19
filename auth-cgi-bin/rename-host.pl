@@ -67,7 +67,6 @@ print "<h3>Renaming '$oldhost'</h3><p/>\n";
 # need modes for selecting type, domain, and hostname
 
 my %host_types = (
-    "guest"   => "Guest/Sponsored Host",
     "device" => "Device Host",
     "server"  => "Server",
 );
@@ -107,12 +106,6 @@ elsif ( $mode eq "nametype" ) {
     print "<ul>\n";
     my $cnt = 0;
     foreach my $ntype ( sort( keys(%name_types) ) ) {
-        if ( $type eq "guest" ) {
-
-            # only allow ownernames for guest type machines
-            next if ( $ntype ne "ownername" );
-        }
-
         if ($access->Check(
                 type   => $type,
                 flag   => $ntype,
@@ -210,10 +203,6 @@ elsif ( $mode eq "hostname" && $nametype eq "ownername" ) {
     my %domains = $dns->GetDomains();
     &HTMLStartSelect( "domain", 1 );
     foreach my $domain ( sort( keys(%domains) ) ) {
-        if ( $type eq "guest" ) {
-            next if ( $domain ne "guest.device.mst.edu" );
-        }
-
         if ($access->Check(
                 type   => $type,
                 flag   => "ownername",
@@ -222,12 +211,7 @@ elsif ( $mode eq "hostname" && $nametype eq "ownername" ) {
             )
             )
         {
-            if ( $domain eq "managed.mst.edu" ) {
-                print "<option selected>$domain\n";
-            }
-            else {
                 print "<option>$domain\n";
-            }
         }
     }
     &HTMLEndSelect();
@@ -315,16 +299,6 @@ elsif ( $mode eq "rename" ) {
             print "<h3>Short hostname might conflict with '<tt>";
             print $html->SearchLink_Host($old_host);
             print "</tt>'.</h3>\n";
-        }
-    }
-
-    if ( $type eq "guest" ) {
-        if ( $nametype ne "ownername" ) {
-            $html->ErrorExit("Guest machines must be named for the sponsor/owner.");
-        }
-
-        if ( $domain ne "guest.device.spirenteng.com" ) {
-            $html->ErrorExit("Guest machines must be in the guest.device.spirenteng.com subdomain.");
         }
     }
 

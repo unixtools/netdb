@@ -164,9 +164,6 @@ sub update_purge_date_auto {
     my ( $host, $date ) = @_;
     my $qry;
     my $days = 180;
-    if ( $host =~ /\.guest\.device\.mst\.edu$/o ) {
-        $days = 15;
-    }
 
     if ($date) {
         print "new date: $date + ${days} ";

@@ -155,7 +155,6 @@ print "<td align=center valign=top><b>Types:</b><br/>";
 print "<option value=\"\">none\n";
 print "<option>*\n";
 print "<option>device\n";
-print "<option>guest\n";
 print "<option>server\n";
 print "<option>cname\n";
 &HTMLEndSelect();

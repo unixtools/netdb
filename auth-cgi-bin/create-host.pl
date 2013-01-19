@@ -62,7 +62,6 @@ $log->Log();
 # need modes for selecting type, domain, and hostname
 
 my %host_types = (
-    "guest"   => "Guest/Sponsored Host",
     "device" => "Device",
     "cname"   => "Canonical Name (CNAME)",
     "server"  => "Server",
@@ -312,16 +311,6 @@ elsif ( $mode eq "create" ) {
         $html->ErrorExitRaw( "Ethernet address already assigned to '"
                 . $html->SearchLink_HostEdit($eth_host_assigned)
                 . "', host not created." );
-    }
-
-    if ( $type eq "guest" ) {
-        if ( $nametype ne "ownername" ) {
-            $html->ErrorExit("Guest machines must be named for the sponsor/owner.");
-        }
-
-        if ( $domain !~ /guest/ ) {
-            $html->ErrorExit("Guest machines must be in the guest subdomain.");
-        }
     }
 
     my $host;

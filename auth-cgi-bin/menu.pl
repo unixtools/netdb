@@ -80,9 +80,6 @@ if ( $privs{"sysprog:netdb:search"} ) {
 $html->StartInnerRow();
 print "<td><a href=\"view-my-info.pl\">View Current Connection Info</a></td>\n";
 $html->EndInnerRow();
-$html->StartInnerRow();
-print "<td><a href=\"guest-request.pl\">Guest Registration Request</a></td>\n";
-$html->EndInnerRow();
 $html->EndInnerTable();
 $html->EndBlockTable();
 

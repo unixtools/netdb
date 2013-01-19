@@ -28,7 +28,7 @@ $dhcp->BlockUpdates();
 $dns->BlockUpdates();
 
 my $qry = "select host from hosts where purge_date < now() and "
-    . "type in ('desktop','printer','guest') order by purge_date";
+    . "type in ('device') order by purge_date";
 my $cid = $db->SQL_OpenQuery($qry) || $db->SQL_Error($qry);
 
 my @hosts;

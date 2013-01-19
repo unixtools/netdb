@@ -263,15 +263,6 @@ sub CheckNameLength {
     my %opts = @_;
     my $host = $opts{host};
 
-    if ( $host =~ /\.managed\.mst\.edu$/o ) {
-        my $shost = $host;
-        $shost =~ s/\..*//go;
-        if ( length($shost) > 15 ) {
-            return
-                "Total length of short hostname ($shost) in managed.mst.edu domain exceeds maximum of 15 characters.";
-        }
-    }
-
     if ( length($host) > 60 ) {
         return "Total length of long hostname ($host) exceeds maximum of 60 characters.";
     }
@@ -295,9 +286,6 @@ sub CheckValidNameType {
     if ( $type eq "server" || $type eq "cname" ) {
         return $nametype eq "customname";
     }
-    elsif ( $type eq "guest" ) {
-        return $nametype eq "ownername";
-    }
 
     # Fall through and allow it
     return 1;
@@ -316,18 +304,6 @@ sub CheckValidNameTypeDomain {
     my $type     = $opts{type};
     my $nametype = $opts{nametype};
     my $domain   = $opts{domain};
-
-    if ( $domain eq "prn.mst.edu" && $type ne "printer" ) {
-        return 0;
-    }
-
-    if ( $type eq "guest" && ( $nametype ne "ownername" || $domain !~ /guest/ ) ) {
-        return 0;
-    }
-
-    if ( $type ne "guest" && $domain =~ /guest/ ) {
-        return 0;
-    }
 
     return 1;
 }

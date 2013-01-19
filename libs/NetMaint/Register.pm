@@ -101,10 +101,6 @@ sub RegisterDesktop {
     my $ether  = $util->CondenseEther( $opts{ether} );
     my $type   = lc $opts{type} || "desktop";
 
-    if ( $domain =~ /guest/ ) {
-        $type = "guest";
-    }
-
     my $dhcp = new NetMaint::DHCP;
 
     my ( $qry, $cid );

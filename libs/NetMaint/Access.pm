@@ -751,45 +751,8 @@ sub ExpandRule {
 sub GetDefaultRegistrationQuota {
     my $self   = shift;
     my $userid = lc shift;
-    my ( $qry, $cid );
-    my $db = $self->{db};
-    my $ads = new Local::ADSObject( use_gc => 1 );
 
-    my $info = $ads->GetAttributes( $userid, attributes => ["distinguishedName"] );
-    my $dn;
-    if ($info) {
-        ($dn) = @{ $info->{distinguishedName} };
-    }
-
-    if ( !$dn ) {
-
-        # unable to obtain DN, return 0 quota
-        return 0;
-    }
-
-    # umaccounts entries get defaulted to 0
-    if ( $dn =~ /DC=umac,DC=umsystem,DC=edu/io ) {
-        return 0;
-    }
-
-    if ( $dn =~ /(CN|OU)=Resource/io ) {
-        return 0;
-    }
-
-    if ( $dn =~ /(CN|OU)=Temporary/io ) {
-        return 0;
-    }
-
-    if ( $dn =~ /(CN|OU)=Staff-Faculty/io ) {
-        return 25;
-    }
-
-    # If not at our site, slightly reduced default quota
-    if ( $dn !~ /DC=mst,DC=edu/i ) {
-        return 3;
-    }
-
-    return 15;
+    return 1000;
 }
 
 # Begin-Doc

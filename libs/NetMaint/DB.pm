@@ -35,14 +35,14 @@ sub new {
 
     if ( !$DB ) {
         my $hn = hostname;
-        if ( $hn =~ /dns-m1/ ) {
+        if ( $hn =~ /netmgr/ ) {
             $DB = new Local::MySQLObject;
             $DB->SQL_OpenDatabase( "netdb", user => "netdb" )
                 || die "Couldn't open mysql DB!";
         }
         else {
             $DB = new Local::MySQLObject;
-            $DB->SQL_OpenDatabase( "netdb", user => "netdb", host => "dns-m1.srv.mst.edu" )
+            $DB->SQL_OpenDatabase( "netdb", user => "netdb", host => "netmgr.spirenteng.com" )
                 || die "Couldn't open mysql DB!";
         }
     }

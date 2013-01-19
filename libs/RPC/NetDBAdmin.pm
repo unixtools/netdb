@@ -622,16 +622,6 @@ sub CreateHost {
     }
     $index = int($index);
 
-    if ( $type eq "guest" ) {
-        if ( $nametype ne "ownername" ) {
-            die "Guest machines must be named for the sponsor/owner.";
-        }
-
-        if ( $domain !~ /guest/ ) {
-            die "Guest machines must be in the guest subdomain.";
-        }
-    }
-
     my $host;
     if ( $nametype eq "ownername" ) {
         $host = sprintf( "s%.2d%s.%s", $index, $owner, $domain );

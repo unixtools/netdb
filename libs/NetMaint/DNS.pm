@@ -127,11 +127,17 @@ sub Bump_Serial {
     my ( $qry, $cid );
 
     if ( !$zone ) {
-        if ( $host =~ /\.mst.edu/o ) {
-            $zone = "mst.edu";
+        die;
+
+        if ( $host =~ /\.spirenteng.com/o ) {
+            $zone = "spirenteng.com";
         }
-        elsif ( $host =~ /151\.131\.in-addr\.arpa/o ) {
-            $zone = "151.131.in-addr.arpa";
+        elsif ( $host =~ /(.in-addr\.arpa/o ) {
+            $zone = ".in-addr.arpa";
+        }
+        else
+        {
+            die;
         }
     }
 
