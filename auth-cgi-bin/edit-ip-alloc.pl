@@ -286,7 +286,7 @@ sub DisplaySubnetDetails {
     print "<br/>";
     print "Template: ";
     &HTMLStartSelect( "template", 1 );
-    foreach my $opttmpl ( "Standard", "VOIP", "Public", "Short" ) {
+    foreach my $opttmpl ( "Standard", "Public", "Short" ) {
         my $lctmpl = lc $opttmpl;
         print "<option value=\"$lctmpl\" ", $sntmpl eq $lctmpl ? " selected" : "", ">$opttmpl</option>\n";
     }

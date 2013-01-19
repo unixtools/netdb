@@ -275,25 +275,18 @@ foreach my $sn ( sort( keys(%$subnets) ) ) {
     my $gw    = $subnets->{$sn}->{gateway};
     my $tmpl  = $subnets->{$sn}->{template};
 
-    # Default to 12 hours
-    my $def_lease_time = 12 * 60 * 60;
-    my $max_lease_time = 12 * 60 * 60;
+    # Default to 2 hours
+    my $def_lease_time = 2 * 60 * 60;
+    my $max_lease_time = 2 * 60 * 60;
 
     # Add to front of list to allow override with subnet options table
-    if ( $tmpl eq "voip" ) {
-        unshift( @{ $sn_options->{$sn} }, "option cisco-voip-tftp-servers 10.20.0.1" );
-        unshift( @{ $sn_options->{$sn} }, "option ntp-servers ${gw}" );
-        unshift( @{ $sn_options->{$sn} }, "boot-unknown-clients on" );
-        $def_lease_time = 8 * 24 * 60 * 60;
-        $max_lease_time = 8 * 24 * 60 * 60;
-    }
-    elsif ( $tmpl eq "short" ) {
+    if ( $tmpl eq "short" ) {
         $def_lease_time = 5 * 60;
         $max_lease_time = 5 * 60;
     }
     elsif ( $tmpl eq "public" ) {
-        $def_lease_time = 60 * 60;
-        $max_lease_time = 60 * 60;
+        $def_lease_time = 2 * 60 * 60;
+        $max_lease_time = 2 * 60 * 60;
         unshift( @{ $sn_options->{$sn} }, "boot-unknown-clients on" );
     }
 
