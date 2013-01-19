@@ -43,21 +43,6 @@ sub UserInfo {
     my $self   = shift;
     my $userid = lc shift;
 
-    my $ads = $self->{ads};
-    if ( !$ads ) {
-        $ads = new Local::ADSObject( use_gc => 1 )
-            || die "couldn't create ads object";
-        $self->{ads} = $ads;
-    }
-
-    my $info = $ads->GetAttributes($userid);
-
-    if ($info) {
-        my $name;
-        ($name) = @{ $info->{displayName} };
-
-        return { name => $name, };
-    }
     return undef;
 }
 
