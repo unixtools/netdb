@@ -104,7 +104,7 @@ sub PageFooter {
     print "<tr><td align=center colspan=2><hr></td></tr>\n";
 
     print "<tr><td align=center colspan=2><font face=arial size=-1>";
-    print "Before using this application, you must familiarized yourself with the usage\n";
+    print "Before using this application, you must familiarize yourself with the usage\n";
     print "documentation in the <a href=\"https://origin.spirenteng.com/display/ENGOP/NetDB\">NetDB</a> origin page.\n";
     print "</td></tr>\n";
 
