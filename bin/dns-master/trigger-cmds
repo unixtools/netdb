@@ -2,4 +2,4 @@
 
 /local/netdb/bin/dns-master/build-dns-zones.pl
 /local/amazon/sync.pl
-/local/netdb/gen-html.pl
+/local/netmap/gen-html.pl
