@@ -62,7 +62,7 @@ $html->StartInnerRow();
 print "<td><a href=\"create-host.pl\">Create New Host</a> (Expert)</td>\n";
 $html->EndInnerRow();
 
-if ( $privs{"sysprog:netdb:search"} ) {
+if ( $privs{"netdb-admin"} ) {
     $html->StartInnerRow();
     print "<td><a href=\"search-hosts.pl\">Search Hosts</a></td>\n";
     $html->EndInnerRow();
@@ -73,20 +73,16 @@ $html->EndInnerRow();
 $html->EndInnerTable();
 $html->EndBlockTable();
 
-if (   $privs{"sysprog:netdb:edit-privs"}
-    || $privs{"sysprog:netdb:alloc"}
-    || $privs{"sysprog:netdb:quota"} )
+if (   $privs{"netdb-admin"} )
 {
     print "<p/>\n";
     $html->StartBlockTable( "Administrative Tools", 400 );
     $html->StartInnerTable();
 
-    if ( $privs{"sysprog:netdb:edit-privs"} ) {
+    if ( $privs{"netdb-admin"} ) {
         $html->StartInnerRow();
         print "<td><a href=\"edit-privs.pl\">Access Control Admin</a></td>\n";
         $html->EndInnerRow();
-    }
-    if ( $privs{"sysprog:netdb:alloc"} ) {
         $html->StartInnerRow();
         print "<td><a href=\"edit-ip-alloc.pl\">Subnet IP Allocation Editor</a></td>\n";
         $html->EndInnerRow();
@@ -99,13 +95,9 @@ if (   $privs{"sysprog:netdb:edit-privs"}
         $html->StartInnerRow();
         print "<td><a href=\"svi-config.pl\">Subnet SVI Config</a></td>\n";
         $html->EndInnerRow();
-    }
-    if ( $privs{"sysprog:netdb:quota"} ) {
         $html->StartInnerRow();
         print "<td><a href=\"edit-quotas.pl\">Edit Registration Quotas</a></td>\n";
         $html->EndInnerRow();
-    }
-    if ( $privs{"sysprog:netdb:adminlock"} ) {
         $html->StartInnerRow();
         print "<td><a href=\"bulk-admin-disable.pl\">Bulk Admin Disable</a></td>\n";
         $html->EndInnerRow();

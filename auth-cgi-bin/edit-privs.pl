@@ -37,7 +37,7 @@ my $dns    = new NetMaint::DNS;
 my $log    = new NetMaint::Logging;
 
 $html->PageHeader();
-$html->RequirePriv("sysprog:netdb:edit-privs");
+$html->RequirePriv("netdb-admin");
 
 $log->Log();
 

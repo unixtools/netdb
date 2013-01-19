@@ -38,7 +38,7 @@ sub new {
     $title = "NetDB: " . $title;
 
 
-    &HTMLImpersonate("sysprog:impersonate");
+    &HTMLImpersonate("netdb-admin");
 
     $tmp = new Spirent::AppTemplate(
         title => $title,

@@ -35,7 +35,7 @@ my $log  = new NetMaint::Logging;
 my $dhcp = new NetMaint::DHCP;
 
 $html->PageHeader();
-$html->RequirePriv("sysprog:netdb:alloc");
+$html->RequirePriv("netdb-admin");
 
 $log->Log();
 

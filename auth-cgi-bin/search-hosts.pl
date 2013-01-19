@@ -40,7 +40,7 @@ my $util  = new NetMaint::Util;
 $html->PageHeader();
 
 my %privs = ( &PrivSys_FetchPrivs( $ENV{REMOTE_USER} ), &PrivSys_FetchPrivs("public") );
-if ( !$privs{"sysprog:netdb:search"} && !$privs{"sysprog:netdb"} ) {
+if ( !$privs{"netdb-admin"} && !$privs{"netdb-admin"} ) {
     $html->ErrorExit("Permission Denied.");
 }
 

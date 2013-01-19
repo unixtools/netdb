@@ -282,7 +282,7 @@ sub CheckHostDeleteAccess {
     my $obo      = $privs{"netdb-admin"};
     my $nametype = $self->GetHostNameType($host);
 
-    if ( $privs{"sysprog:netdb"} ) {
+    if ( $privs{"netdb-admin"} ) {
         return 1;
     }
 
@@ -297,7 +297,7 @@ sub CheckHostDeleteAccess {
     return 0 if ( !$hosttype );
 
     if ($hostadminlock) {
-        if ( !$privs{"sysprog:netdb:adminlock"} ) {
+        if ( !$privs{"netdb-admin"} ) {
             return 0;
         }
     }
@@ -361,7 +361,7 @@ sub CheckHostEditAccess {
     my $obo      = $privs{"netdb-admin"};
     my $nametype = $self->GetHostNameType($host);
 
-    if ( $privs{"sysprog:netdb"} ) {
+    if ( $privs{"netdb-admin"} ) {
         return 1;
     }
 
@@ -376,7 +376,7 @@ sub CheckHostEditAccess {
     return 0 if ( !$hosttype );
 
     if ($hostadminlock) {
-        if ( !$privs{"sysprog:netdb:adminlock"} ) {
+        if ( !$privs{"netdb-admin"} ) {
             return 0;
         }
     }
@@ -450,10 +450,10 @@ sub CheckHostViewAccess {
     my %privs = &PrivSys_FetchPrivs($userid);
 
     my $obo      = $privs{"netdb-admin"};
-    my $viewany  = $privs{"sysprog:netdb:view-any"};
+    my $viewany  = $privs{"netdb-admin"};
     my $nametype = $self->GetHostNameType($host);
 
-    if ( $viewany || $privs{"sysprog:netdb"} ) {
+    if ( $viewany || $privs{"netdb-admin"} ) {
         return 1;
     }
 
@@ -538,7 +538,7 @@ sub CheckAllDomains {
 
     my %privs = &PrivSys_FetchPrivs($userid);
 
-    if ( $privs{"sysprog:netdb"} ) {
+    if ( $privs{"netdb-admin"} ) {
         return 1;
     }
 
@@ -589,7 +589,7 @@ sub Check {
     $self->LoadUserAccessData($q_userid);
     $self->LoadUserAccessData("public");
 
-    if ( $privs{"sysprog:netdb"} ) {
+    if ( $privs{"netdb-admin"} ) {
         return 1;
     }
 

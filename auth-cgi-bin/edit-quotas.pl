@@ -35,7 +35,7 @@ my $access = new NetMaint::Access;
 my $log    = new NetMaint::Logging;
 
 $html->PageHeader();
-$html->RequirePriv("sysprog:netdb:quota");
+$html->RequirePriv("netdb-admin");
 
 $log->Log();
 

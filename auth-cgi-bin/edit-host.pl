@@ -249,7 +249,7 @@ elsif ( $mode eq "updatecname" ) {
 elsif ( $mode eq "adminlockhost" ) {
     &CheckHostAndEditAccess();
 
-    if ( !$privs{"sysprog:netdb:adminlock"} ) {
+    if ( !$privs{"netdb-admin"} ) {
         $html->ErrorExit("Permission Denied.");
     }
 
@@ -267,7 +267,7 @@ elsif ( $mode eq "adminlockhost" ) {
 elsif ( $mode eq "adminunlockhost" ) {
     &CheckHostAndEditAccess();
 
-    if ( !$privs{"sysprog:netdb:adminlock"} ) {
+    if ( !$privs{"netdb-admin"} ) {
         $html->ErrorExit("Permission Denied.");
     }
 
@@ -410,7 +410,7 @@ elsif ( $mode eq "updateadmincomm" ) {
 elsif ( $mode eq "autoaddstatic" ) {
     &CheckHostAndEditAccess();
 
-    if ( !$privs{"sysprog:netdb:static-ip"} ) {
+    if ( !$privs{"netdb-admin"} ) {
         $html->ErrorExit("Permission Denied to add static addresses.");
     }
 
@@ -468,7 +468,7 @@ elsif ( $mode eq "addstatic" ) {
 
     my $submode = $rqpairs{submode} || "listsubnets";
 
-    if ( !$privs{"sysprog:netdb:static-ip"} ) {
+    if ( !$privs{"netdb-admin"} ) {
         $html->ErrorExit("Permission Denied to add static addresses.");
     }
 
@@ -572,7 +572,7 @@ elsif ( $mode eq "enable_static_dns" ) {
 
     my $ip = $rqpairs{ip};
 
-    if ( !$privs{"sysprog:netdb:static-dns"} ) {
+    if ( !$privs{"netdb-admin"} ) {
         $html->ErrorExit("Permission Denied.");
     }
 
@@ -595,7 +595,7 @@ elsif ( $mode eq "enable_all_static_dns" ) {
 
     $dns->BlockUpdates();
 
-    if ( !$privs{"sysprog:netdb:static-dns"} ) {
+    if ( !$privs{"netdb-admin"} ) {
         $html->ErrorExit("Permission Denied.");
     }
 
@@ -1181,7 +1181,7 @@ AUTOSUGGEST
 
             print "<td><a href=\"?mode=delstatic&host=$host&ip=$ip\">Delete</a>\n";
 
-            if ( $privs{"sysprog:netdb:static-dns"} ) {
+            if ( $privs{"netdb-admin"} ) {
                 print " - <a href=\"?mode=enable_static_dns&host=$host&ip=$ip\">";
                 print "Enable Static DNS</a> ";
             }
@@ -1197,7 +1197,7 @@ AUTOSUGGEST
             $html->EndInnerRow();
         }
 
-        if ( $privs{"sysprog:netdb:static-ip"} ) {
+        if ( $privs{"netdb-admin"} ) {
             $html->StartInnerRow();
             print "<td align=center colspan=2>\n";
 
@@ -1363,7 +1363,7 @@ EOF
         $html->StartInnerTable();
         $html->StartInnerRow();
         print "<td align=center><b>Host is administratively locked. Only administrators can edit.</b></td>\n";
-        if ( $privs{"sysprog:netdb:adminlock"} ) {
+        if ( $privs{"netdb-admin"} ) {
             print "<td>\n";
             print "<a href=\"?mode=adminunlockhost&host=$host\">Unlock Host</a>\n";
             print "</td>\n";
@@ -1373,7 +1373,7 @@ EOF
         $html->EndBlockTable();
     }
     else {
-        if ( $privs{"sysprog:netdb:adminlock"} ) {
+        if ( $privs{"netdb-admin"} ) {
             $html->StartBlockTable( "Administrative Lock Status", 600 );
             $html->StartInnerTable();
             $html->StartInnerRow();
