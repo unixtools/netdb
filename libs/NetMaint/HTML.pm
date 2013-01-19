@@ -77,8 +77,6 @@ sub PageHeader {
         print "<tr><td align=center colspan=2>\n";
         print "<a href=\"/auth-cgi-bin/cgiwrap/netdb/menu.pl\">Main Menu</a>\n";
         print " - ";
-        print "<a href=\"/auth-cgi-bin/cgiwrap/netdb/register-desktop.pl\">Register Desktop</a>\n";
-        print " - ";
         print "<a href=\"/auth-cgi-bin/cgiwrap/netdb/search-hosts.pl\">Search Hosts</a>\n";
         print " - ";
         print "<a href=\"/auth-cgi-bin/cgiwrap/netdb/create-host.pl\">Create Host</a>\n";

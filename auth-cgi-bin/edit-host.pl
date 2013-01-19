@@ -1132,8 +1132,8 @@ AUTOSUGGEST
         }
 
         my $allow_more_eth = 1;
-        if ( ( $nametype eq "ownername" || $nametype eq "travelname" )
-            && $hosttype eq "desktop" )
+        if ( ( $nametype eq "ownername" )
+            && $hosttype eq "device" )
         {
             my $curreg = $access->GetUsedQuota($owner);
             my $quota  = $access->GetRegistrationQuota($owner);
