@@ -307,7 +307,7 @@ sub CheckHostDeleteAccess {
         return 1;
     }
 
-    if ( $hosttype eq "desktop"
+    if ( $hosttype eq "device"
         && ( $nametype eq "ownername" ) )
     {
         if ( $obo || ( $hostowner eq $userid ) ) {
@@ -399,7 +399,7 @@ sub CheckHostEditAccess {
         return 1;
     }
 
-    if ( $hosttype eq "desktop"
+    if ( $hosttype eq "device"
         && ( $nametype eq "ownername" ) )
     {
         if ( $obo || ( $hostowner eq $userid ) ) {
@@ -484,7 +484,7 @@ sub CheckHostViewAccess {
         return 1;
     }
 
-    if ( $hosttype eq "desktop"
+    if ( $hosttype eq "device"
         && ( $nametype eq "ownername" ) )
     {
         if ( $obo || ( $hostowner eq $userid ) ) {

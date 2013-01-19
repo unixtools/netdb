@@ -83,17 +83,6 @@ if ($ether) {
     print "<td>Current Registered Host Name:</td>\n";
     print "<td>$host</td>\n";
     $html->EndInnerRow();
-
-    $html->StartInnerRow();
-    print
-        "<td colspan=2 align=center><a href=\"/auth-cgi-bin/cgiwrap/netdb/register-desktop.pl?ether=$ether\">Register this machine</a></td>\n";
-    $html->EndInnerRow();
-}
-else {
-    $html->StartInnerRow();
-    print
-        "<td colspan=2 align=center><a href=\"/auth-cgi-bin/cgiwrap/netdb/register-desktop.pl\">Register a machine</a></td>\n";
-    $html->EndInnerRow();
 }
 
 $html->EndInnerTable();
