@@ -43,7 +43,8 @@ sub UserInfo {
     my $self   = shift;
     my $userid = lc shift;
 
-    return undef;
+    # always return success, later change this to use Crowd lookup
+    return { "name" => $userid };
 }
 
 # Begin-Doc
