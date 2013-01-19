@@ -42,23 +42,6 @@ create table admin_host_options
 create index admin_host_options_h ON admin_host_options (host);
 create unique index admin_host_options_hc ON admin_host_options (host, config);
 
--- Schema definition for TABLE ARPSCAN
-create table arpscan 
-(
- ether varchar(20) not null, 
- ip varchar(20) not null, 
- tstamp datetime not null, 
- router varchar(128) not null, 
- latest integer
-);
-
-create index arpscan_ether_idx ON arpscan (ether);
-create unique index arpscan_ether_router_ip_idx ON arpscan (ether, router, ip);
-create index arpscan_ip_idx ON arpscan (ip);
-create index arpscan_latest_idx ON arpscan (latest);
-create index arpscan_router_idx ON arpscan (router);
-create index arpscan_tstamp_idx ON arpscan (tstamp);
-
 -- Schema definition for TABLE DHCP_ACKLOG
 create table dhcp_acklog 
 (

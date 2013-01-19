@@ -15,7 +15,6 @@ require NetMaint::DB;
 require NetMaint::Util;
 require NetMaint::DBCache;
 require NetMaint::DHCP;
-require NetMaint::ARP;
 require NetMaint::Network;
 
 @ISA    = qw(Exporter);
@@ -36,7 +35,6 @@ sub new {
     $tmp->{util}    = new NetMaint::Util;
     $tmp->{dbcache} = new NetMaint::DBCache;
     $tmp->{dhcp}    = new NetMaint::DHCP;
-    $tmp->{arp}     = new NetMaint::ARP;
     $tmp->{network} = new NetMaint::Network;
 
 
@@ -93,19 +91,7 @@ sub GetHostSeen {
 
     # Now get the list of static IPs assigned to the host
     my $network = $self->{network};
-    my $arp     = $self->{arp};
     my @ips     = $network->GetHostAddresses($host);
-
-    # For each of those IPs, get a list of any hardware addresses found in the scan/ack/etc. tables
-    foreach my $ip ( $network->GetHostAddresses($host) ) {
-        $debug && print "got ip $ip\n";
-        my $recs = $arp->GetARPHistory( ip => $ip );
-        foreach my $rec (@$recs) {
-            my $ceth = $util->CondenseEther( $rec->{ether} );
-            $debug && print "got ether $ceth from ip $ip\n";
-            $ethers{$ceth} = 1;
-        }
-    }
 
     # Now, for each distinct ethernet address we've found, scan through all the various tables
     # to find recent data

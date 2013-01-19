@@ -16,7 +16,6 @@ use lib "/local/netdb/libs";
 require NetMaint::HTML;
 require NetMaint::Network;
 require NetMaint::Util;
-require NetMaint::ARP;
 require NetMaint::DNS;
 require NetMaint::Logging;
 
@@ -58,7 +57,6 @@ if ( $mode eq "" ) {
     &HTMLEndForm();
 }
 elsif ( $mode eq "report" ) {
-    my $arp    = new NetMaint::ARP;
     my $util   = new NetMaint::Util;
     my $dns    = new NetMaint::DNS;
     my $subnet = $rqpairs{subnet};
@@ -72,9 +70,6 @@ elsif ( $mode eq "report" ) {
     my @addrs = $net->NetworkSort( keys(%addrs) );
 
     foreach my $ip (@addrs) {
-        my %info = $arp->GetIPLastARP($ip);
-        next if ( $info{ip} && ( int( $info{age} ) < $days ) );
-
         my @recs = $dns->Search_A_Records_Address_Exact($ip);
         next if ( $#recs < 0 );
 

@@ -250,44 +250,6 @@ sub Display_Person {
 }
 
 # Begin-Doc
-# Name: Display_ARP_History
-# Type: method
-# Description: displays arp history
-# Syntax: $obj->Display_ARP_History(title => $title, entries => $entries);
-# End-Doc
-sub Display_ARP_History {
-    my $self    = shift;
-    my %opts    = @_;
-    my $title   = $opts{title} || "ARP History";
-    my $entries = $opts{entries} || return;
-    my $util    = $self->{util};
-
-    $self->StartBlockTable( $title, 750 );
-    $self->StartInnerTable( "Time", "Ether", "IP", "Router" );
-
-    my $cnt = 0;
-    foreach my $entry ( reverse @{$entries} ) {
-        $self->StartInnerRow();
-        print "<td><tt>", $entry->{tstamp}, "</tt></td>\n";
-        print "<td><tt>", $self->SearchLink_Ether( $entry->{ether} ), "</tt></td>\n";
-        print "<td><tt>", $self->SearchLink_IP( $entry->{ip} ),       "</tt></td>\n";
-
-        my $rname = $util->ResolveIP( $entry->{router} );
-
-        print "<td><tt>", $entry->{router}, " ($rname)</tt></td>\n";
-        $self->EndInnerRow();
-        $cnt++;
-    }
-    if ( $cnt == 0 ) {
-        $self->StartInnerRow();
-        print "<td colspan=5 align=center>No history found.</td>\n";
-        $self->EndInnerRow();
-    }
-    $self->EndInnerTable();
-    $self->EndBlockTable();
-}
-
-# Begin-Doc
 # Name: Display_DHCP_History
 # Type: method
 # Description: displays dhcp history

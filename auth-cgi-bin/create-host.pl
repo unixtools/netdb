@@ -17,7 +17,6 @@ use lib "/local/netdb/libs";
 require NetMaint::HTML;
 require NetMaint::Hosts;
 require NetMaint::DHCP;
-require NetMaint::ARP;
 require NetMaint::DNS;
 require NetMaint::Util;
 require NetMaint::Access;
@@ -34,7 +33,6 @@ $html->PageHeader();
 
 my $hosts    = new NetMaint::Hosts;
 my $dhcp     = new NetMaint::DHCP;
-my $arp      = new NetMaint::ARP;
 my $util     = new NetMaint::Util;
 my $dns      = new NetMaint::DNS;
 my $log      = new NetMaint::Logging;

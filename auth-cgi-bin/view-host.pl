@@ -16,7 +16,6 @@ use lib "/local/netdb/libs";
 require NetMaint::HTML;
 require NetMaint::Hosts;
 require NetMaint::DHCP;
-require NetMaint::ARP;
 require NetMaint::DNS;
 require NetMaint::Util;
 require NetMaint::Access;
@@ -34,7 +33,6 @@ $html->PageHeader();
 
 my $hosts  = new NetMaint::Hosts;
 my $dhcp   = new NetMaint::DHCP;
-my $arp    = new NetMaint::ARP;
 my $util   = new NetMaint::Util;
 my $dns    = new NetMaint::DNS;
 my $log    = new NetMaint::Logging;
@@ -123,13 +121,6 @@ $html->EndInnerTable();
 $html->EndBlockTable();
 
 foreach my $ether (@ethers) {
-    my $arphist = $arp->GetARPHistory( ether => $ether );
-    print "<p/>\n";
-    $html->Display_ARP_History(
-        title   => "ARP History - " . $util->FormatEther($ether),
-        entries => $arphist
-    );
-
     my $dhcphist = $dhcp->GetDHCPHistory( ether => $ether );
     print "\n<p/>\n";
     $html->Display_DHCP_History(
@@ -190,17 +181,6 @@ if ( $#a_recs >= 0 ) {
     $html->Display_A_Records(
         title   => "Address Records - $host",
         records => \@a_recs
-    );
-}
-
-foreach my $rec (@a_recs) {
-    my $ip = $rec->{address};
-
-    my $arphist = $arp->GetARPHistory( ip => $ip );
-    print "\n<p/>\n";
-    $html->Display_ARP_History(
-        title   => "ARP History - $ip",
-        entries => $arphist
     );
 }
 

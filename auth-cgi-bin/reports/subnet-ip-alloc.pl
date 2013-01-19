@@ -16,7 +16,6 @@ use lib "/local/netdb/libs";
 require NetMaint::HTML;
 require NetMaint::Network;
 require NetMaint::Util;
-require NetMaint::ARP;
 require NetMaint::DNS;
 require NetMaint::Logging;
 
@@ -55,7 +54,6 @@ if ( $mode eq "" ) {
     &HTMLEndForm();
 }
 elsif ( $mode eq "report" ) {
-    my $arp    = new NetMaint::ARP;
     my $util   = new NetMaint::Util;
     my $dns    = new NetMaint::DNS;
     my $subnet = $rqpairs{subnet};

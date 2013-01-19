@@ -16,7 +16,6 @@ use lib "/local/netdb/libs";
 require NetMaint::HTML;
 require NetMaint::Network;
 require NetMaint::Util;
-require NetMaint::ARP;
 require NetMaint::DNS;
 require NetMaint::Logging;
 
