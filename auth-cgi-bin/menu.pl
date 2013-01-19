@@ -1,0 +1,243 @@
+#!/usr/bin/perl
+
+# Begin-Doc
+# Name: menu.pl
+# Type: script
+# Description: netdb main menu
+# End-Doc
+
+use strict;
+
+use lib "/local/umrperl/libs";
+use UMR::HTMLUtil;
+use UMR::PrivSys;
+use lib "/local/netdb/libs";
+
+require NetMaint::HTML;
+require NetMaint::Access;
+
+&HTMLGetRequest();
+&HTMLContentType();
+
+my $html = new NetMaint::HTML( title => "Tools Menu" );
+my $access = new NetMaint::Access;
+
+my %privs = ( &PrivSys_FetchPrivs( $ENV{REMOTE_USER} ), &PrivSys_FetchPrivs("public") );
+
+$html->PageHeader();
+
+print "<p/>\n";
+
+$html->StartBlockTable( "Instructions", 500 );
+$html->StartInnerTable();
+$html->StartInnerRow();
+print "<td>\n";
+print "A menu of available applications is listed below. The list\n";
+print "of applications will vary according to the access privileges\n";
+print "you have been granted.\n";
+print "<p/>\n";
+print "If you are a regular user wanting to register your system\n";
+print "for use on the campus network (whether it is a regular desktop, \n";
+print "laptop, tablet, xbox, or other type of machine with ethernet\n";
+print "or wireless), you should use the\n";
+print "'Register desktop and laptop systems' link below.\n";
+print "<p/>\n";
+print "Any links labelled 'Expert' are intended for experienced\n";
+print "users, and will not be as straightforward to use.\n";
+print "</td>\n";
+$html->EndInnerRow();
+$html->EndInnerTable();
+$html->EndBlockTable();
+
+print "<p/>\n";
+
+$html->StartBlockTable( "Host Registration and Status Tools", 400 );
+$html->StartInnerTable();
+if ($access->Check(
+        type   => "desktop",
+        flag   => "ownername",
+        action => "update"
+    )
+    )
+{
+    $html->StartInnerRow();
+    print "<td><a href=\"register-desktop.pl\">Register desktop and laptop systems</a> (Easy)</td>\n";
+    $html->EndInnerRow();
+}
+if ( $access->Check( flag => "clcname", action => "update" ) ) {
+    $html->StartInnerRow();
+    print "<td><a href=\"register-clc.pl\">Register CLC systems</a> (Easy)</td>\n";
+    $html->EndInnerRow();
+}
+
+# Display cname manager link if any cname-manager privs are granted
+foreach my $priv ( keys %privs ) {
+    if ( $priv =~ /^sysprog:netdb:cname-manager/o ) {
+        $html->StartInnerRow();
+        print "<td><a href=\"register-cname.pl\">CName Manager</a> (Easy)</td>\n";
+        $html->EndInnerRow();
+        last;
+    }
+}
+
+$html->StartInnerRow();
+print "<td><a href=\"edit-host.pl\">Edit or Register Host Details</a> (Expert)</td>\n";
+$html->EndInnerRow();
+$html->StartInnerRow();
+print "<td><a href=\"create-host.pl\">Create New Host</a> (Expert)</td>\n";
+$html->EndInnerRow();
+
+if ( $privs{"sysprog:netdb:search"} ) {
+    $html->StartInnerRow();
+    print "<td><a href=\"search-hosts.pl\">Search Hosts</a></td>\n";
+    $html->EndInnerRow();
+}
+$html->StartInnerRow();
+print "<td><a href=\"view-my-info.pl\">View Current Connection Info</a></td>\n";
+$html->EndInnerRow();
+$html->StartInnerRow();
+print "<td><a href=\"guest-request.pl\">Guest Registration Request</a></td>\n";
+$html->EndInnerRow();
+$html->EndInnerTable();
+$html->EndBlockTable();
+
+if (   $privs{"sysprog:netdb:edit-privs"}
+    || $privs{"sysprog:netdb:alloc"}
+    || $privs{"sysprog:netdb:quota"} )
+{
+    print "<p/>\n";
+    $html->StartBlockTable( "Administrative Tools", 400 );
+    $html->StartInnerTable();
+
+    if ( $privs{"sysprog:netdb:edit-privs"} ) {
+        $html->StartInnerRow();
+        print "<td><a href=\"edit-privs.pl\">Access Control Admin</a></td>\n";
+        $html->EndInnerRow();
+    }
+    if ( $privs{"sysprog:netdb:alloc"} ) {
+        $html->StartInnerRow();
+        print "<td><a href=\"edit-ip-alloc.pl\">Subnet IP Allocation Editor</a></td>\n";
+        $html->EndInnerRow();
+        $html->StartInnerRow();
+        print "<td><a href=\"edit-vlans.pl\">VLAN Editor</a></td>\n";
+        $html->EndInnerRow();
+        $html->StartInnerRow();
+        print "<td><a href=\"unreg-fw-rules.pl\">Unreg Range Firewall Rules</a></td>\n";
+        $html->EndInnerRow();
+        $html->StartInnerRow();
+        print "<td><a href=\"svi-config.pl\">Subnet SVI Config</a></td>\n";
+        $html->EndInnerRow();
+    }
+    if ( $privs{"sysprog:netdb:quota"} ) {
+        $html->StartInnerRow();
+        print "<td><a href=\"edit-quotas.pl\">Edit Registration Quotas</a></td>\n";
+        $html->EndInnerRow();
+    }
+    if ( $privs{"sysprog:netdb:syncnet"} ) {
+        $html->StartInnerRow();
+        print "<td><a href=\"sync-devices.pl\">Sync Network Device Config</a></td>\n";
+        $html->EndInnerRow();
+    }
+    if ( $privs{"sysprog:netdb:adminlock"} ) {
+        $html->StartInnerRow();
+        print "<td><a href=\"bulk-admin-disable.pl\">Bulk Admin Disable</a></td>\n";
+        $html->EndInnerRow();
+    }
+
+    $html->EndInnerTable();
+    $html->EndBlockTable();
+}
+
+if ( $privs{"sysprog:netdb:reports"} ) {
+    print "<p/>\n";
+    $html->StartBlockTable( "System and Host Status Reports", 500 );
+    $html->StartInnerTable();
+
+    $html->StartInnerRow();
+    print "<td><a href=\"reports/host-problems.pl\">Host Problem Report</a></td>\n";
+    print "<td><a href=\"reports/history-ip-arp.pl\">ARP History by IP</a></td>\n";
+    $html->EndInnerRow();
+
+    $html->StartInnerRow();
+    print "<td><a href=\"reports/history-ether-arp.pl\">ARP History by Ether</a></td>\n";
+    print "<td><a href=\"reports/history-ip-dhcp.pl\">DHCP History by IP</a></td>\n";
+    $html->EndInnerRow();
+
+    $html->StartInnerRow();
+    print "<td><a href=\"reports/history-ether-dhcp.pl\">DHCP History by Ether</a></td>\n";
+    print "<td><a href=\"reports/hosts-by-domain.pl\">Host Count by Domain</a></td>\n";
+    $html->EndInnerRow();
+
+    $html->StartInnerRow();
+    print "<td><a href=\"reports/dns-records-by-type.pl\">DNS Records by Type</a></td>\n";
+    print "<td><a href=\"reports/subnet-listing.pl\">Subnet Listing</a></td>\n";
+    $html->EndInnerRow();
+
+    $html->StartInnerRow();
+    print "<td><a href=\"reports/subnet-freeip.pl\">Subnet Free IP List</a></td>\n";
+    print "<td><a href=\"reports/subnet-expireip.pl\">Subnet IP Expiration Report</a></td>\n";
+    $html->EndInnerRow();
+
+    $html->StartInnerRow();
+    print "<td><a href=\"reports/subnet-ip-alloc.pl\">Subnet IP Allocation Report</a></td>\n";
+    print "<td><a href=\"reports/subnet-lastarp.pl\">Subnet Last ARP Report</a></td>\n";
+    $html->EndInnerRow();
+
+    $html->StartInnerRow();
+    print "<td><a href=\"reports/systems-seen.pl\">Seen IP/Systems Report</a></td>\n";
+    print "<td><a href=\"reports/vmware-and-san-ip-report.pl\">VMWare/SAN IP Report</a></td>\n";
+    $html->EndInnerRow();
+
+    $html->StartInnerRow();
+    print "<td><a href=\"reports/ignored-dhcp.pl\">Ignored DHCP Requests</a></td>\n";
+    print "<td><a href=\"reports/dhcp-usage.pl\">DHCP Usage Summary</a></td>\n";
+    $html->EndInnerRow();
+
+    $html->StartInnerRow();
+    print "<td><a href=\"reports/host-expiration.pl\">Host Expiration</a></td>\n";
+    print "<td><a href=\"reports/dhcp-high-counts.pl\">Excessive DHCP Requests</a></td>\n";
+    $html->EndInnerRow();
+
+    $html->StartInnerRow();
+    print "<td><a href=\"reports/disabled-hosts.pl\">Disabled Hosts</a></td>\n";
+    print "<td><a href=\"reports/duplicate-short-names.pl\">Duplicated Short Hostnames</a></td>\n";
+    $html->EndInnerRow();
+
+    $html->StartInnerRow();
+    print "<td><a href=\"reports/improper-ip-use.pl\">Improper IP Usage</a></td>\n";
+    print "<td><a href=\"reports/lease-mismatches.pl\">DHCP Lease Ether Mismatches</a></td>\n";
+    $html->EndInnerRow();
+
+    $html->StartInnerRow();
+    print "<td><a href=\"reports/ether-block-list.pl\">Switch Ether Block List</a></td>\n";
+    print "<td><a href=\"reports/admin-options-report.pl\">Admin Options Report</a></td>\n";
+    $html->EndInnerRow();
+
+    $html->StartInnerRow();
+    print "<td><a href=\"reports/quota-report.pl\">Quota Report</a></td>\n";
+    print "<td><a href=\"reports/quota-usage-report.pl\">Quota Usage Report</a></td>\n";
+    $html->EndInnerRow();
+
+    $html->StartInnerRow();
+    print "<td><a href=\"reports/admin-comments-report.pl\">Admin Comments Report</a></td>\n";
+    print "<td><a href=\"reports/vlan-cfg-scripts.pl\">VLAN Config Scripts</a></td>\n";
+    $html->EndInnerRow();
+
+    $html->StartInnerRow();
+    print "<td><a href=\"reports/host-options-report.pl\">Host Options Report</a></td>\n";
+    print "<td><a href=\"reports/subnet-special-addr.pl\">Subnet Special Addr Report</a></td>\n";
+    $html->EndInnerRow();
+    $html->StartInnerRow();
+    print "<td><a href=\"reports/subnet-visualizer.pl\">Subnet Visualizer</a></td>\n";
+    print "<td><a href=\"reports/cnames-by-target.pl\">CNames by Target</a></td>\n";
+    $html->EndInnerRow();
+    $html->StartInnerRow();
+    print "<td><a href=\"reports/active-hosts-dump.pl\">Active Hosts by Employee/Dept</a></td>\n";
+    print "<td><a href=\"reports/live-dhcp-usage.pl\">Live DHCP Usage</a></td>\n";
+    $html->EndInnerRow();
+
+    $html->EndInnerTable();
+    $html->EndBlockTable();
+}
+
+$html->PageFooter();

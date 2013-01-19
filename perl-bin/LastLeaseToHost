@@ -1,0 +1,37 @@
+#!/usr/bin/perl
+
+=pod
+
+Begin-Doc
+Name: LastLeaseToHost
+Type: RPC Perl Script
+Description: Returns host associated with last dhcp lease for a given IP
+CGI-Parameters: ip - ip address to look up, can be repeated
+SimpleRPC-Return: hash, keyed on ip, value is host
+End-Doc
+
+=cut
+
+use lib "/local/umrperl/libs";
+use lib "/local/netdb/libs";
+use UMR::SimpleRPC;
+use RPC::NetDBUser;
+use strict;
+
+my $rpc = new UMR::SimpleRPC::Server;
+$rpc->Init();
+
+my $admin = new RPC::NetDBUser;
+my @ips   = $rpc->param("ip");
+
+my %res_by_ip = ();
+foreach my $ip (@ips) {
+    my $host = $rpc->Try(
+        sub {
+            return $admin->LastLeaseToHost($ip);
+        }
+    );
+    $res_by_ip{$ip} = $host;
+}
+
+$rpc->Finish( {%res_by_ip} );

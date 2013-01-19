@@ -1,0 +1,114 @@
+#!/usr/bin/perl
+
+# Begin-Doc
+# Name: process-sce-updates
+# Description: helper script that receives log entries and calls out to update sce mappings
+# End-Doc
+
+use strict;
+
+use Sys::Syslog;
+use File::Temp qw(tempfile);
+openlog "sce-update", "pid nowait", "daemon" || warn "failed to open syslog socket";
+
+my %have_subscriber;
+open( my $subfh, "/local/scesm/bin/list-subscribers subscribers|" );
+while ( defined( my $line = <$subfh> ) ) {
+    chomp($line);
+    $have_subscriber{$line} = time;
+}
+close($subfh);
+
+my @sce_updates   = ();
+my $last_sce_push = time;
+
+while ( defined( my $line = <> ) ) {
+    chomp($line);
+    my ( $action, $ip, $type, $owner, $nametype, $host ) = split( /\t/, $line );
+
+    my $subscriber = "";
+
+    syslog "debug", "%s", $line;
+    syslog "debug", "%s", "action=$action ip=$ip type=$type owner=$owner nametype=$nametype host=$host";
+
+    if ( $ip =~ /^10\./ || $ip =~ /^192\.168\./ ) {
+        syslog "debug", "%s", "sce-update: skipping private address ($ip)";
+        next;
+    }
+
+    # This will be very inefficient till it's make into a single stream with continuous calls
+    if ( $owner && $host =~ /^rc\d\d[a-z](.*)\.[a-z]+\.[a-z]+\.[a-z]+$/o ) {
+        $subscriber = "clc-" . lc $1;
+    }
+    elsif ($owner) {
+        $subscriber = "user-" . lc $owner;
+    }
+
+    if ( $subscriber eq "user-namesrv" ) {
+        if ( $host =~ /lwapp/o ) {
+            $subscriber = "net-lwapp";
+        }
+        elsif ( $host =~ /tlck/ ) {
+            $subscriber = "net-tlck";
+        }
+        elsif ( $host =~ /\.srv\./ ) {
+            $subscriber = "srv-other";
+        }
+        else {
+            my $shost = $host;
+            $shost =~ s|\.mst\.edu||go;
+            $shost =~ s|\.|-|go;
+
+            $subscriber = "net-$shost";
+        }
+    }
+
+    syslog "debug", "%s", "detected subscriber '$subscriber'";
+    if ( $subscriber && $action eq "login" ) {
+        if ( !$have_subscriber{$subscriber} ) {
+            push( @sce_updates, "add-subscriber $subscriber" );
+            $have_subscriber{$subscriber} = 1;
+        }
+        push( @sce_updates, "add-mapping $subscriber $ip" );
+    }
+    elsif ( $subscriber && $action eq "logout" ) {
+        push( @sce_updates, "del-mapping $subscriber $ip" );
+    }
+    else {
+        syslog "err", "%s", "unhandled update: $line";
+    }
+
+    # If we've got 100 to send, or it's been over 10 seconds
+    if ( @sce_updates > 100 || ( time - $last_sce_push ) > 10 ) {
+        &send_updates();
+        $last_sce_push = time;
+    }
+}
+&send_updates();
+
+# Begin-Doc
+# Name: send_updates
+# Description: helper routine to send a list of commands to the sce via the batch-cmd interface
+# End-Doc
+sub send_updates {
+    my ( $fh, $filename ) = tempfile( "scecmdXXXXXX", DIR => "/local/netdb/tmp" );
+    foreach my $line (@sce_updates) {
+        syslog "debug", "%s", "batching sce cmd: $line";
+        print $fh $line, "\n";
+    }
+    print $fh "quit\n";
+    close($fh);
+
+    syslog "debug", "%s", "sending sce command batch";
+
+    open( my $batchfh, "/local/scesm/bin/batch-cmd < $filename|" );
+    while ( defined( my $line = <$batchfh> ) ) {
+        syslog "debug", "%s", "read sce response: $line";
+    }
+    syslog "debug", "%s", "finished sce batch-cmd";
+    close($batchfh);
+
+    unlink($filename);
+
+    @sce_updates = ();
+}

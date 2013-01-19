@@ -1,0 +1,35 @@
+#!/usr/bin/perl
+
+=pod
+
+Begin-Doc
+Name: DeleteHost
+Type: RPC Perl Script
+Location: Deletes a host
+CGI-Parameters: host - hostname
+SimpleRPC-Return: none
+End-Doc
+
+=cut
+
+use lib "/local/umrperl/libs";
+use lib "/local/netdb/libs";
+use UMR::SimpleRPC;
+use RPC::NetDBAdmin;
+use strict;
+
+my $rpc = new UMR::SimpleRPC::Server;
+my %opts = $rpc->Init();
+
+$rpc->RequirePriv("rpc:netdb:userops");
+
+my $admin = new RPC::NetDBAdmin;
+
+my $res = $rpc->Try(
+    sub {
+		my $host = $opts{host};
+        return $admin->DeleteHost($host);
+    }
+);
+
+$rpc->Finish($res);

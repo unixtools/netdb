@@ -1,0 +1,37 @@
+#!/usr/bin/perl
+
+=pod
+
+Begin-Doc
+Name: LastLeaseToEther
+Type: RPC Perl Script
+Description: Returns ethernet address associated with last dhcp lease for a given IP
+CGI-Parameters: ip - ip address to look up, can be repeated
+SimpleRPC-Return: hash, keyed on ip, value is ether
+End-Doc
+
+=cut
+
+use lib "/local/umrperl/libs";
+use lib "/local/netdb/libs";
+use UMR::SimpleRPC;
+use RPC::NetDBUser;
+use strict;
+
+my $rpc = new UMR::SimpleRPC::Server;
+$rpc->Init();
+
+my $admin = new RPC::NetDBUser;
+my @ips   = $rpc->param("ip");
+
+my %res_by_ip = ();
+foreach my $ip (@ips) {
+    my $ether = $rpc->Try(
+        sub {
+            return $admin->LastLeaseToEther($ip);
+        }
+    );
+    $res_by_ip{$ip} = $ether;
+}
+
+$rpc->Finish( {%res_by_ip} );

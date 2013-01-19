@@ -1,0 +1,33 @@
+#!/usr/bin/perl
+
+=pod
+
+Begin-Doc
+Name: MatchPartialHost
+Type: RPC Perl Script
+Description: Returns list of hostnames in netdb matching a partial hostname
+CGI-Parameters: host - partial hostname to look up
+SimpleRPC-Return: array of matching hosts
+End-Doc
+
+=cut
+
+use lib "/local/umrperl/libs";
+use lib "/local/netdb/libs";
+use UMR::SimpleRPC;
+use RPC::NetDBUser;
+use strict;
+
+my $rpc = new UMR::SimpleRPC::Server;
+$rpc->Init();
+
+my $admin = new RPC::NetDBUser;
+my $host  = $rpc->param("host");
+
+my @hosts = $rpc->Try(
+    sub {
+        return $admin->MatchPartialHost($host);
+    }
+);
+
+$rpc->Finish(@hosts);

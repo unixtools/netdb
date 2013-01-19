@@ -1,0 +1,37 @@
+#!/usr/bin/perl
+
+=pod
+
+Begin-Doc
+Name: EtherToHost
+Type: RPC Perl Script
+Description: Returns hostname associated in netdb with a given ethernet address
+CGI-Parameters: ether - ethernet address to look up, can be repeated
+SimpleRPC-Return: hash, keyed on ether, value is hostname
+End-Doc
+
+=cut
+
+use lib "/local/umrperl/libs";
+use lib "/local/netdb/libs";
+use UMR::SimpleRPC;
+use RPC::NetDBUser;
+use strict;
+
+my $rpc = new UMR::SimpleRPC::Server;
+$rpc->Init();
+
+my $admin  = new RPC::NetDBUser;
+my @ethers = $rpc->param("ether");
+
+my %res_by_ether = ();
+foreach my $ether (@ethers) {
+    my $host = $rpc->Try(
+        sub {
+            return $admin->EtherToHost($ether);
+        }
+    );
+    $res_by_ether{$ether} = $host;
+}
+
+$rpc->Finish( {%res_by_ether} );

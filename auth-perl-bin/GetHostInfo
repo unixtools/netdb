@@ -1,0 +1,39 @@
+#!/usr/bin/perl
+
+=pod
+
+Begin-Doc
+Name: GetHostInfo
+Type: RPC Perl Script
+Description: Returns location/description info from netdb for host
+CGI-Parameters: host - hostname to look up, can be repeated
+SimpleRPC-Return: hash - keyed on hostname, values are hashes with keys location and description, possibly others in future
+End-Doc
+
+=cut
+
+use lib "/local/umrperl/libs";
+use lib "/local/netdb/libs";
+use UMR::SimpleRPC;
+use RPC::NetDBAdmin;
+use strict;
+
+my $rpc = new UMR::SimpleRPC::Server;
+$rpc->Init();
+
+$rpc->RequirePriv("rpc:netdb:userops");
+
+my $admin = new RPC::NetDBAdmin;
+my @hosts = $rpc->param("host");
+
+my %res_by_host = ();
+foreach my $host (@hosts) {
+    my $res = $rpc->Try(
+        sub {
+            return $admin->GetHostInfo($host);
+        }
+    );
+    $res_by_host{$host} = $res;
+}
+
+$rpc->Finish( {%res_by_host} );

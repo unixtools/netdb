@@ -1,0 +1,19 @@
+#
+5 0-23/6 * * * /local/netdb/bin/dns-master/clean-tables.pl 2>&1 | /usr/bin/logger -t netdb-clean
+15 1 * * * /local/netdb/bin/dns-master/clean-arpscan.pl 2>&1 | /usr/bin/logger -t netdb-clean-arpscan
+#
+0-59/5 * * * * /local/netdb/bin/dns-master/expand-all-access-rules.pl 2>&1 | /usr/bin/logger -t netdb-access-rules
+#
+0-59/5 * * * * /local/netdb/bin/dns-master/update-purge-dates.pl -fast 2>&1 | /usr/bin/logger -t netdb-purge-dates
+39 * * * * /local/netdb/bin/dns-master/update-purge-dates.pl 2>&1 | /usr/bin/logger -t netdb-purge-dates
+11 0 * * * /local/netdb/bin/dns-master/delete-expired-hosts.pl -noverify 2>&1 | /usr/bin/logger -t delete-expired
+#
+45 * * * * /local/netdb/bin/dns-master/clean-abandoned-dyn-dns.pl 2>&1 | /usr/bin/logger -t netdb-clean-abandoned
+#
+45 2 * * * /local/netdb/bin/dns-master/load-scesm-statics.pl 2>&1 | /usr/bin/logger -t netdb-load-scesm-statics
+#
+14 0-23/6 * * * /local/netdb/bin/dns-master/scan-computer-objects.pl 2>&1 | /usr/bin/logger -t scan-comp-obj
+#
+30 * * * * /local/netdb/bin/dns-master/update-ignored-ethers.pl 2>&1 | /usr/bin/logger -t update-ignored-ethers
+#
+0 1 * * * /local/netdb/bin/dns-master/export-alm-host-owner.pl 2>&1 | /usr/bin/logger -t export-alm-info

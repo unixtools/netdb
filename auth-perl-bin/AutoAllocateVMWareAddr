@@ -1,0 +1,35 @@
+#!/usr/bin/perl
+
+=pod
+
+Begin-Doc
+Name: AutoAllocateVMWareAddr
+Type: RPC Perl Script
+Location: Allocates vmware mac addr for host
+CGI-Parameters: key is 'host' value is hostname
+SimpleRPC-Return: none
+End-Doc
+
+=cut
+
+use lib "/local/umrperl/libs";
+use lib "/local/netdb/libs";
+use UMR::SimpleRPC;
+use RPC::NetDBAdmin;
+use strict;
+
+my $rpc = new UMR::SimpleRPC::Server;
+my %opts = $rpc->Init();
+
+$rpc->RequirePriv("rpc:netdb:userops");
+
+my $admin = new RPC::NetDBAdmin;
+
+my $res = $rpc->Try(
+    sub {
+		my $host = $opts{host};
+        return $admin->AutoAllocateVMWareAddr($host);
+    }
+);
+
+$rpc->Finish($res);
