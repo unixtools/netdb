@@ -159,7 +159,11 @@ sub RecordNewLease {
 
     # Clear any old dynamic registrations
     my @oldips      = $self->GetCurLeases($ether);
-    my $dynhostname = "dyn-ether-" . lc($ether) . ".device.spirenteng.com";
+    #my $dynhostname = "dyn-ether-" . lc($ether) . ".device.spirenteng.com";
+
+    my $daship = $ip;
+    $daship =~ s/\./-/go;
+    my $dynhostname = "dhcp-${daship}.spirenteng.com";
 
     $debug && print "old ips = ", join( ", ", @oldips ), "\n";
     $dns->BlockUpdates();
