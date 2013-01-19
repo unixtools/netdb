@@ -166,17 +166,11 @@ foreach my $zone ( sort(@zones) ) {
 
     # Should move this to database in dns_soa...
     my @stat = stat("${fname}.tmp");
-    if ( $zone eq "mst.edu" && $stat[7] < 25_000 ) {
+    if ( $stat[7] < 150 ) {
         print "Zone ($zone) file too small (", $stat[7], " bytes). Not installing new version.\n";
     }
-    elsif ( $zone eq "mst.edu" && $linecount < 800 ) {
+    elsif ( $linecount < 4 ) {
         print "Zone($zone) file too small (", $linecount, " lines). Not installing new version.\n";
-    }
-    elsif ( $zone eq "151.131.in-addr.arpa" && $stat[7] < 150_000 ) {
-        print "Zone ($zone) file too small (", $stat[7], " bytes). Not installing new version.\n";
-    }
-    elsif ( $zone eq "131.151.in-addr.arpa" && $linecount < 3000 ) {
-        print "Zone ($zone) file too small (", $linecount, " lines). Not installing new version.\n";
     }
     else {
         print "Zone file acceptable. Installing new version.\n";

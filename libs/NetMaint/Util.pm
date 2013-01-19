@@ -90,9 +90,9 @@ sub CheckValidEther {
 
     my $ether = $self->FormatEther($origether);
 
-    if ( $origether =~ /^131\.151\.\d+\.\d+$/ ) {
+    if ( $origether =~ /^\d+\.\d+\.\d+\.\d+$/ ) {
         return
-            "'$origether' is a UMR IP address, not an ethernet address. Look for something that looks like XX:XX:XX:XX:XX:XX";
+            "'$origether' is an ip address, not an ethernet address. Look for something that looks like XX:XX:XX:XX:XX:XX";
     }
 
     if ( !$ether ) {
@@ -228,18 +228,7 @@ sub IPToARPAZone {
 
     my ( $a, $b, $c, $d, $rest ) = split( /\./, $arpa, 5 );
 
-    if ( $ip =~ /^131\.151\./o ) {
-        return join( ".", $c, $d, $rest );
-    }
-    elsif ( $ip =~ /^10\./o ) {
-        return join( ".", $d, $rest );
-    }
-    elsif ( $ip =~ /^172\./o ) {
-        return join( ".", $d, $rest );
-    }
-    else {
-        return join( ".", $b, $c, $d, $rest );
-    }
+    return join( ".", $b, $c, $d, $rest );
 }
 
 1;

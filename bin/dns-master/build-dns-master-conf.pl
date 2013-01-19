@@ -45,26 +45,28 @@ foreach my $zone ( sort(@zones) ) {
         next;
     }
 
-    my @notify = ("131.151.245.18", "131.151.245.19", "131.151.245.20");
-    if ( $zone =~ /mst.edu/ )
-    {
-        push(@notify, "134.124.31.136");
-    }
+    my @notify = ();
+    # ip address list
 
     print $out <<EOF;
 zone "$zone" {
     type master;
     file "$src";
-    also-notify {
 EOF
+
+    if ( scalar(@notify) > 0 )
+    {
+        print $out " also-notify {";
 
     foreach my $ip ( @notify )
     {
         print $out " "x8, "$ip;\n";
     }
 
+        print $out " };\n";
+   }
+
 print $out <<EOF;
-    };
 };
 EOF
 

@@ -97,46 +97,13 @@ unlink( $fname . ".tmp" );
 open( my $tmpfh, ">${fname}.tmp" );
 
 print "Generating header.\n";
-print $tmpfh "option domain-name \"mst.edu\";\n";
-print $tmpfh "option domain-name-servers 131.151.247.40, 131.151.247.41;\n";
+print $tmpfh "option domain-name \"spirenteng.com\";\n";
+print $tmpfh "option domain-name-servers 10.40.50.60, 10.40.50.61;\n";
 print $tmpfh "next-server ${server};\n";
 print $tmpfh "one-lease-per-client true;\n";
-print $tmpfh "option netbios-node-type 8;\n";
-print $tmpfh "option netbios-name-servers 131.151.247.43, 131.151.247.44;\n";
 print $tmpfh "ddns-update-style none;\n";
 print $tmpfh "authoritative;\n";
 
-print $tmpfh "\n";
-
-# Define our local options
-print $tmpfh "option jetdirect-cf code 144 = text;\n";
-
-print $tmpfh "\n";
-print $tmpfh "# JetDirect Config\n";
-print $tmpfh "option space JetDirect;\n";
-print $tmpfh "option JetDirect.jetdirect-cf code 144 = text;\n";
-
-print $tmpfh "\n";
-print $tmpfh "# Cisco WLS Data\n";
-print $tmpfh "option space Cisco;\n";
-print $tmpfh "option Cisco.lwapp-controllers code 241 = array of ip-address;\n";
-
-print $tmpfh "\n";
-print $tmpfh "# Cisco VOIP Data\n";
-print $tmpfh "option cisco-voip-tftp-servers code 150 = array of ip-address;\n";
-
-# Wyse Thin clients
-print $tmpfh "option wyse-url code 161 = text;\n";
-print $tmpfh "option wyse-root code 162 = text;\n";
-print $tmpfh "option wyse-username code 184 = text;\n";
-print $tmpfh "option wyse-password code 185 = text;\n";
-
-print $tmpfh "\n";
-print $tmpfh "option hpdm-gateway code 202 = text;\n";
-print $tmpfh "\n";
-
-# PolyCom
-print $tmpfh "option polycom-boot-url code 66 = text;\n";
 print $tmpfh "\n";
 
 print "Generating known static system group.\n";
@@ -435,7 +402,6 @@ foreach my $sn ( sort( keys(%$subnets) ) ) {
         print $tmpfh " }\n\n";
     }
 
-    # and the unreg ranges
     if ( $#ur_range_refs >= 0 ) {
         print $tmpfh " pool {\n";
         print $tmpfh "  deny dynamic bootp clients;\n";
@@ -443,8 +409,7 @@ foreach my $sn ( sort( keys(%$subnets) ) ) {
         print $tmpfh "  deny known clients;\n";
         print $tmpfh "  default-lease-time 120;\n";
         print $tmpfh "  max-lease-time 120;\n";
-        print $tmpfh "  option domain-name-servers netreg.srv.mst.edu;\n";
-        print $tmpfh "  option netbios-name-servers netreg.srv.mst.edu;\n";
+        print $tmpfh "  #option domain-name-servers unreghandler.spirenteng.com;\n";
         print $tmpfh "\n";
 
         foreach my $rref (@ur_range_refs) {
@@ -545,8 +510,8 @@ else {
 if ( $errcnt > 0 ) {
     print "Sending build failure message.\n";
     open( my $mail, "|/usr/sbin/sendmail -t" );
-    print $mail "To: nneul\@mst.edu\n";
-    print $mail "From: sysmon\@mst.edu\n";
+    print $mail "To: nneul\@neulinger.org\n";
+    print $mail "From: netdb\@spirenteng.com\n";
     print $mail "Subject: DHCP config build failure.\n";
     print $mail "\n\nSee dhcp server logs for content of error. Build failed.\n";
     close($mail);
@@ -596,123 +561,6 @@ sub ProcessHostOption {
     $optname =~ s/\s+.*$//go;
 
     if (0) {
-    }
-    elsif ( $optname eq "PXE-SERVERS" ) {
-        $conf .= <<EO_PXE_SERVERS;
-filename "/pxe-servers/gpxelinux.0";
-EO_PXE_SERVERS
-    }
-    elsif ( $optname eq "PXE-SERVERS-TEST" ) {
-        $conf .= <<EO_PXE_SERVERS_TEST;
-filename "/pxe-servers-test/gpxelinux.0";
-EO_PXE_SERVERS_TEST
-    }
-    elsif ( $optname eq "PXE-WYSE" ) {
-        $conf .= <<EO_PXE_WYSE;
-filename "/pxe-wyse/gpxelinux.0";
-option wyse-url "http://131.151.249.129/wyse";
-EO_PXE_WYSE
-    }
-    elsif ( $optname eq "PXE-RST" ) {
-        $conf .= <<EO_PXE_RST;
-filename "/pxe-rst/pxelinux.0";
-EO_PXE_RST
-    }
-    elsif ( $optname eq "PXE-DI-WINDOWS" ) {
-        $conf .= <<EO_PXE_DI_WINDOWS;
-filename "/pxe-di-windows/pxelinux.0";
-EO_PXE_DI_WINDOWS
-    }
-    elsif ( $optname eq "NETCONF-AP-WLSE" ) {
-        $conf .= <<EO_NETCONF_AP_WLSE;
-next-server wlse01.network.mst.edu;
-filename "$shortname";
-EO_NETCONF_AP_WLSE
-    }
-    elsif ( $optname eq "NETCONF-AP-LWAPP-MESH" ) {
-        $conf .= <<EO_NETCONF_AP_LWAPP;
-if (option vendor-class-identifier = "Airespace.AP1200" )
-{
-    option vendor-encapsulated-options "131.151.2.193";
-}
-else
-{
-    vendor-option-space Cisco;
-    option Cisco.lwapp-controllers 131.151.2.193;
-}
-EO_NETCONF_AP_LWAPP
-    }
-    elsif ( $optname eq "NETCONF-AP-LWAPP" ) {
-        $conf .= <<EO_NETCONF_AP_LWAPP;
-if (option vendor-class-identifier = "Airespace.AP1200" )
-{
-    option vendor-encapsulated-options "131.151.2.195";
-}
-else
-{
-    vendor-option-space Cisco;
-    option Cisco.lwapp-controllers 131.151.2.195;
-}
-EO_NETCONF_AP_LWAPP
-    }
-    elsif ( $optname eq "JETDIRECT-STANDARD" ) {
-        $conf .= <<EO_JETDIRECT;
-option jetdirect-cf "jetdirect/standard";
-vendor-option-space JetDirect;
-option jetDirect.jetdirect-cf "jetdirect/standard";
-EO_JETDIRECT
-    }
-    elsif ( $optname eq "JETDIRECT-OPEN" ) {
-        $conf .= <<EO_JETDIRECT;
-option jetdirect-cf "jetdirect/open";
-vendor-option-space JetDirect;
-option jetDirect.jetdirect-cf "jetdirect/open";
-EO_JETDIRECT
-    }
-    elsif ( $optname eq "PXE-CMSERVER-PROD" ) {
-        $conf .= <<EO_PXE_CMSRV_PROD;
-filename "smsboot\\\\x86\\\\wdsnbp.com";
-next-server cmserver-pxe.srv.mst.edu;
-EO_PXE_CMSRV_PROD
-    }
-    elsif ( $optname eq "PXE-CMSERVER-TEST" ) {
-        $conf .= <<EO_PXE_CMSRV_TEST;
-filename "smsboot\\\\x86\\\\wdsnbp.com";
-next-server cmserver-tpxe.srv.mst.edu;
-EO_PXE_CMSRV_TEST
-    }
-    elsif ( $optname eq "PXE-CMDESK-PROD" ) {
-        $conf .= <<EO_PXE_CMDESK_PROD;
-filename "smsboot\\\\x86\\\\wdsnbp.com";
-next-server cmdesk-pxe.srv.mst.edu;
-EO_PXE_CMDESK_PROD
-    }
-    elsif ( $optname eq "PXE-CMDESK-TEST" ) {
-        $conf .= <<EO_PXE_CMDESK_TEST;
-filename "smsboot\\\\x86\\\\wdsnbp.com";
-next-server cmdesk-tpxe.srv.mst.edu;
-EO_PXE_CMDESK_TEST
-    }
-    elsif ( $optname eq "HP-THINCLIENT" ) {
-
-        #hpdm-t1.srv.mst.edu
-        $conf .= <<EO_HP_TC;
-option hpdm-gateway "131.151.248.101 131.151.248.101";
-EO_HP_TC
-    }
-
-    elsif ( $optname =~ /VOIP-POLY-SP-(\d+)/ ) {
-        my $model = $1;
-
-        my $pc_user = lc($ether);
-        $pc_user =~ tr/a-f0-9//cd;
-
-        my $pc_pw = substr(lc(md5_hex(lc($pc_user . $polycom_pw_secret))),0,12);
-
-        $conf .= <<EO_VOIP;
-option polycom-boot-url "http://${pc_user}:${pc_pw}\@xsp.evs.fidnet.com/dms/polycom$model";
-EO_VOIP
-
     }
     elsif ( $option ne "" ) {
         $conf .= "${option};\n";

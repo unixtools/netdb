@@ -49,6 +49,6 @@ my $qry
     . " (select ip from ip_alloc where type='dynamic')";
 $db->SQL_ExecQuery($qry) || $db->SQL_Error($qry) && die;
 
-my $qry = "delete from dns_ptr where address like '%.mst.edu' and "
+my $qry = "delete from dns_ptr where address like '%.spirenteng.com' and "
     . "address not in (select name from dns_a) and mtime < date_sub(now(),interval 14 day)";
 $db->SQL_ExecQuery($qry) || $db->SQL_Error($qry) && die;

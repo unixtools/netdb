@@ -93,8 +93,9 @@ print "Scanning DHCP lease status... ";
 unlink("/local/netdb/.ssh/known_hosts");
 open( STDERR_SV, ">&STDERR" );
 open( STDERR,    ">/dev/null" );
+# this is invalid SPIRENT - need to change when I set up an actual dhcp server
 open( my $in,    "-|" )
-    || exec( "/usr/bin/ssh", "netdb\@dhcpsrv1.srv.mst.edu", "cat", "/local/dhcp-root/etc/dhcpd.leases" );
+    || exec( "/usr/bin/ssh", "netdb\@fc-mgmt-ito.spirenteng.com", "cat", "/local/dhcp-root/etc/dhcpd.leases" );
 open( STDERR, ">&STDERR_SV" );
 my $tmpinfo;
 my $ip;

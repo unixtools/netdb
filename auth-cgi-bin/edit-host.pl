@@ -406,101 +406,6 @@ elsif ( $mode eq "updateadmincomm" ) {
 
     &DisplayHost($host);
 }
-elsif ( $mode eq "autoaddmgmt" ) {
-    my $snlabel;
-    my $snip;
-    if ( $host =~ m#^([a-z0-9]+)-([a-f0-9][a-f0-9])\.network\.mst\.edu#o ) {
-        $snlabel = $1;
-        $snip    = hex($2);
-        print "<b>Auto-allocationg mgmt address for device ($snip) in subnet ($snlabel)</b><br/>\n";
-    }
-    else {
-        $html->ErrorExit("Can only auto-add mgmt addresses for network devices.");
-    }
-    &CheckHostAndEditAccess();
-
-    if ( !$privs{"sysprog:netdb:static-ip"} ) {
-        $html->ErrorExit("Permission Denied to add static addresses.");
-    }
-
-    # Figure out the appropriate subnet
-    my $info = $network->GetSubnets();
-    my $sn;
-    foreach my $tmpsn ( keys(%$info) ) {
-        my $desc = $info->{$tmpsn}->{description};
-        if ( $desc =~ /Campus Network Switches - ([A-Z0-9]+) - .*/o ) {
-            my $tmplabel = $1;
-            if ( uc($tmplabel) eq uc($snlabel) ) {
-                $sn = $tmpsn;
-                last;
-            }
-        }
-    }
-
-    if ($sn) {
-        print "<b>Found subnet ($sn)</b><br/>\n";
-    }
-    else {
-        $html->ErrorExit("Unable to find subnet matching ($snlabel)");
-    }
-
-    if ( $sn !~ /^10\.[01]\./o ) {
-        $html->ErrorExit("Subnet ($sn) is not a mgmt subnet.");
-    }
-
-    my $ip = $sn;
-    $ip =~ s|\.\d+/\d+$||o;
-    $ip .= "." . $snip;
-
-    print "<b>Target IP Address: $ip</b><br/>\n";
-
-    if ( !$access->Check( subnet => $sn, action => "update" ) ) {
-        $html->ErrorExit("Permission Denied.");
-    }
-
-    my %info = $network->GetAddressDetail($ip);
-
-    if ( $info{ip} ne $ip ) {
-        $html->ErrorExit("Sorry, couldn't look up address detail for that IP.");
-    }
-
-    if ( $info{host} eq $host ) {
-        $html->ErrorExit("IP is already allocated for this host!");
-    }
-
-    if ( $info{host} ne "" ) {
-        $html->ErrorExitRaw( "Sorry, IP already allocated to (" . $html->SearchLink_HostEdit( $info{host} ) . ")." );
-    }
-
-    if (   $info{type} ne "static"
-        && $info{type} ne "network"
-        && $info{type} ne "reserved" )
-    {
-        $html->ErrorExit( "Sorry, IP is marked as type (" . $info{type} . ")." );
-    }
-
-    print "<b>Attempting to set static allocation for $ip.</b><br/>\n";
-    $network->SetIPAllocation( $ip, "static" );
-
-    print "<b>Attempting to allocate $ip for $host.</b><br/>\n";
-    $network->AllocateAddress( $ip, $host );
-
-    print "<b>Attempting to add static PTR record for $host/$ip.</b><br/>\n";
-    $dns->Add_Static_PTR( $ip, $host );
-
-    print "<b>Attempting to add static A record for $host/$ip.</b><br/>\n";
-    $dns->Add_Static_A( $host, $ip );
-
-    $hosts->MarkUpdated($host);
-
-    $dhcp->TriggerUpdate();
-
-    print "<p/><hr/><p/>\n";
-    &DisplaySearchForms();
-    print "<p/><hr/><p/>\n";
-
-    &DisplayHost($host);
-}
 
 elsif ( $mode eq "autoaddstatic" ) {
     &CheckHostAndEditAccess();
@@ -1353,10 +1258,6 @@ var as_json = new bsn.AutoSuggest('subnet', subnet_as_options);
 
 </script>
 EOF
-
-            if ( $host =~ /^[a-z]+-[0-9a-f][0-9a-f]\.network\.mst\.edu/o ) {
-                print " | <a href=\"?mode=autoaddmgmt&host=$host\">Management</a>\n";
-            }
 
             if ( $hosttype eq "network" ) {
                 print "<br/>WDS VLAN: ";

@@ -55,16 +55,6 @@ print "<p/>\n";
 $html->StartBlockTable( "Host Registration and Status Tools", 400 );
 $html->StartInnerTable();
 
-# Display cname manager link if any cname-manager privs are granted
-foreach my $priv ( keys %privs ) {
-    if ( $priv =~ /^sysprog:netdb:cname-manager/o ) {
-        $html->StartInnerRow();
-        print "<td><a href=\"register-cname.pl\">CName Manager</a> (Easy)</td>\n";
-        $html->EndInnerRow();
-        last;
-    }
-}
-
 $html->StartInnerRow();
 print "<td><a href=\"edit-host.pl\">Edit or Register Host Details</a> (Expert)</td>\n";
 $html->EndInnerRow();
