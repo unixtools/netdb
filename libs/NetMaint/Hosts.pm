@@ -11,7 +11,6 @@ use strict;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 
-use Local::UsageLogger;
 require NetMaint::DB;
 require NetMaint::Logging;
 require NetMaint::LastTouch;
@@ -34,7 +33,6 @@ sub new {
     $tmp->{log}   = new NetMaint::Logging;
     $tmp->{touch} = new NetMaint::LastTouch;
 
-    &LogAPIUsage();
 
     return bless $tmp, $class;
 }

@@ -11,7 +11,6 @@ use strict;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 
-use Local::UsageLogger;
 use Local::NIS::UserGroup;
 use Local::ADSObject;
 use Local::PrivSys;
@@ -42,7 +41,6 @@ sub new {
     $tmp->{access_data}        = [];
     $tmp->{access_data_loaded} = {};
 
-    &LogAPIUsage();
 
     return bless $tmp, $class;
 }

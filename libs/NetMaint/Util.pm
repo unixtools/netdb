@@ -11,7 +11,6 @@ use strict;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 
-use Local::UsageLogger;
 use Data::Dumper;
 use Local::ADSObject;
 use Socket;
@@ -30,7 +29,6 @@ sub new {
     my $class = ref($self) || $self;
     my $tmp   = {};
 
-    &LogAPIUsage();
 
     return bless $tmp, $class;
 }

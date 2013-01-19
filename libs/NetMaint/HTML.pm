@@ -11,7 +11,6 @@ use strict;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 
-use Local::UsageLogger;
 use Local::HTMLUtil;
 use NetMaint::Util;
 use Data::Dumper;
@@ -38,7 +37,6 @@ sub new {
     my $title = $opts{title} || "Network Maintenance Tool";
     $title = "NetDB: " . $title;
 
-    &LogAPIUsage();
 
     &HTMLImpersonate("sysprog:impersonate");
 

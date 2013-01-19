@@ -16,7 +16,6 @@ use strict;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 
-use Local::UsageLogger;
 use NetMaint::DB;
 
 @ISA    = qw(Exporter);
@@ -77,7 +76,6 @@ sub new {
     my $class = ref($self) || $self;
     my $tmp   = {};
 
-    &LogAPIUsage();
 
     bless $tmp, $class;
 
@@ -95,7 +93,6 @@ sub GetSubnets {
     my $self = shift;
     my ( $qry, $cid );
 
-    &LogAPIUsage();
 
     if ( $subnets && ( time - $subnets_last_fetch ) < 15 * 60 ) {
         return $subnets;
@@ -136,7 +133,6 @@ sub GetVLANs {
     my $self = shift;
     my ( $qry, $cid );
 
-    &LogAPIUsage();
 
     if ( $vlans && ( time - $vlans_last_fetch ) < 15 * 60 ) {
         return $vlans;
@@ -174,7 +170,6 @@ sub HostToOwner {
     my ( $qry, $cid );
     my ($owner);
 
-    &LogAPIUsage();
 
     my $db = $self->_init_db();
 
@@ -198,7 +193,6 @@ sub OwnerToHosts {
     my ( $qry, $cid );
     my @hosts;
 
-    &LogAPIUsage();
 
     my $db = $self->_init_db();
 
@@ -225,7 +219,6 @@ sub HostToEther {
     my ($ether);
     my @ethers;
 
-    &LogAPIUsage();
 
     my $db = $self->_init_db();
 
@@ -252,7 +245,6 @@ sub EtherToHost {
     my $ether = shift;
     my ( $qry, $cid );
 
-    &LogAPIUsage();
 
     $ether = uc $ether;
     $ether =~ tr/0-9A-F//cd;
@@ -285,7 +277,6 @@ sub LastLeaseToEther {
     my $ether;
     my ( $qry, $cid );
 
-    &LogAPIUsage();
 
     my $db = $self->_init_db();
 
@@ -311,7 +302,6 @@ sub LastLeaseToHost {
     my $ether;
     my ( $qry, $cid );
 
-    &LogAPIUsage();
 
     my $db = $self->_init_db();
 
@@ -337,7 +327,6 @@ sub MatchPartialHost {
     my ( $qry,  $cid );
     my ( $host, @hosts );
 
-    &LogAPIUsage();
 
     my $db = $self->_init_db();
 
@@ -368,7 +357,6 @@ sub ValidFQDN {
     my $host = lc shift;
     my ( $qry, $cid );
 
-    &LogAPIUsage();
 
     my $db = $self->_init_db();
 

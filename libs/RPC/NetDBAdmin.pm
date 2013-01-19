@@ -16,7 +16,6 @@ use strict;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 
-use Local::UsageLogger;
 use Local::PrivSys;
 use NetMaint::Register;
 use NetMaint::Hosts;
@@ -75,7 +74,6 @@ sub new {
     my $class = ref($self) || $self;
     my $tmp   = {};
 
-    &LogAPIUsage();
 
     bless $tmp, $class;
 
@@ -93,7 +91,6 @@ sub GetHostInfo {
     my $host = lc shift;
     my ( $qry, $cid );
 
-    &LogAPIUsage();
 
     my $access = new NetMaint::Access;
     my $hosts  = new NetMaint::Hosts;
@@ -119,7 +116,6 @@ sub GetHostDescription {
     my $host = lc shift;
     my ( $qry, $cid );
 
-    &LogAPIUsage();
 
     my $db = $self->_init_db();
 
@@ -151,7 +147,6 @@ sub SetHostDescription {
     my $desc = shift;
     my ( $qry, $cid );
 
-    &LogAPIUsage();
 
     my $db = $self->_init_db();
 
@@ -179,7 +174,6 @@ sub GetHostLocation {
     my $host = lc shift;
     my ( $qry, $cid );
 
-    &LogAPIUsage();
 
     my $db = $self->_init_db();
 
@@ -211,7 +205,6 @@ sub SetHostLocation {
     my $loc  = shift;
     my ( $qry, $cid );
 
-    &LogAPIUsage();
 
     my $db = $self->_init_db();
 
@@ -239,7 +232,6 @@ sub AutoAllocateVMWareAddr {
     my $host = lc shift;
     my ( $qry, $cid );
 
-    &LogAPIUsage();
 
     my $db = $self->_init_db();
 
@@ -268,7 +260,6 @@ sub AddEther {
     my $ether = shift;
     my ( $qry, $cid );
 
-    &LogAPIUsage();
 
     my $db = $self->_init_db();
 
@@ -327,7 +318,6 @@ sub RemoveEther {
     my $ether = shift;
     my ( $qry, $cid );
 
-    &LogAPIUsage();
 
     my $db = $self->_init_db();
 
@@ -363,7 +353,6 @@ sub GetHostOptions {
     my $host = lc shift;
     my ( $qry, $cid );
 
-    &LogAPIUsage();
 
     my $db = $self->_init_db();
 
@@ -401,7 +390,6 @@ sub GetAdminOptions {
     my $host = lc shift;
     my ( $qry, $cid );
 
-    &LogAPIUsage();
 
     my $db = $self->_init_db();
 
@@ -440,7 +428,6 @@ sub AddHostOption {
     my $option = shift;
     my ( $qry, $cid );
 
-    &LogAPIUsage();
 
     my $access = new NetMaint::Access;
     my $dhcp   = new NetMaint::DHCP;
@@ -476,7 +463,6 @@ sub RemoveHostOption {
     my $option = shift;
     my ( $qry, $cid );
 
-    &LogAPIUsage();
 
     my $access = new NetMaint::Access;
     my $dhcp   = new NetMaint::DHCP;
@@ -506,7 +492,6 @@ sub AddAdminOption {
     my $option = shift;
     my ( $qry, $cid );
 
-    &LogAPIUsage();
 
     my $access = new NetMaint::Access;
     my $dhcp   = new NetMaint::DHCP;
@@ -546,7 +531,6 @@ sub RemoveAdminOption {
     my $option = shift;
     my ( $qry, $cid );
 
-    &LogAPIUsage();
 
     my $access = new NetMaint::Access;
     my $dhcp   = new NetMaint::DHCP;
@@ -579,7 +563,6 @@ sub DeleteHost {
     my $host = lc shift;
     my ( $qry, $cid );
 
-    &LogAPIUsage();
 
     my $access   = new NetMaint::Access;
     my $hosts    = new NetMaint::Hosts;
@@ -608,7 +591,6 @@ sub CreateHost {
     my %opts = @_;
     my ( $qry, $cid );
 
-    &LogAPIUsage();
 
     my $access = new NetMaint::Access;
     my $dhcp   = new NetMaint::DHCP;
@@ -739,7 +721,6 @@ sub GetUtilityCNames {
     my $self   = shift;
     my @groups = @_;
 
-    &LogAPIUsage();
     foreach my $grp (@groups) {
         &PrivSys_QuietRequirePriv("rpc:netdb:utilitycname:$grp");
     }
@@ -771,7 +752,6 @@ sub DeleteUtilityCNames {
     my $self  = shift;
     my @hosts = @_;
 
-    &LogAPIUsage();
     foreach my $host (@hosts) {
         $host = lc $host;
 
@@ -802,7 +782,6 @@ sub UpdateUtilityCName {
     my $host = lc shift;
     my $tgt  = lc shift;
 
-    &LogAPIUsage();
 
     if ( $host =~ m|^([^.]+)\.([^.]+)\.spirenteng\.com$| ) {
         &PrivSys_QuietRequirePriv("rpc:netdb:utilitycname:$2");
