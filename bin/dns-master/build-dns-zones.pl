@@ -177,7 +177,7 @@ foreach my $zone ( sort(@zones) ) {
         print "Zone file acceptable. Installing new version.\n";
         rename( $fname . ".tmp", $fname );
 
-        my $bindbase = "/local/newbind/data/source";
+        my $bindbase = "/local/bind/data/source";
         my $realfile = $bindbase . "/" . $zone;
         my $tmpfile  = $realfile . ".tmp";
         unlink($tmpfile);
@@ -203,8 +203,8 @@ foreach my $zone ( sort(@zones) ) {
         print "Signing zone $zone:\n";
         open( my $signzone, "-|" ) || exec(
             "/local/bind/sbin/dnssec-signzone", "-T",                     3600,
-            "-S",                               "-K",                     "/local/newbind/data/keys",
-            "-d",                               "/local/newbind/data/dsset", "-g",
+            "-S",                               "-K",                     "/local/bind/data/keys",
+            "-d",                               "/local/bind/data/dsset", "-g",
             "-r",                               "/dev/urandom",           "-P",
             "-t",                               "-u",                     "-o",
             $zone,                              "-f",                     "${fname}.signed.tmp",
@@ -222,7 +222,7 @@ foreach my $zone ( sort(@zones) ) {
             print "Signing completed, moving signed zone into place (${fname}.signed.tmp to ${fname}.signed).\n";
             rename( "${fname}.signed.tmp", "${fname}.signed" );
 
-            my $bindbase = "/local/newbind/data/source";
+            my $bindbase = "/local/bind/data/source";
             my $realfile = $bindbase . "/" . $zone . ".signed";
             my $tmpfile  = $realfile . ".tmp";
             unlink($tmpfile);
