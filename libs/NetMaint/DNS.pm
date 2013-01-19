@@ -132,7 +132,7 @@ sub Bump_Serial {
         if ( $host =~ /\.spirenteng.com/o ) {
             $zone = "spirenteng.com";
         }
-        elsif ( $host =~ /(.in-addr\.arpa/o ) {
+        elsif ( $host =~ /(.in-addr\.arpa)/o ) {
             $zone = ".in-addr.arpa";
         }
         else

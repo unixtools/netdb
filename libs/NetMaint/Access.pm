@@ -11,7 +11,6 @@ use strict;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 
-use Local::NIS::UserGroup;
 use Local::ADSObject;
 use Local::PrivSys;
 require NetMaint::DB;
@@ -643,7 +642,7 @@ sub ExpandRule {
     my @users = ();
     foreach my $whoent (@who) {
         if ( $whoent =~ /^\@(.*?)\s*$/o ) {
-            push( @users, &NIS_UserGroup_MemberUsers($1) );
+            # Not supported currently, ignore
         }
         elsif ( $whoent !~ /^\@/o ) {
             push( @users, $whoent );
