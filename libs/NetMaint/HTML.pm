@@ -17,10 +17,10 @@ use NetMaint::Util;
 use Data::Dumper;
 use NetMaint::Leases;
 use NetMaint::DHCP;
-use Local::AppTemplate;
+use Spirent::AppTemplate;
 use Local::HTMLImpersonate;
 
-@ISA    = qw(Local::AppTemplate Exporter);
+@ISA    = qw(Spirent::AppTemplate Exporter);
 @EXPORT = qw();
 
 # Begin-Doc
@@ -42,7 +42,7 @@ sub new {
 
     &HTMLImpersonate("sysprog:impersonate");
 
-    $tmp = new Local::AppTemplate(
+    $tmp = new Spirent::AppTemplate(
         title => $title,
         style => <<EOSTYLE,
 #content { font-size: 12px; 
@@ -86,14 +86,6 @@ sub PageHeader {
         print "<a href=\"/auth-cgi-bin/cgiwrap/netdb/create-host.pl\">Create Host</a>\n";
         print " - ";
         print "<a href=\"/auth-cgi-bin/cgiwrap/netdb/edit-host.pl\">Edit Host</a>\n";
-
-        print "<br>";
-
-        print "<a href=\"https://help.mst.edu\">Help Request System</a>\n";
-        print " - ";
-        print "<a href=\"http://it.mst.edu\">IT</a>\n";
-        print " - ";
-        print "<a href=\"http://campus.mst.edu\">Campus Web</a>\n";
         print "</td></tr>\n";
 
         print "<tr><td align=center colspan=2><hr></td></tr>\n";
@@ -116,9 +108,8 @@ sub PageFooter {
     print "<tr><td align=center colspan=2><hr></td></tr>\n";
 
     print "<tr><td align=center colspan=2><font face=arial size=-1>";
-    print "Using this application implies that you have read and agree to the\n";
-    print "acceptable-usage policies on the ";
-    print "<a href=\"http://it.mst.edu/policies\">IT policies</a> page.\n";
+    print "Before using this application, you must familiarized yourself with the usage\n";
+    print "documentation in the <a href=\"https://origin.spirenteng.com/display/ENGOP/NetDB\">NetDB</a> origin page.\n";
     print "</td></tr>\n";
 
     print "<tr><td align=center colspan=2><hr></td></tr>\n";
@@ -636,8 +627,8 @@ sub SearchLink_AnalyzeUser {
     my $self   = shift;
     my $userid = shift;
 
-    return "<a href=\"https://itweb.mst.edu/auth-cgi-bin/cgiwrap/analyzer/analyze.pl?userid=${userid}\">"
-        . "(Analyze)</a></td>\n";
+    return "<a href=\"https://crowd.spirenteng.com/crowd/console/secure/user/view!default.action?directoryID=1310721&name=${userid}\">"
+        . "(Crowd User Info)</a></td>\n";
 }
 
 # Begin-Doc
@@ -738,7 +729,7 @@ sub StartMailWrapper {
         my $mailtofh;
 
         open( $mailtofh, "|/usr/lib/sendmail -t" );
-        print $mailtofh "From: Network Management Tool <netdb\@mst.edu>\n";
+        print $mailtofh "From: Network Management Tool <netdb\@spirenteng.com>\n";
         print $mailtofh "Subject: $title - " . scalar(localtime) . "\n";
         print $mailtofh "Mime-Version: 1.0\n";
         print $mailtofh "Content-type: text/html\n";
