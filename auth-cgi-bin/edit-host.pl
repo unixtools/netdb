@@ -291,7 +291,7 @@ elsif ( $mode eq "updateowner" ) {
         $html->ErrorExit("Invalid owner userid.");
     }
 
-    if ( !$privs{"sysprog:netdb:user-on-behalf"} ) {
+    if ( !$privs{"netdb-admin"} ) {
         $html->ErrorExit("Only users that have the user-on-behalf ability can change host owners.");
     }
 
@@ -873,7 +873,7 @@ AUTOSUGGEST
     );
 
     if (   $access->GetHostNameType($host) eq "customname"
-        && $privs{"sysprog:netdb:user-on-behalf"} )
+        && $privs{"netdb-admin"} )
     {
         print "<p/>\n";
         $html->StartBlockTable( "Host Owner Update", 600 );

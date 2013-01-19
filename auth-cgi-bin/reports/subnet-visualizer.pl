@@ -20,7 +20,7 @@ require NetMaint::HTML;
 require NetMaint::Network;
 require NetMaint::Logging;
 
-&PrivSys_RequirePriv("sysprog:netdb:reports");
+&PrivSys_RequirePriv("netdb-admin");
 
 &HTMLGetRequest();
 &HTMLContentType();

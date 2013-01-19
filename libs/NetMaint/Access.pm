@@ -279,7 +279,7 @@ sub CheckHostDeleteAccess {
 
     my %privs = &PrivSys_FetchPrivs($userid);
 
-    my $obo      = $privs{"sysprog:netdb:user-on-behalf"};
+    my $obo      = $privs{"netdb-admin"};
     my $nametype = $self->GetHostNameType($host);
 
     if ( $privs{"sysprog:netdb"} ) {
@@ -358,7 +358,7 @@ sub CheckHostEditAccess {
 
     my %privs = &PrivSys_FetchPrivs($userid);
 
-    my $obo      = $privs{"sysprog:netdb:user-on-behalf"};
+    my $obo      = $privs{"netdb-admin"};
     my $nametype = $self->GetHostNameType($host);
 
     if ( $privs{"sysprog:netdb"} ) {
@@ -449,7 +449,7 @@ sub CheckHostViewAccess {
 
     my %privs = &PrivSys_FetchPrivs($userid);
 
-    my $obo      = $privs{"sysprog:netdb:user-on-behalf"};
+    my $obo      = $privs{"netdb-admin"};
     my $viewany  = $privs{"sysprog:netdb:view-any"};
     my $nametype = $self->GetHostNameType($host);
 

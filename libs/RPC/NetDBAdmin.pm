@@ -637,7 +637,7 @@ sub CreateHost {
     }
 
     if ( $nametype eq "ownername" ) {
-        if ( ! &PrivSys_CheckPriv($ENV{REMOTE_USER}, "sysprog:netdb:user-on-behalf") ) {
+        if ( ! &PrivSys_CheckPriv($ENV{REMOTE_USER}, "netdb-admin") ) {
             if ( $owner ne $ENV{REMOTE_USER} ) {
                 die "Permission Denied (Owner mismatch).";
             }
@@ -710,7 +710,7 @@ sub GetUtilityCNames {
     my @groups = @_;
 
     foreach my $grp (@groups) {
-        &PrivSys_QuietRequirePriv("rpc:netdb:utilitycname:$grp");
+        &PrivSys_QuietRequirePriv("netdb-admin");
     }
 
     my $db  = $self->_init_db();
@@ -744,7 +744,7 @@ sub DeleteUtilityCNames {
         $host = lc $host;
 
         if ( $host =~ m|^([^.]+)\.([^.]+)\.spirenteng\.com$| ) {
-            &PrivSys_QuietRequirePriv("rpc:netdb:utilitycname:$2");
+            &PrivSys_QuietRequirePriv("netdb-admin");
         }
         else {
             die "Invalid host format (must be name.group.spirenteng.com).\n";
@@ -772,7 +772,7 @@ sub UpdateUtilityCName {
 
 
     if ( $host =~ m|^([^.]+)\.([^.]+)\.spirenteng\.com$| ) {
-        &PrivSys_QuietRequirePriv("rpc:netdb:utilitycname:$2");
+        &PrivSys_QuietRequirePriv("netdb-admin");
     }
     else {
         die "Invalid host format ($host) (must be name.group.spirenteng.com).\n";

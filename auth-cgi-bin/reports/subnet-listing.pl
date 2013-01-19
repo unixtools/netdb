@@ -18,7 +18,7 @@ require NetMaint::Network;
 require NetMaint::Logging;
 
 use Local::PrivSys;
-&PrivSys_RequirePriv("sysprog:netdb:reports");
+&PrivSys_RequirePriv("netdb-admin");
 
 &HTMLGetRequest();
 &HTMLContentType();

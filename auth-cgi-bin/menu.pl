@@ -115,7 +115,7 @@ if (   $privs{"sysprog:netdb:edit-privs"}
     $html->EndBlockTable();
 }
 
-if ( $privs{"sysprog:netdb:reports"} ) {
+if ( $privs{"netdb-admin"} ) {
     print "<p/>\n";
     $html->StartBlockTable( "System and Host Status Reports", 500 );
     $html->StartInnerTable();
