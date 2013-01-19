@@ -40,13 +40,6 @@ alarm(120);
 my $trace    = 0;
 my $lastopen = 0;
 
-print "opening SCE sub-process\n";
-
-my $sce_pid = open( my $scefh, "|/local/netdb/bin/dhcp/process-sce-updates" )
-    || die "failed open for sce";
-select($scefh);
-$| = 1;
-select(STDOUT);
 $SIG{PIPE} = "die";
 
 my $leases;
@@ -195,43 +188,6 @@ while (1) {
 }
 
 # Begin-Doc
-# Name: handle_sce
-# Description: helper routine for requesting an update to the sce mappings based on a new lease
-# End-Doc
-sub handle_sce {
-    my ( $mode, $ip, $ether ) = @_;
-
-    my $hostname = $dhcp->SearchByEtherExact($ether);
-
-    my $kid;
-    do {
-        $kid = waitpid( -1, WNOHANG );
-        if ( $kid == $sce_pid ) {
-            die "SCE sub-process died.\n";
-        }
-    } while $kid > 0;
-
-    if ($hostname) {
-        my $info = $hosts->GetHostInfo($hostname);
-        if ($info) {
-            my $owner = $info->{owner};
-            my $type  = $info->{type};
-
-            my $nametype = $access->GetHostNameType($hostname);
-
-            print $scefh "$mode\t$ip\t$type\t$owner\t$nametype\t$hostname\n"
-                || die "failed SCE write";
-        }
-        else {
-            print "failed to look up host info for $hostname\n";
-        }
-    }
-    else {
-        print "failed to look up host name for ether $ether\n";
-    }
-}
-
-# Begin-Doc
 # Name: handle_release
 # Description: helper routine for handling DHCPRELEASE lease requests
 # End-Doc
@@ -247,8 +203,6 @@ sub handle_release {
         ip    => $ip
     );
     $trace && print "]\n";
-
-    &handle_sce( "logout", $ip, $ether );
 }
 
 # Begin-Doc
@@ -274,8 +228,6 @@ sub handle_ack {
     my $et = time;
     $trace && print int( ( $et - $st ) * 1000 );
     $trace && print "]\n";
-
-    &handle_sce( "login", $ip, $ether );
 }
 
 # Begin-Doc
@@ -297,8 +249,6 @@ sub handle_bootreply {
         type    => "BOOTREPLY",
     );
     $trace && print "]\n";
-
-    &handle_sce( "login", $ip, $ether );
 }
 
 # Begin-Doc
