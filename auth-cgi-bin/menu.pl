@@ -54,22 +54,6 @@ print "<p/>\n";
 
 $html->StartBlockTable( "Host Registration and Status Tools", 400 );
 $html->StartInnerTable();
-if ($access->Check(
-        type   => "desktop",
-        flag   => "ownername",
-        action => "update"
-    )
-    )
-{
-    $html->StartInnerRow();
-    print "<td><a href=\"register-desktop.pl\">Register desktop and laptop systems</a> (Easy)</td>\n";
-    $html->EndInnerRow();
-}
-if ( $access->Check( flag => "clcname", action => "update" ) ) {
-    $html->StartInnerRow();
-    print "<td><a href=\"register-clc.pl\">Register CLC systems</a> (Easy)</td>\n";
-    $html->EndInnerRow();
-}
 
 # Display cname manager link if any cname-manager privs are granted
 foreach my $priv ( keys %privs ) {
@@ -134,11 +118,6 @@ if (   $privs{"sysprog:netdb:edit-privs"}
         print "<td><a href=\"edit-quotas.pl\">Edit Registration Quotas</a></td>\n";
         $html->EndInnerRow();
     }
-    if ( $privs{"sysprog:netdb:syncnet"} ) {
-        $html->StartInnerRow();
-        print "<td><a href=\"sync-devices.pl\">Sync Network Device Config</a></td>\n";
-        $html->EndInnerRow();
-    }
     if ( $privs{"sysprog:netdb:adminlock"} ) {
         $html->StartInnerRow();
         print "<td><a href=\"bulk-admin-disable.pl\">Bulk Admin Disable</a></td>\n";
@@ -186,7 +165,6 @@ if ( $privs{"sysprog:netdb:reports"} ) {
 
     $html->StartInnerRow();
     print "<td><a href=\"reports/systems-seen.pl\">Seen IP/Systems Report</a></td>\n";
-    print "<td><a href=\"reports/vmware-and-san-ip-report.pl\">VMWare/SAN IP Report</a></td>\n";
     $html->EndInnerRow();
 
     $html->StartInnerRow();
@@ -221,7 +199,6 @@ if ( $privs{"sysprog:netdb:reports"} ) {
 
     $html->StartInnerRow();
     print "<td><a href=\"reports/admin-comments-report.pl\">Admin Comments Report</a></td>\n";
-    print "<td><a href=\"reports/vlan-cfg-scripts.pl\">VLAN Config Scripts</a></td>\n";
     $html->EndInnerRow();
 
     $html->StartInnerRow();

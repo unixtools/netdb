@@ -203,17 +203,6 @@ elsif ( $mode eq "bydomainexact" ) {
 
     &PrintViewList(@list);
 }
-elsif ( $mode eq "byclc" ) {
-    my $hosts = new NetMaint::Hosts;
-    my @hosts = $hosts->SearchByCLCName( $search, 1000 );
-
-    my @list;
-    foreach my $host ( sort @hosts ) {
-        push( @list, [ $host, $host ] );
-    }
-
-    &PrintViewList(@list);
-}
 elsif ( $mode eq "byether" ) {
     my $dhcp = new NetMaint::DHCP;
     my $util = new NetMaint::Util;

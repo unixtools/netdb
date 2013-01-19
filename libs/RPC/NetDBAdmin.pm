@@ -601,7 +601,7 @@ sub DeleteHost {
 # Type: method
 # Description: Creates a host
 # Syntax: $info = $obj->CreateHost(%opts);
-# Comments: %opts has keys: owner, index, nametype, domain, clc, type, hostname, image
+# Comments: %opts has keys: owner, index, nametype, domain, type, hostname, image
 # End-Doc
 sub CreateHost {
     my $self = shift;
@@ -620,7 +620,6 @@ sub CreateHost {
     my $nametype = $opts{nametype};
     my $hostname = $opts{hostname};
     my $domain   = $opts{domain};
-    my $clc      = $opts{clc};
     my $type     = $opts{type};
     my $image    = $opts{image};
 
@@ -642,7 +641,7 @@ sub CreateHost {
     $index = int($index);
 
     if ( $type eq "guest" ) {
-        if ( $nametype ne "ownername" && $nametype ne "travelname" ) {
+        if ( $nametype ne "ownername" ) {
             die "Guest machines must be named for the sponsor/owner.";
         }
 
@@ -652,26 +651,8 @@ sub CreateHost {
     }
 
     my $host;
-    if ( $nametype eq "clcname" ) {
-        $host = sprintf( "rc%.2d%s%s.%s", $index, $image, $clc, $domain );
-    }
-    elsif ( $nametype eq "virtclcname" ) {
-        $host = sprintf( "rcv%.2d%s%s.%s", $index, $image, $clc, $domain );
-    }
-    elsif ( $nametype eq "thinclcname" ) {
-        $host = sprintf( "rcx%.2d%s%s.%s", $index, $image, $clc, $domain );
-    }
-    elsif ( $nametype eq "ownername" ) {
-        $host = sprintf( "r%.2d%s.%s", $index, $owner, $domain );
-    }
-    elsif ( $nametype eq "thinname" ) {
-        $host = sprintf( "rx%.2d%s.%s", $index, $owner, $domain );
-    }
-    elsif ( $nametype eq "virtownername" ) {
-        $host = sprintf( "rv%.2d%s.%s", $index, $owner, $domain );
-    }
-    elsif ( $nametype eq "travelname" ) {
-        $host = sprintf( "rt%.2d%s.%s", $index, $owner, $domain );
+    if ( $nametype eq "ownername" ) {
+        $host = sprintf( "s%.2d%s.%s", $index, $owner, $domain );
     }
     elsif ( $nametype eq "customname" ) {
         $host = sprintf( "%s.%s", $hostname, $domain );
@@ -685,37 +666,7 @@ sub CreateHost {
         die "Hostname ($host) Invalid - request type ($nametype), determined type ($foundtype)";
     }
 
-    if ( $nametype eq "clcname" ) {
-        my @existing_hosts = $hosts->SearchByCLCName($clc);
-        foreach my $existing_host (@existing_hosts) {
-            if ( $existing_host =~ /rc(\d\d).(.*)\./o ) {
-                if ( $index == $1 && $clc eq $2 ) {
-                    die "Host index $index already used by $existing_host.";
-                }
-            }
-        }
-    }
-    elsif ( $nametype eq "virtclcname" ) {
-        my @existing_hosts = $hosts->SearchByCLCName($clc);
-        foreach my $existing_host (@existing_hosts) {
-            if ( $existing_host =~ /rcv(\d\d).(.*)\./o ) {
-                if ( $index == $1 && $clc eq $2 ) {
-                    die "Host index $index already used by $existing_host.";
-                }
-            }
-        }
-    }
-    elsif ( $nametype eq "thinclcname" ) {
-        my @existing_hosts = $hosts->SearchByCLCName($clc);
-        foreach my $existing_host (@existing_hosts) {
-            if ( $existing_host =~ /rcx(\d\d).(.*)\./o ) {
-                if ( $index == $1 && $clc eq $2 ) {
-                    die "Host index $index already used by $existing_host.";
-                }
-            }
-        }
-    }
-    elsif ( $nametype eq "ownername" ) {
+    if ( $nametype eq "ownername" ) {
         if ( !$privs{"sysprog:netdb:user-on-behalf"} ) {
             if ( $owner ne $ENV{REMOTE_USER} ) {
                 die "Permission Denied (Owner mismatch).";
@@ -729,54 +680,6 @@ sub CreateHost {
         my @existing_hosts = $hosts->SearchByOwnerExact($owner);
         foreach my $existing_host (@existing_hosts) {
             if ( $existing_host =~ /r(\d\d)/o ) {
-                if ( $index == $1 ) {
-                    die "Host index $index already used by $existing_host.";
-                }
-            }
-        }
-    }
-    elsif ( $nametype eq "thinname" ) {
-        if ( !$privs{"sysprog:netdb:user-on-behalf"} ) {
-            if ( $owner ne $ENV{REMOTE_USER} ) {
-                die "Permission Denied (Owner mismatch).";
-            }
-        }
-
-        my @existing_hosts = $hosts->SearchByOwnerExact($owner);
-        foreach my $existing_host (@existing_hosts) {
-            if ( $existing_host =~ /rx(\d\d)/o ) {
-                if ( $index == $1 ) {
-                    die "Host index $index already used by $existing_host.";
-                }
-            }
-        }
-    }
-    elsif ( $nametype eq "virtownername" ) {
-        if ( !$privs{"sysprog:netdb:user-on-behalf"} ) {
-            if ( $owner ne $ENV{REMOTE_USER} ) {
-                die "Permission Denied (Owner mismatch).";
-            }
-        }
-
-        my @existing_hosts = $hosts->SearchByOwnerExact($owner);
-        foreach my $existing_host (@existing_hosts) {
-            if ( $existing_host =~ /rv(\d\d)/o ) {
-                if ( $index == $1 ) {
-                    die "Host index $index already used by $existing_host.";
-                }
-            }
-        }
-    }
-    elsif ( $nametype eq "travelname" ) {
-        if ( !$privs{"sysprog:netdb:user-on-behalf"} ) {
-            if ( $owner ne $ENV{REMOTE_USER} ) {
-                die "Permission Denied (Owner mismatch).";
-            }
-        }
-
-        my @existing_hosts = $hosts->SearchByOwnerExact($owner);
-        foreach my $existing_host (@existing_hosts) {
-            if ( $existing_host =~ /rt(\d\d)/o ) {
                 if ( $index == $1 ) {
                     die "Host index $index already used by $existing_host.";
                 }
@@ -847,7 +750,7 @@ sub GetUtilityCNames {
     my $qry = "select name,address from dns_cname where name like ? and name in (select host from hosts)";
     my $cid = $db->SQL_OpenBoundQuery($qry) || $db->SQL_Error($qry) && die;
     foreach my $grp (@groups) {
-        $db->SQL_ExecQuery( $cid, "%.${grp}.mst.edu" );
+        $db->SQL_ExecQuery( $cid, "%.${grp}.spirenteng.com" );
         while ( my ( $name, $tgt ) = $db->SQL_FetchRow($cid) ) {
             $res->{$grp}->{$name} = $tgt;
         }
@@ -872,11 +775,11 @@ sub DeleteUtilityCNames {
     foreach my $host (@hosts) {
         $host = lc $host;
 
-        if ( $host =~ m|^([^.]+)\.([^.]+)\.mst\.edu$| ) {
+        if ( $host =~ m|^([^.]+)\.([^.]+)\.spirenteng\.com$| ) {
             &PrivSys_QuietRequirePriv("rpc:netdb:utilitycname:$2");
         }
         else {
-            die "Invalid host format (must be name.group.mst.edu).\n";
+            die "Invalid host format (must be name.group.spirenteng.com).\n";
         }
     }
 
@@ -901,11 +804,11 @@ sub UpdateUtilityCName {
 
     &LogAPIUsage();
 
-    if ( $host =~ m|^([^.]+)\.([^.]+)\.mst\.edu$| ) {
+    if ( $host =~ m|^([^.]+)\.([^.]+)\.spirenteng\.com$| ) {
         &PrivSys_QuietRequirePriv("rpc:netdb:utilitycname:$2");
     }
     else {
-        die "Invalid host format ($host) (must be name.group.mst.edu).\n";
+        die "Invalid host format ($host) (must be name.group.spirenteng.com).\n";
     }
 
     if ( !gethostbyname($tgt) ) {

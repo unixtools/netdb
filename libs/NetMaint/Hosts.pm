@@ -248,10 +248,7 @@ sub GetDefaultOwner {
     my $type     = $opts{type};
 
     if ( $type eq "server" || $type eq "cname" || $type eq "network" ) {
-        $defowner = "namesrv";
-    }
-    elsif ( $nametype eq "clcname" || $nametype eq "virtclcname" || $nametype eq "thinclcname" ) {
-        $defowner = "deskinst";
+        $defowner = "netdb";
     }
 
     return $defowner;
@@ -297,19 +294,11 @@ sub CheckValidNameType {
     my $type     = $opts{type};
     my $nametype = $opts{nametype};
 
-    if ( $type eq "server" || $type eq "cname" || $type eq "network" ) {
+    if ( $type eq "server" || $type eq "cname" ) {
         return $nametype eq "customname";
     }
     elsif ( $type eq "guest" ) {
         return $nametype eq "ownername";
-    }
-    elsif ( $type eq "printer" ) {
-        if ( $nametype eq "clcname" || $nametype eq "customname" || $nametype eq "ownername" ) {
-            return 1;
-        }
-        else {
-            return 0;
-        }
     }
 
     # Fall through and allow it
@@ -342,25 +331,6 @@ sub CheckValidNameTypeDomain {
         return 0;
     }
 
-    if ( $nametype eq "clcname" || $nametype eq "virtclcname" || $nametype eq "thinclcname" ) {
-        return $domain eq "managed.mst.edu";
-    }
-
-    if (   $nametype eq "ownername"
-        || $nametype eq "travelname"
-        || $nametype eq "virtownername" )
-    {
-        if ( $domain eq "prn.mst.edu" || $domain =~ /device.mst.edu/ || $domain eq "managed.mst.edu" ) {
-            return 1;
-        }
-        else {
-            return 0;
-        }
-    }
-    elsif ( $type eq "printer" ) {
-        return $domain eq "prn.mst.edu";
-    }
-
     return 1;
 }
 
@@ -379,22 +349,7 @@ sub GetFreeIndexes {
 
     my $pat;
     if ( $nametype eq "ownername" ) {
-        $pat = qr/^r(\d\d)/;
-    }
-    elsif ( $nametype eq "virtownername" ) {
-        $pat = qr/^rv(\d\d)/;
-    }
-    elsif ( $nametype eq "clcname" ) {
-        $pat = qr/^rc(\d\d)/;
-    }
-    elsif ( $nametype eq "thinname" ) {
-        $pat = qr/^rx(\d\d)/;
-    }
-    elsif ( $nametype eq "virtclcname" ) {
-        $pat = qr/^rcv(\d\d)/;
-    }
-    elsif ( $nametype eq "travelname" ) {
-        $pat = qr/^rt(\d\d)/;
+        $pat = qr/^s(\d\d)/;
     }
     else {
 
@@ -475,47 +430,6 @@ sub SearchByDomainExact {
 
     $qry = "select host from hosts where domain=?";
     push( @vals, $dom );
-    if ( $max > 0 ) {
-        $qry .= " limit ?";
-        push( @vals, $max );
-    }
-    $cid = $db->SQL_OpenBoundQuery($qry)
-        || $db->SQL_Error($qry) && return undef;
-    $db->SQL_ExecQuery( $cid, @vals )
-        || $db->SQL_Error($qry) && return undef;
-    while ( my ($host) = $db->SQL_FetchRow($cid) ) {
-        push( @hosts, $host );
-    }
-    $db->SQL_CloseQuery($cid);
-
-    return @hosts;
-}
-
-# Begin-Doc
-# Name: SearchByCLCName
-# Type: method
-# Description: Returns array of hostnames in clc $clc
-# Comments: returns undef if not found
-# Syntax: @hosts = $obj->SearchByCLCName($clc, [$max]);
-# End-Doc
-sub SearchByCLCName {
-    my $self = shift;
-    my $clc  = lc shift;
-    my $max  = shift || 0;
-
-    my $db = $self->{db};
-    my ( $qry, $cid );
-    my @hosts;
-    my @vals;
-
-    if ( $clc !~ /^[a-z0-9]+$/io ) {
-        return ();
-    }
-
-    $qry = "select host from hosts where host like ? or host like ? or host like ? ";
-    push( @vals, "rc%" . $clc . ".%.edu" );
-    push( @vals, "rcv%" . $clc . ".%.edu" );
-    push( @vals, "rcx%" . $clc . ".%.edu" );
     if ( $max > 0 ) {
         $qry .= " limit ?";
         push( @vals, $max );
@@ -840,7 +754,7 @@ sub SendAdminDisableNotice {
     my $info = $self->GetHostInfo($host);
 
     open( my $sfh, "|/usr/lib/sendmail -t -fsecurity" );
-    print $sfh "From: security\@mst.edu\n";
+    print $sfh "From: security\@spirenteng.com\n";
     print $sfh "Subject: System Administratively Disabled\n";
     print $sfh "To: ", $info->{owner}, "\n";
     print $sfh "\n";
@@ -849,11 +763,8 @@ sub SendAdminDisableNotice {
     print $sfh "Situation: ", $info->{admin_comments}, "\n";
     print $sfh "\n";
     print $sfh "
-Once the issue has been resolved contact IT to have network access
-restored. For confidential issues you can email IT Security directly at
-security\@mst.edu. For all others submit a request by calling the IT Help
-Desk at 573-341-HELP.
-    ";
+Once the issue has been resolved contact EngOps to have network access
+restored.";
     print $sfh "\n";
     close($sfh);
 }

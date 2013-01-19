@@ -296,7 +296,7 @@ elsif ( $mode eq "updateowner" ) {
     }
 
     if ( $access->GetHostNameType($host) ne "customname" ) {
-        $html->ErrorExit("Owner can only be set for custom named hosts, not owner or clc named hosts.");
+        $html->ErrorExit("Owner can only be set for custom named hosts, not owner named hosts.");
     }
 
     print "<h3>Updating owner to $newowner for host $host</h3>\n";

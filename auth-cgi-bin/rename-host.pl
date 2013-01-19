@@ -68,20 +68,12 @@ print "<h3>Renaming '$oldhost'</h3><p/>\n";
 
 my %host_types = (
     "guest"   => "Guest/Sponsored Host",
-    "desktop" => "Desktop/Regular Host",
-    "printer" => "Printer",
-    "network" => "Network Device",
+    "device" => "Device Host",
     "server"  => "Server",
 );
 
 my %name_types = (
-    "clcname"       => "CLC Host Names [rc###clc]",
-    "virtclcname"   => "Virtual CLC Host Names [rcv###clc]",
-    "thinclcname"   => "Thin Client CLC Host Names [rcx###clc]",
-    "thinname"      => "Thin Client Owner Host Names [rx##owner]",
     "ownername"     => "Owner Host Names [r##owner]",
-    "virtownername" => "Virtual Owner Host Names [rv##owner]",
-    "travelname"    => "Travelling Host Names [rt##owner]",
     "customname"    => "Custom Host Name [*.domain]",
 );
 
@@ -118,7 +110,7 @@ elsif ( $mode eq "nametype" ) {
         if ( $type eq "guest" ) {
 
             # only allow ownernames for guest type machines
-            next if ( $ntype ne "ownername" && $ntype ne "travelname" );
+            next if ( $ntype ne "ownername" );
         }
 
         if ($access->Check(
@@ -132,22 +124,6 @@ elsif ( $mode eq "nametype" ) {
                 && $privs{"sysprog:netdb:user-on-behalf"} )
             {
                 print "<li><a href=\"?oldhost=$oldhost&mode=ownername&";
-                print "type=$type&nametype=$ntype\">";
-                print $name_types{$ntype}, " [$ntype]</a>\n";
-                $cnt++;
-            }
-            elsif ($ntype eq "travelname"
-                && $privs{"sysprog:netdb:user-on-behalf"} )
-            {
-                print "<li><a href=\"?oldhost=$oldhost&mode=travelname&";
-                print "type=$type&nametype=$ntype\">";
-                print $name_types{$ntype}, " [$ntype]</a>\n";
-                $cnt++;
-            }
-            elsif ($ntype eq "thinname"
-                && $privs{"sysprog:netdb:user-on-behalf"} )
-            {
-                print "<li><a href=\"?oldhost=$oldhost&mode=thinname&";
                 print "type=$type&nametype=$ntype\">";
                 print $name_types{$ntype}, " [$ntype]</a>\n";
                 $cnt++;
@@ -166,56 +142,6 @@ elsif ( $mode eq "nametype" ) {
         print "<h3>No naming styles available.</h3>\n";
     }
 
-}
-elsif ( $mode eq "hostname" && $nametype eq "clcname" ) {
-    &HTMLStartForm( &HTMLScriptURL, "GET" );
-    &HTMLHidden( "oldhost",  $oldhost );
-    &HTMLHidden( "mode",     "rename" );
-    &HTMLHidden( "nametype", $nametype );
-    &HTMLHidden( "type",     $type );
-    print "rc";
-    &HTMLStartSelect( "index", 1 );
-    for ( my $i = 1; $i <= 99; $i++ ) {
-        print "<option>", sprintf( "%.2d", $i ), "\n";
-    }
-    &HTMLEndSelect();
-    &HTMLStartSelect("image");
-    foreach my $image ( 'a' .. 'z' ) {
-        print "<option>$image\n";
-    }
-    &HTMLEndSelect();
-    &HTMLInputText( "clc", 10, $rqpairs{clc}, 6 );
-    print ".";
-    my %domains = $dns->GetDomains();
-    &HTMLStartSelect( "domain", 1 );
-    foreach my $domain ( sort( keys(%domains) ) ) {
-
-        if ($access->Check(
-                type   => $type,
-                flag   => "clcname",
-                domain => $domain,
-                action => "insert"
-            )
-            )
-        {
-            if ( $domain eq "managed.mst.edu" ) {
-                print "<option selected>$domain\n";
-            }
-            else {
-                print "<option>$domain\n";
-            }
-        }
-    }
-    &HTMLEndSelect();
-    print "  Owner: ";
-    &HTMLInputText( "owner", 10, "deskinst" );
-    print "<p/>\n";
-    &HTMLCheckbox( "skip_cnames", 0 );
-    print "Do not update CName targets.";
-    print "<p/>\n";
-    &HTMLSubmit("Rename");
-    &HTMLEndForm();
-    print "<p/>\n";
 }
 elsif ( $mode eq "ownername" ) {
     &HTMLStartForm( &HTMLScriptURL, "GET" );
@@ -314,200 +240,6 @@ elsif ( $mode eq "hostname" && $nametype eq "ownername" ) {
     &HTMLEndForm();
     print "<p/>\n";
 }
-elsif ( $mode eq "travelname" ) {
-    &HTMLStartForm( &HTMLScriptURL, "GET" );
-    &HTMLHidden( "oldhost",  $oldhost );
-    &HTMLHidden( "mode",     "hostname" );
-    &HTMLHidden( "nametype", $nametype );
-    &HTMLHidden( "type",     $type );
-
-    my $defowner = $ENV{REMOTE_USER};
-    if ( $type eq "server" ) {
-        $defowner = "namesrv";
-    }
-
-    print "Owner: ";
-    my %privs = &PrivSys_FetchPrivs( $ENV{REMOTE_USER} );
-    if ( $privs{"sysprog:netdb:user-on-behalf"} ) {
-        &HTMLInputText( "owner", 10, $defowner );
-    }
-    else {
-        print $ENV{REMOTE_USER};
-        &HTMLHidden( "owner", $ENV{REMOTE_USER} );
-    }
-    &HTMLEndSelect();
-    print "<p/>\n";
-    &HTMLCheckbox( "skip_cnames", 0 );
-    print "Do not update CName targets.";
-
-    print "<p/>\n";
-    &HTMLSubmit("Rename");
-    &HTMLEndForm();
-    print "<p/>\n";
-}
-elsif ( $mode eq "hostname" && $nametype eq "travelname" ) {
-    my $owner = $rqpairs{owner} || $ENV{REMOTE_USER};
-    my @hosts = sort( $hosts->SearchByOwnerExact($owner) );
-
-    # Note which hosts to skip in list
-    my %skip_numbers = ();
-    foreach my $host (@hosts) {
-        if ( $host =~ /rt(\d\d)/o ) {
-            $skip_numbers{ int($1) } = 1;
-        }
-    }
-
-    &HTMLStartForm( &HTMLScriptURL, "GET" );
-    &HTMLHidden( "oldhost",  $oldhost );
-    &HTMLHidden( "mode",     "rename" );
-    &HTMLHidden( "nametype", $nametype );
-    &HTMLHidden( "type",     $type );
-    print "rt";
-    &HTMLStartSelect( "index", 1 );
-    for ( my $i = 1; $i <= 99; $i++ ) {
-
-        if ( !$skip_numbers{$i} ) {
-
-            print "<option>", sprintf( "%.2d", $i ), "\n";
-        }
-    }
-    &HTMLEndSelect();
-
-    my $defowner = $owner;
-    print $owner;
-    &HTMLHidden( "owner", $owner );
-
-    print ".";
-    my %domains = $dns->GetDomains();
-    &HTMLStartSelect( "domain", 1 );
-    foreach my $domain ( sort( keys(%domains) ) ) {
-        if ( $type eq "guest" ) {
-            next if ( $domain ne "guest.device.mst.edu" );
-        }
-
-        if ($access->Check(
-                type   => $type,
-                flag   => "travelname",
-                domain => $domain,
-                action => "insert"
-            )
-            )
-        {
-            if ( $domain eq "managed.mst.edu" ) {
-                print "<option selected>$domain\n";
-            }
-            else {
-                print "<option>$domain\n";
-            }
-        }
-    }
-    &HTMLEndSelect();
-    print "<p/>\n";
-    &HTMLCheckbox( "skip_cnames", 0 );
-    print "Do not update CName targets.";
-
-    print "<p/>\n";
-    &HTMLSubmit("Rename");
-    &HTMLEndForm();
-    print "<p/>\n";
-}
-elsif ( $mode eq "thinname" ) {
-    &HTMLStartForm( &HTMLScriptURL, "GET" );
-    &HTMLHidden( "oldhost",  $oldhost );
-    &HTMLHidden( "mode",     "hostname" );
-    &HTMLHidden( "nametype", $nametype );
-    &HTMLHidden( "type",     $type );
-
-    my $defowner = $ENV{REMOTE_USER};
-    if ( $type eq "server" ) {
-        $defowner = "namesrv";
-    }
-
-    print "Owner: ";
-    my %privs = &PrivSys_FetchPrivs( $ENV{REMOTE_USER} );
-    if ( $privs{"sysprog:netdb:user-on-behalf"} ) {
-        &HTMLInputText( "owner", 10, $defowner );
-    }
-    else {
-        print $ENV{REMOTE_USER};
-        &HTMLHidden( "owner", $ENV{REMOTE_USER} );
-    }
-    &HTMLEndSelect();
-    print "<p/>\n";
-    &HTMLCheckbox( "skip_cnames", 0 );
-    print "Do not update CName targets.";
-
-    print "<p/>\n";
-    &HTMLSubmit("Rename");
-    &HTMLEndForm();
-    print "<p/>\n";
-}
-elsif ( $mode eq "hostname" && $nametype eq "thinname" ) {
-    my $owner = $rqpairs{owner} || $ENV{REMOTE_USER};
-    my @hosts = sort( $hosts->SearchByOwnerExact($owner) );
-
-    # Note which hosts to skip in list
-    my %skip_numbers = ();
-    foreach my $host (@hosts) {
-        if ( $host =~ /rx(\d\d)/o ) {
-            $skip_numbers{ int($1) } = 1;
-        }
-    }
-
-    &HTMLStartForm( &HTMLScriptURL, "GET" );
-    &HTMLHidden( "oldhost",  $oldhost );
-    &HTMLHidden( "mode",     "rename" );
-    &HTMLHidden( "nametype", $nametype );
-    &HTMLHidden( "type",     $type );
-    print "rx";
-    &HTMLStartSelect( "index", 1 );
-    for ( my $i = 1; $i <= 99; $i++ ) {
-
-        if ( !$skip_numbers{$i} ) {
-
-            print "<option>", sprintf( "%.2d", $i ), "\n";
-        }
-    }
-    &HTMLEndSelect();
-
-    my $defowner = $owner;
-    print $owner;
-    &HTMLHidden( "owner", $owner );
-
-    print ".";
-    my %domains = $dns->GetDomains();
-    &HTMLStartSelect( "domain", 1 );
-    foreach my $domain ( sort( keys(%domains) ) ) {
-        if ( $type eq "guest" ) {
-            next if ( $domain ne "guest.device.mst.edu" );
-        }
-
-        if ($access->Check(
-                type   => $type,
-                flag   => "travelname",
-                domain => $domain,
-                action => "insert"
-            )
-            )
-        {
-            if ( $domain eq "managed.mst.edu" ) {
-                print "<option selected>$domain\n";
-            }
-            else {
-                print "<option>$domain\n";
-            }
-        }
-    }
-    &HTMLEndSelect();
-    print "<p/>\n";
-    &HTMLCheckbox( "skip_cnames", 0 );
-    print "Do not update CName targets.";
-
-    print "<p/>\n";
-    &HTMLSubmit("Rename");
-    &HTMLEndForm();
-    print "<p/>\n";
-}
 elsif ( $mode eq "hostname" && $nametype eq "customname" ) {
     &HTMLStartForm( &HTMLScriptURL, "GET" );
     &HTMLHidden( "oldhost",  $oldhost );
@@ -532,18 +264,7 @@ elsif ( $mode eq "hostname" && $nametype eq "customname" ) {
             )
             )
         {
-            if ( $type eq "network" && $domain eq "network.mst.edu" ) {
-                print "<option selected>$domain\n";
-            }
-            elsif ( $type eq "server" && $domain eq "srv.mst.edu" ) {
-                print "<option selected>$domain\n";
-            }
-            elsif ( $type eq "cname" && $domain eq "srv.mst.edu" ) {
-                print "<option selected>$domain\n";
-            }
-            else {
-                print "<option>$domain\n";
-            }
+           print "<option>$domain\n";
         }
     }
     &HTMLEndSelect();
@@ -568,7 +289,6 @@ elsif ( $mode eq "hostname" && $nametype eq "customname" ) {
     print "<p/>\n";
 }
 elsif ( $mode eq "rename" ) {
-    my $clc      = lc $rqpairs{clc};
     my $owner    = lc $rqpairs{owner};
     my $index    = int( $rqpairs{index} );
     my $image    = lc $rqpairs{image};
@@ -599,33 +319,17 @@ elsif ( $mode eq "rename" ) {
     }
 
     if ( $type eq "guest" ) {
-        if ( $nametype ne "ownername" && $nametype ne "travelname" ) {
+        if ( $nametype ne "ownername" ) {
             $html->ErrorExit("Guest machines must be named for the sponsor/owner.");
         }
 
-        if ( $domain ne "guest.device.mst.edu" ) {
-            $html->ErrorExit("Guest machines must be in the guest.device.mst.edu subdomain.");
+        if ( $domain ne "guest.device.spirenteng.com" ) {
+            $html->ErrorExit("Guest machines must be in the guest.device.spirenteng.com subdomain.");
         }
     }
 
-    if ( $nametype eq "clcname" ) {
-        $host = sprintf( "rc%.2d%s%s.%s", $index, $image, $clc, $domain );
-
-        if ( $access->GetHostNameType($host) ne "clcname" ) {
-            $html->ErrorExit("Hostname ($host) Invalid");
-        }
-
-        my @existing_hosts = $hosts->SearchByCLCName($clc);
-        foreach my $existing_host (@existing_hosts) {
-            if ( $existing_host =~ /^rc(\d\d).(.*)\./o ) {
-                if ( $index == $1 && $clc eq $2 ) {
-                    $html->ErrorExit("Host index already used by $existing_host.");
-                }
-            }
-        }
-    }
-    elsif ( $nametype eq "ownername" ) {
-        $host = sprintf( "r%.2d%s.%s", $index, $owner, $domain );
+    if ( $nametype eq "ownername" ) {
+        $host = sprintf( "s%.2d%s.%s", $index, $owner, $domain );
 
         if ( !$privs{"sysprog:netdb:user-on-behalf"} ) {
             if ( $owner ne $ENV{REMOTE_USER} ) {
@@ -639,51 +343,7 @@ elsif ( $mode eq "rename" ) {
 
         my @existing_hosts = $hosts->SearchByOwnerExact($owner);
         foreach my $existing_host (@existing_hosts) {
-            if ( $existing_host =~ /^r(\d\d)/o ) {
-                if ( $index == $1 ) {
-                    $html->ErrorExit("Host index $index already used by $existing_host.");
-                }
-            }
-        }
-    }
-    elsif ( $nametype eq "travelname" ) {
-        $host = sprintf( "rt%.2d%s.%s", $index, $owner, $domain );
-
-        if ( !$privs{"sysprog:netdb:user-on-behalf"} ) {
-            if ( $owner ne $ENV{REMOTE_USER} ) {
-                $html->ErrorExit("Permission Denied. Owner not authorized.");
-            }
-        }
-
-        if ( $access->GetHostNameType($host) ne "travelname" ) {
-            $html->ErrorExit("Hostname ($host) Invalid");
-        }
-
-        my @existing_hosts = $hosts->SearchByOwnerExact($owner);
-        foreach my $existing_host (@existing_hosts) {
-            if ( $existing_host =~ /^rt(\d\d)/o ) {
-                if ( $index == $1 ) {
-                    $html->ErrorExit("Host index $index already used by $existing_host.");
-                }
-            }
-        }
-    }
-    elsif ( $nametype eq "thinname" ) {
-        $host = sprintf( "rx%.2d%s.%s", $index, $owner, $domain );
-
-        if ( !$privs{"sysprog:netdb:user-on-behalf"} ) {
-            if ( $owner ne $ENV{REMOTE_USER} ) {
-                $html->ErrorExit("Permission Denied. Owner not authorized.");
-            }
-        }
-
-        if ( $access->GetHostNameType($host) ne "thinname" ) {
-            $html->ErrorExit("Hostname ($host) Invalid");
-        }
-
-        my @existing_hosts = $hosts->SearchByOwnerExact($owner);
-        foreach my $existing_host (@existing_hosts) {
-            if ( $existing_host =~ /^rx(\d\d)/o ) {
+            if ( $existing_host =~ /^s(\d\d)/o ) {
                 if ( $index == $1 ) {
                     $html->ErrorExit("Host index $index already used by $existing_host.");
                 }

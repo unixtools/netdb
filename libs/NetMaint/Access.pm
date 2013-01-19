@@ -238,7 +238,7 @@ sub LoadUserAccessData {
 # Type: function
 # Description: Determines the name type of a host
 # Syntax: $res = $obj->GetHostNameType($host)
-# Comments: returns string 'clcname', 'ownername', 'customname', 'travelname', 'thinname', 'thinclcname', 'virtclcname', 'virtownername'
+# Comments: returns string 'ownername', 'customname'
 # End-Doc
 sub GetHostNameType {
     my $self = shift;
@@ -249,58 +249,16 @@ sub GetHostNameType {
         # stub
     }
 
-    elsif ( $host =~ /^r\d\d.*\.[a-z]+\.[a-z]+\.[a-z]+$/o ) {
+    elsif ( $host =~ /^s\d\d.*\.[a-z]+\.[a-z]+\.[a-z]+$/o ) {
         return "ownername";
     }
-    elsif ( $host =~ /^r\d\d.*\.[a-z]+\.[a-z]+\.[a-z]+\.[a-z]+$/o ) {
+    elsif ( $host =~ /^s\d\d.*\.[a-z]+\.[a-z]+\.[a-z]+\.[a-z]+$/o ) {
         return "ownername";
     }
 
-    elsif ( $host =~ /^rv\d\d.*\.[a-z]+\.[a-z]+\.[a-z]+$/o ) {
-        return "virtownername";
-    }
-    elsif ( $host =~ /^rv\d\d.*\.[a-z]+\.[a-z]+\.[a-z]+\.[a-z]+$/o ) {
-        return "virtownername";
-    }
-
-    elsif ( $host =~ /^rt\d\d.*\.[a-z]+\.[a-z]+\.[a-z]+$/o ) {
-        return "travelname";
-    }
-    elsif ( $host =~ /^rt\d\d.*\.[a-z]+\.[a-z]+\.[a-z]+\.[a-z]+$/o ) {
-        return "travelname";
-    }
-
-    elsif ( $host =~ /^rc\d\d[a-z].*\.[a-z]+\.[a-z]+\.[a-z]+$/o ) {
-        return "clcname";
-    }
-    elsif ( $host =~ /^rc\d\d[a-z].*\.[a-z]+\.[a-z]+\.[a-z]+\.[a-z]+$/o ) {
-        return "clcname";
-    }
-
-    elsif ( $host =~ /^rx\d\d[a-z].*\.[a-z]+\.[a-z]+\.[a-z]+$/o ) {
-        return "thinname";
-    }
-    elsif ( $host =~ /^rx\d\d[a-z].*\.[a-z]+\.[a-z]+\.[a-z]+\.[a-z]+$/o ) {
-        return "thinname";
-    }
-
-    elsif ( $host =~ /^rcv\d\d[a-z].*\.[a-z]+\.[a-z]+\.[a-z]+$/o ) {
-        return "virtclcname";
-    }
-    elsif ( $host =~ /^rcv\d\d[a-z].*\.[a-z]+\.[a-z]+\.[a-z]+\.[a-z]+$/o ) {
-        return "virtclcname";
-    }
-
-    elsif ( $host =~ /^rcx\d\d[a-z].*\.[a-z]+\.[a-z]+\.[a-z]+$/o ) {
-        return "thinclcname";
-    }
-    elsif ( $host =~ /^rcx\d\d[a-z].*\.[a-z]+\.[a-z]+\.[a-z]+\.[a-z]+$/o ) {
-        return "thinclcname";
-    }
-
-    elsif ($host !~ /^[0-9a-z]+[0-9a-z-]*[0-9a-z]+\.[0-9a-z]+\.mst\.edu$/o
-        && $host !~ /^[0-9a-z]+[0-9a-z-]*[0-9a-z]+\.mst\.edu$/o &&
-        $host !~ /^[0-9]+\.[0-9a-z]+\.mst\.edu/o )
+    elsif ($host !~ /^[0-9a-z]+[0-9a-z-]*[0-9a-z]+\.[0-9a-z]+\.spirenteng\.com$/o
+        && $host !~ /^[0-9a-z]+[0-9a-z-]*[0-9a-z]+\.spirenteng\.com$/o &&
+        $host !~ /^[0-9]+\.[0-9a-z]+\.spirenteng\.com/o )
     {
         return "invalidname";
     }
@@ -353,7 +311,7 @@ sub CheckHostDeleteAccess {
     }
 
     if ( $hosttype eq "desktop"
-        && ( $nametype eq "ownername" || $nametype eq "travelname" ) )
+        && ( $nametype eq "ownername" ) )
     {
         if ( $obo || ( $hostowner eq $userid ) ) {
             if ($self->CheckAllDomains(
@@ -445,7 +403,7 @@ sub CheckHostEditAccess {
     }
 
     if ( $hosttype eq "desktop"
-        && ( $nametype eq "ownername" || $nametype eq "travelname" ) )
+        && ( $nametype eq "ownername" ) )
     {
         if ( $obo || ( $hostowner eq $userid ) ) {
             if ($self->CheckAllDomains(
@@ -530,7 +488,7 @@ sub CheckHostViewAccess {
     }
 
     if ( $hosttype eq "desktop"
-        && ( $nametype eq "ownername" || $nametype eq "travelname" ) )
+        && ( $nametype eq "ownername" ) )
     {
         if ( $obo || ( $hostowner eq $userid ) ) {
             if ($self->CheckAllDomains(

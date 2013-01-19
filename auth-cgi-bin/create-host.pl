@@ -52,7 +52,6 @@ my $domain   = lc( $rqpairs{domain} );
 my $index    = $rqpairs{index};
 my $image    = lc( $rqpairs{image} );
 my $nametype = $rqpairs{nametype};
-my $clc      = lc( $rqpairs{clc} );
 my $hostname = lc $rqpairs{hostname};
 my $ether    = $rqpairs{ether};
 my $target   = $rqpairs{target};
@@ -64,21 +63,13 @@ $log->Log();
 
 my %host_types = (
     "guest"   => "Guest/Sponsored Host",
-    "desktop" => "Desktop/Regular Host",
-    "printer" => "Printer",
-    "network" => "Network Device",
+    "device" => "Device",
     "cname"   => "Canonical Name (CNAME)",
     "server"  => "Server",
 );
 
 my %name_types = (
-    "clcname"       => "CLC Host Names [rc###clc]",
-    "thinclcname"   => "Thin Client CLC Host Names [rcx###clc]",
-    "virtclcname"   => "Virtual CLC Host Names [rcv###clc]",
-    "ownername"     => "Owner Host Names [r##owner]",
-    "thinname"      => "Thin Client Owner Host Names [rx##owner]",
-    "virtownername" => "Virtual Owner Host Names [rv##owner]",
-    "travelname"    => "Travelling Host Names [rt##owner]",
+    "ownername"     => "Owner Host Names [s##owner]",
     "customname"    => "Custom Host Name [*.domain]",
 );
 
@@ -124,11 +115,7 @@ if ( $mode eq "hosttype" ) {
                 {
 
                     if ($privs{"sysprog:netdb:user-on-behalf"}
-                        && (   $ntype eq "ownername"
-                            || $ntype eq "thinname"
-                            || $ntype eq "travelname"
-                            || $ntype eq "virtownername"
-                            || $ntype eq "virttravelname" )
+                        && (   $ntype eq "ownername" )
                         )
                     {
                         print "<li><a href=\"?mode=${ntype}&type=$type&nametype=$ntype\">";
@@ -175,10 +162,7 @@ elsif ( $mode eq "nametype" ) {
         {
             if ($privs{"sysprog:netdb:user-on-behalf"}
                 && (   $ntype eq "ownername"
-                    || $ntype eq "travelname"
-                    || $ntype eq "thinname"
-                    || $ntype eq "virtownername"
-                    || $ntype eq "virttravelname" )
+                    )
                 )
             {
                 print "<li><a href=\"?mode=${ntype}&type=$type&nametype=$ntype\">";
@@ -201,16 +185,10 @@ elsif ( $mode eq "nametype" ) {
 }
 elsif ( $mode eq "hostname" ) {
 
-    if ( $nametype eq "travelname" || $nametype eq "ownername" || $nametype eq "thinname" ) {
+    if ( $nametype eq "ownername" ) {
         if ( length($owner) > 11 ) {
             $html->ErrorExit(
-                "Owner named devices limited to 11 character owner names. Contact IT to make a custom registration.");
-        }
-    }
-    elsif ( $nametype eq "virtownername" ) {
-        if ( length($owner) > 10 ) {
-            $html->ErrorExit(
-                "Owner named devices limited to 10 character owner names. Contact IT to make a custom registration.");
+                "Owner named devices limited to 11 character owner names. Contact EngOps to make a custom registration.");
         }
     }
 
@@ -220,45 +198,10 @@ elsif ( $mode eq "hostname" ) {
     &HTMLHidden( "type",     $type );
 
     if ( $nametype eq "ownername" ) {
-        print "r";
-    }
-    elsif ( $nametype eq "travelname" ) {
-        print "rt";
-    }
-    elsif ( $nametype eq "virtownername" ) {
-        print "rv";
-    }
-    elsif ( $nametype eq "thinname" ) {
-        print "rx";
-    }
-    elsif ( $nametype eq "clcname" ) {
-        print "rc";
-    }
-    elsif ( $nametype eq "virtclcname" ) {
-        print "rcv";
-    }
-    elsif ( $nametype eq "thinclcname" ) {
-        print "rcx";
+        print "s";
     }
 
-    if ( $nametype eq "clcname" || $nametype eq "virtclcname" || $nametype eq "thinclcname" ) {
-
-        &SimpleHostIndexMenu();
-        &HTMLStartSelect("image");
-        foreach my $image ( 'a' .. 'z' ) {
-            print "<option>$image\n";
-        }
-        &HTMLEndSelect();
-        &HTMLInputText( "clc", 10 );
-        print ".";
-        &SimpleDomainMenu();
-
-        &HTMLHidden( "owner", $hosts->GetDefaultOwner( type => $type, nametype => $nametype ) );
-    }
-    elsif ($nametype eq "ownername"
-        || $nametype eq "thinname"
-        || $nametype eq "travelname"
-        || $nametype eq "virtownername" )
+    if ($nametype eq "ownername" )
     {
         &SimpleHostIndexMenu();
         print $owner;
@@ -305,11 +248,7 @@ elsif ( $mode eq "hostname" ) {
     print "<p/>\n";
 
 }
-elsif ($mode eq "ownername"
-    || $mode eq "thinname"
-    || $mode eq "virtownername"
-    || $mode eq "travelname"
-    || $mode eq "virttravelname" )
+elsif ($mode eq "ownername" )
 {
     &HTMLStartForm( &HTMLScriptURL, "GET" );
     &HTMLHidden( "mode",     "hostname" );
@@ -376,7 +315,7 @@ elsif ( $mode eq "create" ) {
     }
 
     if ( $type eq "guest" ) {
-        if ( $nametype ne "ownername" && $nametype ne "travelname" ) {
+        if ( $nametype ne "ownername" ) {
             $html->ErrorExit("Guest machines must be named for the sponsor/owner.");
         }
 
@@ -387,26 +326,8 @@ elsif ( $mode eq "create" ) {
 
     my $host;
 
-    if ( $nametype eq "clcname" ) {
-        $host = sprintf( "rc%.2d%s%s.%s", $index, $image, $clc, $domain );
-    }
-    elsif ( $nametype eq "virtclcname" ) {
-        $host = sprintf( "rcv%.2d%s%s.%s", $index, $image, $clc, $domain );
-    }
-    elsif ( $nametype eq "thinclcname" ) {
-        $host = sprintf( "rcx%.2d%s%s.%s", $index, $image, $clc, $domain );
-    }
-    elsif ( $nametype eq "ownername" ) {
-        $host = sprintf( "r%.2d%s.%s", $index, $owner, $domain );
-    }
-    elsif ( $nametype eq "thinname" ) {
-        $host = sprintf( "rx%.2d%s.%s", $index, $owner, $domain );
-    }
-    elsif ( $nametype eq "virtownername" ) {
-        $host = sprintf( "rv%.2d%s.%s", $index, $owner, $domain );
-    }
-    elsif ( $nametype eq "travelname" ) {
-        $host = sprintf( "rt%.2d%s.%s", $index, $owner, $domain );
+    if ( $nametype eq "ownername" ) {
+        $host = sprintf( "s%.2d%s.%s", $index, $owner, $domain );
     }
     elsif ( $nametype eq "customname" ) {
         $host = sprintf( "%s.%s", $hostname, $domain );
@@ -421,37 +342,7 @@ elsif ( $mode eq "create" ) {
         $html->ErrorExit("Hostname ($host) Invalid - request type ($nametype), determined type ($foundtype)");
     }
 
-    if ( $nametype eq "clcname" ) {
-        my @existing_hosts = $hosts->SearchByCLCName($clc);
-        foreach my $existing_host (@existing_hosts) {
-            if ( $existing_host =~ /^rc(\d\d).(.*)\./o ) {
-                if ( $index == $1 && $clc eq $2 ) {
-                    $html->ErrorExit("Host index $index already used by $existing_host.");
-                }
-            }
-        }
-    }
-    elsif ( $nametype eq "virtclcname" ) {
-        my @existing_hosts = $hosts->SearchByCLCName($clc);
-        foreach my $existing_host (@existing_hosts) {
-            if ( $existing_host =~ /^rcv(\d\d).(.*)\./o ) {
-                if ( $index == $1 && $clc eq $2 ) {
-                    $html->ErrorExit("Host index $index already used by $existing_host.");
-                }
-            }
-        }
-    }
-    elsif ( $nametype eq "thinclcname" ) {
-        my @existing_hosts = $hosts->SearchByCLCName($clc);
-        foreach my $existing_host (@existing_hosts) {
-            if ( $existing_host =~ /^rcx(\d\d).(.*)\./o ) {
-                if ( $index == $1 && $clc eq $2 ) {
-                    $html->ErrorExit("Host index $index already used by $existing_host.");
-                }
-            }
-        }
-    }
-    elsif ( $nametype eq "ownername" ) {
+    if ( $nametype eq "ownername" ) {
         if ( !$privs{"sysprog:netdb:user-on-behalf"} ) {
             if ( $owner ne $ENV{REMOTE_USER} ) {
                 $html->ErrorExit("Permission Denied (Owner mismatch).");
@@ -465,54 +356,6 @@ elsif ( $mode eq "create" ) {
         my @existing_hosts = $hosts->SearchByOwnerExact($owner);
         foreach my $existing_host (@existing_hosts) {
             if ( $existing_host =~ /^r(\d\d)/o ) {
-                if ( $index == $1 ) {
-                    $html->ErrorExit("Host index $index already used by $existing_host.");
-                }
-            }
-        }
-    }
-    elsif ( $nametype eq "thinname" ) {
-        if ( !$privs{"sysprog:netdb:user-on-behalf"} ) {
-            if ( $owner ne $ENV{REMOTE_USER} ) {
-                $html->ErrorExit("Permission Denied (Owner mismatch).");
-            }
-        }
-
-        my @existing_hosts = $hosts->SearchByOwnerExact($owner);
-        foreach my $existing_host (@existing_hosts) {
-            if ( $existing_host =~ /^rx(\d\d)/o ) {
-                if ( $index == $1 ) {
-                    $html->ErrorExit("Host index $index already used by $existing_host.");
-                }
-            }
-        }
-    }
-    elsif ( $nametype eq "virtownername" ) {
-        if ( !$privs{"sysprog:netdb:user-on-behalf"} ) {
-            if ( $owner ne $ENV{REMOTE_USER} ) {
-                $html->ErrorExit("Permission Denied (Owner mismatch).");
-            }
-        }
-
-        my @existing_hosts = $hosts->SearchByOwnerExact($owner);
-        foreach my $existing_host (@existing_hosts) {
-            if ( $existing_host =~ /^rv(\d\d)/o ) {
-                if ( $index == $1 ) {
-                    $html->ErrorExit("Host index $index already used by $existing_host.");
-                }
-            }
-        }
-    }
-    elsif ( $nametype eq "travelname" ) {
-        if ( !$privs{"sysprog:netdb:user-on-behalf"} ) {
-            if ( $owner ne $ENV{REMOTE_USER} ) {
-                $html->ErrorExit("Permission Denied (Owner mismatch).");
-            }
-        }
-
-        my @existing_hosts = $hosts->SearchByOwnerExact($owner);
-        foreach my $existing_host (@existing_hosts) {
-            if ( $existing_host =~ /^rt(\d\d)/o ) {
                 if ( $index == $1 ) {
                     $html->ErrorExit("Host index $index already used by $existing_host.");
                 }
@@ -573,16 +416,6 @@ elsif ( $mode eq "create" ) {
 
         print "\n";
         $dhcp->AddHostEther( $host, $ether );
-    }
-
-    if ( $type eq "printer" ) {
-        print "<h3>Adding JetDirect Standard DHCP option to host $host.</h3>\n";
-        $dhcp->AddHostOption( $host, "JETDIRECT-STANDARD" );
-    }
-
-    if ( $type eq "server" ) {
-        print "<h3>Adding PXE-SERVERS DHCP option to host $host.</h3>\n";
-        $dhcp->AddHostOption( $host, "PXE-SERVERS" );
     }
 
     if ( $target && $type eq "cname" ) {
@@ -651,28 +484,11 @@ sub SimpleDomainMenu {
     }
 
     my $prefdomain;
-    foreach my $domain (@domains) {
-        if ( $type eq "network" && $domain eq "network.mst.edu" ) {
-            $prefdomain = "network.mst.edu";
-        }
-        elsif ( $type eq "server" && $domain eq "srv.mst.edu" ) {
-            $prefdomain = "srv.mst.edu";
-        }
-        elsif ( $type eq "cname" && $domain eq "srv.mst.edu" ) {
-            $prefdomain = "srv.mst.edu";
-        }
-        elsif ( $type eq "printer" && $domain eq "prn.mst.edu" ) {
-            $prefdomain = "prn.mst.edu";
-        }
-    }
 
     if ( scalar(@domains) > 1 ) {
         &HTMLStartSelect( "domain", 1 );
         foreach my $domain (@domains) {
             if ( $prefdomain && $domain eq $prefdomain ) {
-                print "<option selected>$domain\n";
-            }
-            elsif ( !$prefdomain && $domain eq "managed.mst.edu" ) {
                 print "<option selected>$domain\n";
             }
             else {
@@ -707,17 +523,6 @@ sub SimpleDHCPOptionMenu {
 # Description: print out a available host index menu
 # End-Doc
 sub SimpleHostIndexMenu {
-    if ( $nametype eq "clcname" || $nametype eq "thinclcname" ) {
-
-        # Need to implement a UsedIndexes routine for clcnames and use here...
-        &HTMLStartSelect( "index", 1 );
-        print "<option value=\"##\">auto\n";
-        for ( my $i = 1; $i <= 99; $i++ ) {
-            print "<option>", sprintf( "%.2d", $i ), "\n";
-        }
-        &HTMLEndSelect();
-    }
-    else {
         my @tmp = $hosts->GetFreeIndexes( owner => $owner, nametype => $nametype );
         if ( scalar(@tmp) > 1 ) {
             &HTMLStartSelect( "index", 1 );
@@ -731,5 +536,4 @@ sub SimpleHostIndexMenu {
             print $tmp[0];
             &HTMLHidden( "index", $tmp[0] );
         }
-    }
 }
