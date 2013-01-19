@@ -15,6 +15,9 @@ use NetMaint::DB;
 
 my $db = new NetMaint::DB() || die "failed to open db!";
 
+# Might want this later
+exit 0;
+
 # if the dyn dns reg is over x days old, and we haven't seen or touched
 # that host or ip in the past x days or seen it on the network, then
 # clear that dns registration.
