@@ -119,6 +119,7 @@ if ( $privs{"netdb-admin"} ) {
 
     $html->StartInnerRow();
     print "<td><a href=\"reports/systems-seen.pl\">Seen IP/Systems Report</a></td>\n";
+    print "<td><a href=\"reports/admin-comments-report.pl\">Admin Comments Report</a></td>\n";
     $html->EndInnerRow();
 
     $html->StartInnerRow();
@@ -133,23 +134,12 @@ if ( $privs{"netdb-admin"} ) {
 
     $html->StartInnerRow();
     print "<td><a href=\"reports/disabled-hosts.pl\">Disabled Hosts</a></td>\n";
-    $html->EndInnerRow();
-
-    $html->StartInnerRow();
-    print "<td><a href=\"reports/lease-mismatches.pl\">DHCP Lease Ether Mismatches</a></td>\n";
-    $html->EndInnerRow();
-
-    $html->StartInnerRow();
     print "<td><a href=\"reports/admin-options-report.pl\">Admin Options Report</a></td>\n";
     $html->EndInnerRow();
 
     $html->StartInnerRow();
     print "<td><a href=\"reports/quota-report.pl\">Quota Report</a></td>\n";
     print "<td><a href=\"reports/quota-usage-report.pl\">Quota Usage Report</a></td>\n";
-    $html->EndInnerRow();
-
-    $html->StartInnerRow();
-    print "<td><a href=\"reports/admin-comments-report.pl\">Admin Comments Report</a></td>\n";
     $html->EndInnerRow();
 
     $html->StartInnerRow();
