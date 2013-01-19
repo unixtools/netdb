@@ -31,11 +31,9 @@ my $chunk = 10000;
 &repeat_till_done( "delete from dns_a where name like 'dyn-%' and mtime<date_sub(now(),interval 14 day) limit ?",
     $chunk );
 
-&repeat_till_done( "delete from dhcp_acklog where tstamp<date_sub(now(),interval 14 day) limit ?", $chunk );
+&repeat_till_done( "delete from dhcp_acklog where tstamp<date_sub(now(),interval 360 day) limit ?", $chunk );
 
-&repeat_till_done( "delete from arpscan where tstamp<date_sub(now(),interval 14 day) limit ?", $chunk );
-
-&repeat_till_done( "delete from log where tstamp<date_sub(now(),interval 120 day) limit ?", $chunk );
+&repeat_till_done( "delete from log where tstamp<date_sub(now(),interval 600 day) limit ?", $chunk );
 
 # Begin-Doc
 # Name: repeat_till_done

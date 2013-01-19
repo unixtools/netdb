@@ -84,13 +84,7 @@ if (   $privs{"netdb-admin"} )
         print "<td><a href=\"unreg-fw-rules.pl\">Unreg Range Firewall Rules</a></td>\n";
         $html->EndInnerRow();
         $html->StartInnerRow();
-        print "<td><a href=\"svi-config.pl\">Subnet SVI Config</a></td>\n";
-        $html->EndInnerRow();
-        $html->StartInnerRow();
         print "<td><a href=\"edit-quotas.pl\">Edit Registration Quotas</a></td>\n";
-        $html->EndInnerRow();
-        $html->StartInnerRow();
-        print "<td><a href=\"bulk-admin-disable.pl\">Bulk Admin Disable</a></td>\n";
         $html->EndInnerRow();
     }
 
@@ -104,12 +98,7 @@ if ( $privs{"netdb-admin"} ) {
     $html->StartInnerTable();
 
     $html->StartInnerRow();
-    print "<td><a href=\"reports/host-problems.pl\">Host Problem Report</a></td>\n";
-    print "<td><a href=\"reports/history-ip-arp.pl\">ARP History by IP</a></td>\n";
-    $html->EndInnerRow();
-
-    $html->StartInnerRow();
-    print "<td><a href=\"reports/history-ether-arp.pl\">ARP History by Ether</a></td>\n";
+    print "<td><a href=\"reports/subnet-ip-alloc.pl\">Subnet IP Allocation Report</a></td>\n";
     print "<td><a href=\"reports/history-ip-dhcp.pl\">DHCP History by IP</a></td>\n";
     $html->EndInnerRow();
 
@@ -126,11 +115,6 @@ if ( $privs{"netdb-admin"} ) {
     $html->StartInnerRow();
     print "<td><a href=\"reports/subnet-freeip.pl\">Subnet Free IP List</a></td>\n";
     print "<td><a href=\"reports/subnet-expireip.pl\">Subnet IP Expiration Report</a></td>\n";
-    $html->EndInnerRow();
-
-    $html->StartInnerRow();
-    print "<td><a href=\"reports/subnet-ip-alloc.pl\">Subnet IP Allocation Report</a></td>\n";
-    print "<td><a href=\"reports/subnet-lastarp.pl\">Subnet Last ARP Report</a></td>\n";
     $html->EndInnerRow();
 
     $html->StartInnerRow();
@@ -156,7 +140,6 @@ if ( $privs{"netdb-admin"} ) {
     $html->EndInnerRow();
 
     $html->StartInnerRow();
-    print "<td><a href=\"reports/ether-block-list.pl\">Switch Ether Block List</a></td>\n";
     print "<td><a href=\"reports/admin-options-report.pl\">Admin Options Report</a></td>\n";
     $html->EndInnerRow();
 
