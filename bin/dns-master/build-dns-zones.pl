@@ -62,7 +62,7 @@ foreach my $zone ( sort(@zones) ) {
     unlink( $fname . ".tmp" );
     open( my $tmpfh, ">${fname}.tmp" );
     print $tmpfh "\$ORIGIN $zone.\n";
-    print $tmpfh "\$TTL 900\n";
+    print $tmpfh "\$TTL 300\n";
 
     # Need to add dnssec record types here for subzone signing
     my @types = ();
