@@ -34,8 +34,11 @@ $server =~ s|\..*||gio;
 my $debug = 0;
 open( STDERR, ">&STDOUT" );
 
+my $max_idle = 30 * 60;
+
 # Should never go 2 minutes stuck in a call
-alarm(120);
+# Disabled at spirent, dhcp traffic is low
+alarm($max_idle);
 
 my $trace    = 0;
 my $lastopen = 0;
@@ -95,7 +98,7 @@ while (1) {
         open( my $logfh, "$base/$file" );
         while ( chomp( my $line = <$logfh> ) ) {
             $linecount++;
-            alarm(120);
+            alarm($max_idle);
 
             if ( $line =~ m{network ([\d\.]+/\d+): no free leases} ) {
                 &handle_no_free_leases( $1, $line );

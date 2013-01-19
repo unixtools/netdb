@@ -275,9 +275,9 @@ foreach my $sn ( sort( keys(%$subnets) ) ) {
     my $gw    = $subnets->{$sn}->{gateway};
     my $tmpl  = $subnets->{$sn}->{template};
 
-    # Default to 2 hours
-    my $def_lease_time = 2 * 60 * 60;
-    my $max_lease_time = 2 * 60 * 60;
+    # Default to 1 hours
+    my $def_lease_time = 1 * 60 * 60;
+    my $max_lease_time = 1 * 60 * 60;
 
     # Add to front of list to allow override with subnet options table
     if ( $tmpl eq "short" ) {
@@ -285,8 +285,8 @@ foreach my $sn ( sort( keys(%$subnets) ) ) {
         $max_lease_time = 5 * 60;
     }
     elsif ( $tmpl eq "public" ) {
-        $def_lease_time = 2 * 60 * 60;
-        $max_lease_time = 2 * 60 * 60;
+        $def_lease_time = 1 * 60 * 60;
+        $max_lease_time = 1 * 60 * 60;
         unshift( @{ $sn_options->{$sn} }, "boot-unknown-clients on" );
     }
 
@@ -486,7 +486,7 @@ else {
     close($outconf);
     close($inconf);
 
-    if ( $linecount > 50000 ) {
+    if ( $linecount > 50 ) {
         rename( $tmpfile, $realfile );
 
         # Restart the dhcp server
