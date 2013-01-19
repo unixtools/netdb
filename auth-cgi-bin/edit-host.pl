@@ -841,8 +841,8 @@ sub DisplayHost {
     my $info;
 
     print <<AUTOSUGGEST;
-<script type="text/javascript" src="/~jstools/autosuggest/js/autosuggest.js"></script>
-<link rel="stylesheet" href="/~jstools/autosuggest/css/autosuggest.css" type="text/css" media="screen" charset="utf-8" />
+<script type="text/javascript" src="/~netdb/js/autosuggest/js/autosuggest.js"></script>
+<link rel="stylesheet" href="/~netdb/js/autosuggest/css/autosuggest.css" type="text/css" media="screen" charset="utf-8" />
 AUTOSUGGEST
 
     print "<p/>\n";

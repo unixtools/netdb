@@ -32,7 +32,7 @@ $html->PageHeader( title => "Subnet Listing" );
 
 print <<EOJS;
 <style type="text/css">
-     \@import "/~jstools/DataTables/media/css/demo_table.css";
+     \@import "/~netdb/js/DataTables/media/css/demo_table.css";
 .dataTables_wrapper {
     min-height: 60px;
 }
@@ -42,8 +42,8 @@ print <<EOJS;
 }
 
 </style>
-<script type="text/javascript" src="/~jstools/jquery/jquery.js"></script>
-<script type="text/javascript" src="/~jstools/DataTables/media/js/jquery.dataTables.js"></script>
+<script type="text/javascript" src="/~netdb/js/jquery/jquery.js"></script>
+<script type="text/javascript" src="/~netdb/js/DataTables/media/js/jquery.dataTables.js"></script>
 <script type="text/javascript" src="/~netdb/subnet-sort.js"></script>
 EOJS
 
