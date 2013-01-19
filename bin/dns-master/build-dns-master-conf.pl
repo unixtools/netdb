@@ -33,7 +33,7 @@ print $out "#\n";
 print $out "\n";
 
 foreach my $zone ( sort(@zones) ) {
-    my $file = "/local/bind/data/source/$zone";
+    my $file = "/local/newbind/data/source/$zone";
     my $src  = "source/$zone";
     if ( $sign{$zone} ) {
         $file .= ".signed";
