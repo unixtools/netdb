@@ -16,7 +16,7 @@ use strict;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 
-use UMR::UsageLogger;
+use Local::UsageLogger;
 use NetMaint::DB;
 
 @ISA    = qw(Exporter);

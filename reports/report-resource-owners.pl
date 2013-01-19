@@ -7,11 +7,12 @@
 # End-Doc
 
 $| = 1;
-use lib "/local/umrperl/libs";
-use UMR::OracleObject;
+use lib "/local/perllib/libs";
+use lib "/local/spirentlib/libs";
+use Local::OracleObject;
 use SNMP::Info;
-use UMR::SysProg::SetUID;
-use UMR::SysProg::ADSObject;
+use Local::SetUID;
+use Local::ADSObject;
 
 use lib "/local/netdb/libs";
 use NetMaint::DB;
@@ -22,7 +23,7 @@ use strict;
 
 my $db = new NetMaint::DB() || die "failed to open db!";
 
-my $ads = new UMR::SysProg::ADSObject();
+my $ads = new Local::ADSObject();
 
 my $qry = "select owner,count(*) from hosts group by owner order by owner";
 my $cid = $db->SQL_OpenQuery($qry) || $db->SQL_Error($qry) && die;

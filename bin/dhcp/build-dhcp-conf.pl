@@ -6,14 +6,15 @@
 # Description: build dhcp config files
 # End-Doc
 
-use lib "/local/umrperl/libs";
+use lib "/local/perllib/libs";
+use lib "/local/spirentlib/libs";
 use lib "/local/netdb/libs";
 require NetMaint::DB;
 require NetMaint::Util;
 require NetMaint::Network;
 require NetMaint::DHCP;
 use Digest::MD5 qw(md5_hex);
-use UMR::AuthSrv;
+use Local::AuthSrv;
 
 use strict;
 

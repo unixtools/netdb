@@ -13,7 +13,7 @@ use strict;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 
-use UMR::Error;
+use Local::Error;
 
 @ISA    = qw(Exporter);
 @EXPORT = qw();
@@ -25,7 +25,7 @@ use UMR::Error;
 # Syntax: $maint = new NetMaint::Error()
 # End-Doc
 sub new {
-    return new UMR::Error();
+    return new Local::Error();
 }
 
 1;

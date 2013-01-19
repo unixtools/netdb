@@ -2,8 +2,9 @@
 
 use strict;
 
-use lib "/local/umrperl/libs";
-use UMR::SysProg::SetUID;
+use lib "/local/perllib/libs";
+use lib "/local/spirentlib/libs";
+use Local::SetUID;
 
 $| = 1;
 umask(022);

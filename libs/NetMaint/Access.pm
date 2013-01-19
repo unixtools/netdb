@@ -11,10 +11,10 @@ use strict;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 
-use UMR::UsageLogger;
-use UMR::SysProg::NIS::UserGroup;
-use UMR::SysProg::ADSObject;
-use UMR::PrivSys;
+use Local::UsageLogger;
+use Local::NIS::UserGroup;
+use Local::ADSObject;
+use Local::PrivSys;
 require NetMaint::DB;
 require NetMaint::Util;
 require NetMaint::Logging;
@@ -797,7 +797,7 @@ sub GetDefaultRegistrationQuota {
     my $userid = lc shift;
     my ( $qry, $cid );
     my $db = $self->{db};
-    my $ads = new UMR::SysProg::ADSObject( use_gc => 1 );
+    my $ads = new Local::ADSObject( use_gc => 1 );
 
     my $info = $ads->GetAttributes( $userid, attributes => ["distinguishedName"] );
     my $dn;

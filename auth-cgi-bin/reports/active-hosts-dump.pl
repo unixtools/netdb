@@ -8,15 +8,16 @@
 
 use strict;
 
-use lib "/local/umrperl/libs";
-use UMR::HTMLUtil;
+use lib "/local/perllib/libs";
+use lib "/local/spirentlib/libs";
+use Local::HTMLUtil;
 use lib "/local/netdb/libs";
 
 require NetMaint::DB;
 require NetMaint::Logging;
 
-use UMR::PrivSys;
-use UMR::OracleObject;
+use Local::PrivSys;
+use Local::OracleObject;
 use Text::CSV;
 &PrivSys_RequirePriv("sysprog:netdb:reports");
 
@@ -27,7 +28,7 @@ print "Content-Disposition: attachment; filename=active-hosts.csv\n";
 my $db  = new NetMaint::DB;
 my $log = new NetMaint::Logging;
 
-my $rpt = new UMR::OracleObject;
+my $rpt = new Local::OracleObject;
 $rpt->SQL_OpenDatabase("rpt*") || $rpt->SQL_Error("open db") && die;
 
 $log->Log();

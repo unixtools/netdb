@@ -6,7 +6,8 @@
 # Description: generate the bind dns zone config files
 # End-Doc
 
-use lib "/local/umrperl/libs";
+use lib "/local/perllib/libs";
+use lib "/local/spirentlib/libs";
 use lib "/local/netdb/libs";
 require NetMaint::DNSZones;
 require NetMaint::Error;

@@ -10,9 +10,10 @@ use strict;
 
 use NetAddr::IP;
 
-use lib "/local/umrperl/libs";
-use UMR::HTMLUtil;
-use UMR::PrivSys;
+use lib "/local/perllib/libs";
+use lib "/local/spirentlib/libs";
+use Local::HTMLUtil;
+use Local::PrivSys;
 
 use lib "/local/netdb/libs";
 require NetMaint::HTML;

@@ -6,10 +6,11 @@
 # Description: simple callback script to return a list of subnets by searching name and/or description
 # End-Doc
 
-use lib "/local/umrperl/libs";
-use UMR::HTMLUtil;
+use lib "/local/perllib/libs";
+use lib "/local/spirentlib/libs";
+use Local::HTMLUtil;
 use JSON;
-use UMR::OracleObject;
+use Local::OracleObject;
 
 use lib "/local/netdb/libs";
 use NetMaint::Network;

@@ -8,8 +8,9 @@
 
 use strict;
 
-use lib "/local/umrperl/libs";
-use UMR::HTMLUtil;
+use lib "/local/perllib/libs";
+use lib "/local/spirentlib/libs";
+use Local::HTMLUtil;
 use lib "/local/netdb/libs";
 
 require NetMaint::HTML;
@@ -22,8 +23,8 @@ require NetMaint::Hosts;
 require NetMaint::Access;
 require NetMaint::HostSeen;
 
-use UMR::PrivSys;
-use UMR::SysProg::ADSObject;
+use Local::PrivSys;
+use Local::ADSObject;
 &PrivSys_RequirePriv("sysprog:netdb:reports");
 
 &HTMLGetRequest();
@@ -39,7 +40,7 @@ my $acc     = new NetMaint::Access;
 my $hs      = new NetMaint::HostSeen;
 my $network = new NetMaint::Network;
 
-my $ads = new UMR::SysProg::ADSObject( use_gc => 1 );
+my $ads = new Local::ADSObject( use_gc => 1 );
 
 $log->Log();
 

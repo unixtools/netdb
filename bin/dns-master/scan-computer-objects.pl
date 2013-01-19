@@ -5,10 +5,11 @@
 # Description: scan and mark/purge ADS computer objects based on netdb status
 # End-Doc
 
-use lib "/local/umrperl/libs";
-use UMR::OracleObject;
-use UMR::SysProg::SetUID;
-use UMR::SysProg::ADSObject;
+use lib "/local/perllib/libs";
+use lib "/local/spirentlib/libs";
+use Local::OracleObject;
+use Local::SetUID;
+use Local::ADSObject;
 
 use lib "/local/netdb/libs";
 use NetMaint::DB;
@@ -37,7 +38,7 @@ while ( my ($hostname) = $db->SQL_FetchRow($cid) ) {
 }
 print "Done.\n\n";
 
-my $ad_gc = new UMR::SysProg::ADSObject( use_gc => 1 ) || die;
+my $ad_gc = new Local::ADSObject( use_gc => 1 ) || die;
 
 my @paths = (
     [ "mst.edu", "mst-dc.mst.edu", "DC=mst,DC=edu", "OU=Workstations,DC=mst,DC=edu", "purge" ],
@@ -56,11 +57,11 @@ foreach my $pathref (@paths) {
         print "\n";
         print "Connecting to $server with base $base.\n";
         print "\n";
-        $ad = new UMR::SysProg::ADSObject(
+        $ad = new Local::ADSObject(
             domain => "mst.edu",
             server => $server,
             basedn => $base
-        ) || die $UMR::SysProg::ADSObject::ErrorMsg;
+        ) || die $Local::ADSObject::ErrorMsg;
         $lastdom = $dom;
     }
 

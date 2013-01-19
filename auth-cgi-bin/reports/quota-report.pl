@@ -6,11 +6,12 @@
 # Description: report on quota usage and quota values
 # End-Doc
 
-use lib "/local/umrperl/libs";
+use lib "/local/perllib/libs";
+use lib "/local/spirentlib/libs";
 use lib "/local/netdb/libs";
-use UMR::SysProg::SetUID;
-use UMR::HTMLUtil;
-use UMR::PrivSys;
+use Local::SetUID;
+use Local::HTMLUtil;
+use Local::PrivSys;
 require NetMaint::DB;
 require NetMaint::DHCP;
 require NetMaint::DNS;

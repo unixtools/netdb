@@ -8,10 +8,11 @@
 
 use strict;
 
-use lib "/local/umrperl/libs";
+use lib "/local/perllib/libs";
+use lib "/local/spirentlib/libs";
 use lib "/local/netdb/libs";
 use NetMaint::Access;
-use UMR::SysProg::SetUID;
+use Local::SetUID;
 
 &SetUID("netdb");
 

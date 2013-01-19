@@ -6,8 +6,9 @@
 # Description: output firewall rules script for unreg ranges
 # End-Doc
 
-use lib "/local/umrperl/libs";
-use UMR::HTMLUtil;
+use lib "/local/perllib/libs";
+use lib "/local/spirentlib/libs";
+use Local::HTMLUtil;
 use lib "/local/netdb/libs";
 
 use strict;
@@ -21,7 +22,7 @@ require NetMaint::Util;
 require NetMaint::Logging;
 require NetMaint::Network;
 
-use UMR::PrivSys;
+use Local::PrivSys;
 use NetAddr::IP;
 
 &HTMLGetRequest();

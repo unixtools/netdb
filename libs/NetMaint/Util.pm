@@ -11,9 +11,9 @@ use strict;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 
-use UMR::UsageLogger;
+use Local::UsageLogger;
 use Data::Dumper;
-use UMR::SysProg::ADSObject;
+use Local::ADSObject;
 use Socket;
 
 @ISA    = qw(Exporter);
@@ -47,7 +47,7 @@ sub UserInfo {
 
     my $ads = $self->{ads};
     if ( !$ads ) {
-        $ads = new UMR::SysProg::ADSObject( use_gc => 1 )
+        $ads = new Local::ADSObject( use_gc => 1 )
             || die "couldn't create ads object";
         $self->{ads} = $ads;
     }

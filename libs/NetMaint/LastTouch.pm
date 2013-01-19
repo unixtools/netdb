@@ -11,7 +11,7 @@ use strict;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 
-use UMR::UsageLogger;
+use Local::UsageLogger;
 require NetMaint::DB;
 require NetMaint::Util;
 require NetMaint::DBCache;

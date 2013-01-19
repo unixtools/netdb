@@ -8,7 +8,8 @@
 
 use strict;
 
-use lib "/local/umrperl/libs";
+use lib "/local/perllib/libs";
+use lib "/local/spirentlib/libs";
 use lib "/local/netdb/libs";
 require NetMaint::DB;
 require NetMaint::Register;

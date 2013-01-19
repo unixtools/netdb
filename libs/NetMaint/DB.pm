@@ -11,8 +11,8 @@ use strict;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 
-use UMR::UsageLogger;
-use UMR::MySQLObject;
+use Local::UsageLogger;
+use Local::MySQLObject;
 use Sys::Hostname;
 
 @ISA    = qw(Exporter);
@@ -38,12 +38,12 @@ sub new {
     if ( !$DB ) {
         my $hn = hostname;
         if ( $hn =~ /dns-m1/ ) {
-            $DB = new UMR::MySQLObject;
+            $DB = new Local::MySQLObject;
             $DB->SQL_OpenDatabase( "netdb", user => "netdb" )
                 || die "Couldn't open mysql DB!";
         }
         else {
-            $DB = new UMR::MySQLObject;
+            $DB = new Local::MySQLObject;
             $DB->SQL_OpenDatabase( "netdb", user => "netdb", host => "dns-m1.srv.mst.edu" )
                 || die "Couldn't open mysql DB!";
         }

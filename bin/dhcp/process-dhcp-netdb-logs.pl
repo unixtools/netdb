@@ -8,9 +8,10 @@
 
 use strict;
 
-use lib "/local/umrperl/libs";
+use lib "/local/perllib/libs";
+use lib "/local/spirentlib/libs";
 use lib "/local/netdb/libs";
-use UMR::SysProg::SetUID;
+use Local::SetUID;
 require NetMaint::Leases;
 require NetMaint::DNS;
 require NetMaint::DB;

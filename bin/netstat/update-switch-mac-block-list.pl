@@ -9,8 +9,9 @@
 use strict;
 
 $| = 1;
-use lib "/local/umrperl/libs";
-use UMR::OracleObject;
+use lib "/local/perllib/libs";
+use lib "/local/spirentlib/libs";
+use Local::OracleObject;
 
 use Net::SNMP;
 use Net::Ping;
@@ -19,9 +20,9 @@ use Socket;
 
 use lib "/local/netdb/libs";
 use NetMaint::DB;
-use UMR::AuthSrv;
-use UMR::SysProg::SetUID;
-use UMR::SimpleRPC;
+use Local::AuthSrv;
+use Local::SetUID;
+use Local::SimpleRPC;
 
 &SetUID("netdb");
 
@@ -482,7 +483,7 @@ sub read_conf {
 sub trigger_backup {
     my $device = shift;
 
-    my $rpc = new UMR::SimpleRPC::Client(
+    my $rpc = new Local::SimpleRPC::Client(
         base_url => "https://netstat.srv.mst.edu/cgi-bin/cgiwrap/cfgbkup/rpc",
         retries  => 2
     );

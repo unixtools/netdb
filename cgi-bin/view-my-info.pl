@@ -6,8 +6,9 @@
 # Description: view information on current network connection
 # End-Doc
 
-use lib "/local/umrperl/libs";
-use UMR::HTMLUtil;
+use lib "/local/perllib/libs";
+use lib "/local/spirentlib/libs";
+use Local::HTMLUtil;
 use lib "/local/netdb/libs";
 use strict;
 

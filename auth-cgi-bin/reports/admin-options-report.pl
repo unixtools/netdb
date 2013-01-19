@@ -8,8 +8,9 @@
 
 use strict;
 
-use lib "/local/umrperl/libs";
-use UMR::HTMLUtil;
+use lib "/local/perllib/libs";
+use lib "/local/spirentlib/libs";
+use Local::HTMLUtil;
 use lib "/local/netdb/libs";
 
 require NetMaint::HTML;
@@ -20,7 +21,7 @@ require NetMaint::DB;
 require NetMaint::Logging;
 require NetMaint::Hosts;
 
-use UMR::PrivSys;
+use Local::PrivSys;
 &PrivSys_RequirePriv("sysprog:netdb:reports");
 
 &HTMLGetRequest();

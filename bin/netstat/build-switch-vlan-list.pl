@@ -7,10 +7,11 @@
 # End-Doc
 
 $| = 1;
-use lib "/local/umrperl/libs";
-use UMR::OracleObject;
+use lib "/local/perllib/libs";
+use lib "/local/spirentlib/libs";
+use Local::OracleObject;
 use SNMP::Info;
-use UMR::SysProg::SetUID;
+use Local::SetUID;
 use Socket;
 
 use lib "/local/netdb/libs";

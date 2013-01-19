@@ -16,8 +16,8 @@ use strict;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 
-use UMR::UsageLogger;
-use UMR::PrivSys;
+use Local::UsageLogger;
+use Local::PrivSys;
 use NetMaint::Register;
 use NetMaint::Hosts;
 use NetMaint::DNS;

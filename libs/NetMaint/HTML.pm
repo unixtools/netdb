@@ -11,16 +11,16 @@ use strict;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 
-use UMR::UsageLogger;
-use UMR::HTMLUtil;
+use Local::UsageLogger;
+use Local::HTMLUtil;
 use NetMaint::Util;
 use Data::Dumper;
 use NetMaint::Leases;
 use NetMaint::DHCP;
-use UMR::AppTemplate;
-use UMR::HTMLImpersonate;
+use Local::AppTemplate;
+use Local::HTMLImpersonate;
 
-@ISA    = qw(UMR::AppTemplate Exporter);
+@ISA    = qw(Local::AppTemplate Exporter);
 @EXPORT = qw();
 
 # Begin-Doc
@@ -42,7 +42,7 @@ sub new {
 
     &HTMLImpersonate("sysprog:impersonate");
 
-    $tmp = new UMR::AppTemplate(
+    $tmp = new Local::AppTemplate(
         title => $title,
         style => <<EOSTYLE,
 #content { font-size: 12px; 
@@ -258,7 +258,7 @@ sub Display_Person {
     print "</td>\n";
     $self->EndInnerRow();
 
-    my $ads = new UMR::SysProg::ADSObject( use_gc => 1 );
+    my $ads = new Local::ADSObject( use_gc => 1 );
     my $info = $ads->GetAttributes($userid);
     if ($info) {
         my ( $name, $dn, $address, $title, $department, $phone, $email );

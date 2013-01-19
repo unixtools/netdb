@@ -8,9 +8,10 @@
 
 use strict;
 
-use lib "/local/umrperl/libs";
-use UMR::HTMLUtil;
-use UMR::Encode;
+use lib "/local/perllib/libs";
+use lib "/local/spirentlib/libs";
+use Local::HTMLUtil;
+use Local::Encode;
 use Socket;
 
 use lib "/local/netdb/libs";

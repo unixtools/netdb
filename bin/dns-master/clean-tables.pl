@@ -8,9 +8,10 @@
 
 use strict;
 
-use lib "/local/umrperl/libs";
-use UMR::OracleObject;
-use UMR::SysProg::SetUID;
+use lib "/local/perllib/libs";
+use lib "/local/spirentlib/libs";
+use Local::OracleObject;
+use Local::SetUID;
 
 use lib "/local/netdb/libs";
 use NetMaint::DB;
