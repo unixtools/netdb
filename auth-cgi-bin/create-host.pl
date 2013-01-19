@@ -496,7 +496,7 @@ sub SimpleDomainMenu {
 # Description: print out a simplified (though hardcoded) dhcp option menu
 # End-Doc
 sub SimpleDHCPOptionMenu {
-    if ( $type ne "cname" && $type ne "server" ) {
+    if ( 0 && $type ne "cname" && $type ne "server" ) {
         print "  Optional Desktop DHCP Host Options: ";
         &HTMLRadioButton( "dhcpoptions", "",                0, "None" );
         &HTMLRadioButton( "dhcpoptions", "PXE-CMDESK-PROD", 1, "Windows Desktop PXE" );
