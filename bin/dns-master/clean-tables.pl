@@ -10,7 +10,6 @@ use strict;
 
 use lib "/local/perllib/libs";
 use lib "/local/spirentlib/libs";
-use Local::OracleObject;
 use Local::SetUID;
 
 use lib "/local/netdb/libs";
