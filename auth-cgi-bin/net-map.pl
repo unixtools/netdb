@@ -114,6 +114,18 @@ while ( my ($ip) = $db->SQL_FetchRow($cid) )
 }
 $db->SQL_CloseQuery($cid);
 
+my %ip_to_alloc;
+my $qry = "select ip,host from ip_alloc where host is not null";
+my $cid = $db->SQL_OpenQuery($qry) || $db->SQL_Error($qry) && die;
+while ( my ($ip,$host) = $db->SQL_FetchRow($cid) )
+{
+    if ( $host )
+    {
+        $ip_to_alloc{$ip} = $host;
+    }
+}
+$db->SQL_CloseQuery($cid);
+
 #
 #
 #
@@ -181,12 +193,12 @@ foreach my $ip ( sort { $ip_to_sort{$a} cmp $ip_to_sort{$b} } keys(%ip_to_sort) 
     if ( $newprefix ne $prefix ) {
         $prefix = $newprefix;
         $html->StartInnerHeaderRow();
-        print "<td align=center colspan=5><b>Network Prefix ($prefix)</td>\n";
+        print "<td align=center colspan=4><b>Network Prefix ($prefix)</td>\n";
         $html->EndInnerHeaderRow();
 
         $html->StartInnerHeaderRow();
         print
-            "<td><b>IP</td><td><b>Fwd DNS</td><td><b>Rev DNS</td><td><b>Ping</td><td><b>OS and Services</td>\n";
+            "<td><b>IP</td><td><b>DNS / Alloc</td><td><b>Ping</td><td><b>OS and Services</td>\n";
         $html->EndInnerHeaderRow();
     }
 
@@ -195,18 +207,26 @@ foreach my $ip ( sort { $ip_to_sort{$a} cmp $ip_to_sort{$b} } keys(%ip_to_sort) 
     my $dns  = "";
     my $cnt1 = 0;
     foreach my $host ( sort( keys( %{ $ip_to_dns{$ip} } ) ) ) {
-        $dns .= "<a href=\"${editprefix}$host\">$host</a><br>\n";
+        next if ( $host eq "" );
+        $dns .= "<a href=\"${editprefix}$host\">$host</a>";
         $cnt1++;
     }
 
     my $resv = "";
     my $cnt2 = 0;
     foreach my $host ( sort( keys( %{ $ip_to_resv{$ip} } ) ) ) {
-        $resv .= "<a href=\"${editprefix}$host\">$host</a><br>\n";
+        next if ( $host eq "" );
+        $resv .= "<a href=\"${editprefix}$host\">$host</a>";
         $cnt2++;
     }
 
-    if ( $dns eq "" && $resv eq "" && $ip_to_ping{$ip} eq "" && $ip_to_os{$ip} eq "" && $ip_to_ports{$ip} eq "" ) {
+    my $alloc = $ip_to_alloc{$ip};
+    if ( $alloc )
+    {
+        $alloc = "<a href=\"${editprefix}$alloc\">$alloc</a>";
+    }
+
+    if ( $alloc eq "" && $dns eq "" && $resv eq "" && $ip_to_ping{$ip} eq "" && $ip_to_os{$ip} eq "" && $ip_to_ports{$ip} eq "" ) {
         if ($lastskip) {
             next;
         }
@@ -223,18 +243,16 @@ foreach my $ip ( sort { $ip_to_sort{$a} cmp $ip_to_sort{$b} } keys(%ip_to_sort) 
     $html->StartInnerRow();
     print "<td>$ip</td>\n";
 
-    if ( $dns eq $resv && $cnt1 == 1 && $cnt2 == 1 ) {
-        print "<td><font color=green>$dns</font></td>\n";
-        print "<td><font color=green>$resv</font></td>\n";
+    print "<td>$dns";
+    if ( $resv ne $dns && $resv ne "" )
+    {
+        print " / $resv";
     }
-    elsif ( $dns eq $resv ) {
-        print "<td><font color=orange>$dns</font></td>\n";
-        print "<td><font color=orange>$resv</font></td>\n";
+    if ( $alloc ne $dns && $alloc ne $resv && $alloc ne "" )
+    {
+        print " / $alloc";
     }
-    else {
-        print "<td>$dns</td>\n";
-        print "<td>$resv</td>\n";
-    }
+    print "</td>\n";
 
     print "<td align=center>\n";
     print $ip_to_ping{$ip};
