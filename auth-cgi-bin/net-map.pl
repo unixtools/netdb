@@ -180,7 +180,7 @@ foreach my $i ( 0 .. 255 ) {
 
 $debug && print "Generating HTML...\n";
 
-$html->StartBlockTable("DNS/IP Info for Labs", 1000);
+$html->StartBlockTable("DNS/IP Info for Labs", 800);
 $html->StartInnerTable();
 
 my $lastskip = 0;
@@ -198,35 +198,37 @@ foreach my $ip ( sort { $ip_to_sort{$a} cmp $ip_to_sort{$b} } keys(%ip_to_sort) 
 
         $html->StartInnerHeaderRow();
         print
-            "<td><b>IP</td><td><b>DNS / Alloc</td><td><b>Ping</td><td><b>OS and Services</td>\n";
+            "<td><b>IP</td><td><b>DNS / Alloc<br>(.spirenteng.com)</td><td><b>Ping</td>";
+        print "<td width=600><b>OS and Services</td>\n";
         $html->EndInnerHeaderRow();
     }
 
     my $editprefix = "https://netmgr.spirenteng.com/auth-cgi-bin/cgiwrap/netdb/edit-host.pl?mode=view&host=";
 
+    my %poss_names = ();
+
     my $dns  = "";
-    my $cnt1 = 0;
     foreach my $host ( sort( keys( %{ $ip_to_dns{$ip} } ) ) ) {
         next if ( $host eq "" );
-        $dns .= "<a href=\"${editprefix}$host\">$host</a>";
-        $cnt1++;
+        $poss_names{$host} = 1;
     }
 
     my $resv = "";
-    my $cnt2 = 0;
+    my $ncount = 0;
     foreach my $host ( sort( keys( %{ $ip_to_resv{$ip} } ) ) ) {
         next if ( $host eq "" );
-        $resv .= "<a href=\"${editprefix}$host\">$host</a>";
-        $cnt2++;
+        $poss_names{$host} = 1;
+        $ncount++;
     }
 
     my $alloc = $ip_to_alloc{$ip};
     if ( $alloc )
     {
-        $alloc = "<a href=\"${editprefix}$alloc\">$alloc</a>";
+        $poss_names{$alloc} = 1;
+        $ncount++;
     }
 
-    if ( $alloc eq "" && $dns eq "" && $resv eq "" && $ip_to_ping{$ip} eq "" && $ip_to_os{$ip} eq "" && $ip_to_ports{$ip} eq "" ) {
+    if ( $ncount == 0 && $ip_to_ping{$ip} eq "" && $ip_to_os{$ip} eq "" && $ip_to_ports{$ip} eq "" ) {
         if ($lastskip) {
             next;
         }
@@ -243,16 +245,14 @@ foreach my $ip ( sort { $ip_to_sort{$a} cmp $ip_to_sort{$b} } keys(%ip_to_sort) 
     $html->StartInnerRow();
     print "<td>$ip</td>\n";
 
-    print "<td>$dns";
-    if ( $resv ne $dns && $resv ne "" )
+    my @editlinks = ();
+    foreach my $name ( sort(keys(%poss_names)) )
     {
-        print " / $resv";
+        my $sname = $name;
+        $sname =~ s/.spirenteng.com//go;
+        push(@editlinks, "<a href=\"${editprefix}$name\">$sname</a>");
     }
-    if ( $alloc ne $dns && $alloc ne $resv && $alloc ne "" )
-    {
-        print " / $alloc";
-    }
-    print "</td>\n";
+    print "<td>", join("<br>\n", @editlinks), "</td>\n";
 
     print "<td align=center>\n";
     print $ip_to_ping{$ip};
