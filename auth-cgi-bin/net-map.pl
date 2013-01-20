@@ -14,6 +14,7 @@ use Local::HTMLUtil;
 use Local::PrivSys;
 use lib "/local/netdb/libs";
 
+use NetMaint::DB;
 require NetMaint::HTML;
 use Data::Dumper;
 
@@ -22,6 +23,8 @@ use Data::Dumper;
 
 my $html = new NetMaint::HTML( title => "Tools Menu" );
 
+my $db = new NetMaint::DB;
+
 $html->PageHeader();
 
 chdir("/local/netmap") || die;
@@ -29,6 +32,8 @@ chdir("/local/netmap") || die;
 my %all_ip = ();
 
 my $debug = 0;
+my $line;
+my %ip_to_sort;
 
 my @nets = qw(10.155.0 10.155.2 10.155.100 10.71.50);
 my $netpat = join( "|", map { quotemeta $_ } @nets );
@@ -101,23 +106,13 @@ foreach my $net (@nets) {
 
 my %ip_to_ping = ();
 
-foreach my $net (@nets) {
-    open( my $in_fping, "data/fping-$net.out" );
-
-    $debug && print "Loading FPing scan of $net\n";
-    while ( defined( my $line = <$in_fping> ) ) {
-        if ( $line =~ /^(${net}.\d+)\s+:\s+(.*)/ ) {
-            my $ip   = $1;
-            my $ping = $2;
-            if ( $ping && $ping !~ m|/100%|o ) {
-
-                #$ip_to_ping{$ip} = $ping;
-                $ip_to_ping{$ip} = "YES";
-            }
-        }
-    }
-    close($in_fping);
+my $qry = "select distinct ip from last_ping_ip where unix_timestamp(now())-unix_timestamp(tstamp) < 120";
+my $cid = $db->SQL_OpenQuery($qry) || $db->SQL_Error($qry) && die;
+while ( my ($ip) = $db->SQL_FetchRow($cid) )
+{
+    $ip_to_ping{$ip} = "YES";
 }
+$db->SQL_CloseQuery($cid);
 
 #
 #
@@ -172,7 +167,9 @@ foreach my $i ( 0 .. 255 ) {
 }
 
 $debug && print "Generating HTML...\n";
-print "<table border=1 cellpadding=1 cellspacing=0>\n";
+
+$html->StartBlockTable("DNS/IP Info for Labs", 1000);
+$html->StartInnerTable();
 
 my $lastskip = 0;
 my $prefix   = "";
@@ -183,9 +180,14 @@ foreach my $ip ( sort { $ip_to_sort{$a} cmp $ip_to_sort{$b} } keys(%ip_to_sort) 
 
     if ( $newprefix ne $prefix ) {
         $prefix = $newprefix;
-        print "<tr><td align=center colspan=5 bgcolor=#eeee00><b>Network Prefix ($prefix)</td></tr>\n";
+        $html->StartInnerHeaderRow();
+        print "<td align=center colspan=5><b>Network Prefix ($prefix)</td>\n";
+        $html->EndInnerHeaderRow();
+
+        $html->StartInnerHeaderRow();
         print
-            "<tr bgcolor=#eeee00><td><b>IP</td><td><b>Fwd DNS</td><td><b>Rev DNS</td><td><b>Ping</td><td><b>OS and Services</td></tr>\n";
+            "<td><b>IP</td><td><b>Fwd DNS</td><td><b>Rev DNS</td><td><b>Ping</td><td><b>OS and Services</td>\n";
+        $html->EndInnerHeaderRow();
     }
 
     my $editprefix = "https://netmgr.spirenteng.com/auth-cgi-bin/cgiwrap/netdb/edit-host.pl?mode=view&host=";
@@ -209,14 +211,16 @@ foreach my $ip ( sort { $ip_to_sort{$a} cmp $ip_to_sort{$b} } keys(%ip_to_sort) 
             next;
         }
         else {
-            print "<tr><td colspan=5>... skipped ...</td></tr>\n";
+            $html->StartInnerHeaderRow();
+            print "<td colspan=5 align=center>... skipped ...</td>\n";
+            $html->EndInnerHeaderRow();
             $lastskip = 1;
             next;
         }
     }
     $lastskip = 0;
 
-    print "<tr>\n";
+    $html->StartInnerRow();
     print "<td>$ip</td>\n";
 
     if ( $dns eq $resv && $cnt1 == 1 && $cnt2 == 1 ) {
@@ -246,8 +250,10 @@ foreach my $ip ( sort { $ip_to_sort{$a} cmp $ip_to_sort{$b} } keys(%ip_to_sort) 
     }
     print "</td>\n";
 
-    print "</tr>\n";
+    $html->EndInnerRow();
 }
-print "</table>\n";
+
+$html->EndInnerTable();
+$html->EndBlockTable();
 
 $html->PageFooter();
