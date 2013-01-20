@@ -35,7 +35,7 @@ sub new {
     my %opts  = @_;
 
     my $title = $opts{title} || "Network Maintenance Tool";
-    $title = "NetDB: " . $title;
+    $title = "SpirentEng NetDB: " . $title;
 
 
     &HTMLImpersonate("netdb-admin");
