@@ -83,7 +83,7 @@ sub PageHeader {
         print " - ";
         print "<a href=\"/auth-cgi-bin/cgiwrap/netdb/edit-host.pl\">Edit Host</a>\n";
         print " - ";
-        print "<a href=\"/dns-map.html\">DNS/IP Listing</a>\n";
+        print "<a href=\"/auth-cgi-bin/cgiwrap/netdb/net-map.pl\">DNS/IP Listing</a>\n";
         print " - ";
         print "<a href=\"/vm-map.html\">VM Listing</a>\n";
         print "</td></tr>\n";
