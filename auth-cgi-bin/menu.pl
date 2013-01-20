@@ -83,6 +83,9 @@ if (   $privs{"netdb-admin"} )
         $html->StartInnerRow();
         print "<td><a href=\"edit-quotas.pl\">Edit Registration Quotas</a></td>\n";
         $html->EndInnerRow();
+        $html->StartInnerRow();
+        print "<td><a href=\"net-map.pl\">Display All Lab DNS/IP Info</a></td>\n";
+        $html->EndInnerRow();
     }
 
     $html->EndInnerTable();
