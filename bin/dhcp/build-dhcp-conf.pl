@@ -35,8 +35,6 @@ if ( $ARGV[0] eq "-force" ) {
 # Get name of this server
 chomp( my $server = `/bin/hostname` );
 
-my $polycom_pw_secret = &AuthSrv_Fetch(user => "polycom", instance => "pw-seed");
-
 # Load host options once
 print "Retrieving host dhcp options.\n";
 $error->clear();
