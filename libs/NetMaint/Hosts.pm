@@ -245,7 +245,7 @@ sub GetDefaultOwner {
     my $nametype = $opts{nametype};
     my $type     = $opts{type};
 
-    if ( $type eq "server" || $type eq "cname" || $type eq "network" ) {
+    if ( $type eq "server" || $type eq "cname" || $type eq "network" || $type eq "device" ) {
         $defowner = "netdb";
     }
 
