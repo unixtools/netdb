@@ -19,7 +19,7 @@ require NetMaint::Logging;
 use Local::PrivSys;
 use Local::OracleObject;
 use Text::CSV;
-&PrivSys_RequirePriv("netdb-admin");
+&PrivSys_RequirePriv("netdb-user");
 
 &HTMLGetRequest();
 print "Content-Disposition: attachment; filename=active-hosts.csv\n";

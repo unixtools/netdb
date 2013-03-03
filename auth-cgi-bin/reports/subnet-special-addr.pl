@@ -23,7 +23,7 @@ require NetMaint::DNS;
 
 my $html = new NetMaint::HTML( title => "Subnet Special Address Listing" );
 $html->PageHeader();
-$html->RequirePriv("netdb-admin");
+$html->RequirePriv("netdb-user");
 
 my $log = new NetMaint::Logging;
 my $net = new NetMaint::Network;

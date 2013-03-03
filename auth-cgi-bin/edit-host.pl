@@ -289,7 +289,7 @@ elsif ( $mode eq "updateowner" ) {
         $html->ErrorExit("Invalid owner userid.");
     }
 
-    if ( !$privs{"netdb-admin"} ) {
+    if ( !$privs{"netdb-user"} ) {
         $html->ErrorExit("Only users that have the user-on-behalf ability can change host owners.");
     }
 
@@ -408,7 +408,7 @@ elsif ( $mode eq "updateadmincomm" ) {
 elsif ( $mode eq "autoaddstatic" ) {
     &CheckHostAndEditAccess();
 
-    if ( !$privs{"netdb-admin"} ) {
+    if ( !$privs{"netdb-user"} ) {
         $html->ErrorExit("Permission Denied to add static addresses.");
     }
 
@@ -466,7 +466,7 @@ elsif ( $mode eq "addstatic" ) {
 
     my $submode = $rqpairs{submode} || "listsubnets";
 
-    if ( !$privs{"netdb-admin"} ) {
+    if ( !$privs{"netdb-user"} ) {
         $html->ErrorExit("Permission Denied to add static addresses.");
     }
 
@@ -570,7 +570,7 @@ elsif ( $mode eq "enable_static_dns" ) {
 
     my $ip = $rqpairs{ip};
 
-    if ( !$privs{"netdb-admin"} ) {
+    if ( !$privs{"netdb-user"} ) {
         $html->ErrorExit("Permission Denied.");
     }
 
@@ -593,7 +593,7 @@ elsif ( $mode eq "enable_all_static_dns" ) {
 
     $dns->BlockUpdates();
 
-    if ( !$privs{"netdb-admin"} ) {
+    if ( !$privs{"netdb-user"} ) {
         $html->ErrorExit("Permission Denied.");
     }
 
@@ -871,7 +871,7 @@ AUTOSUGGEST
     );
 
     if (   $access->GetHostNameType($host) eq "customname"
-        && $privs{"netdb-admin"} )
+        && $privs{"netdb-user"} )
     {
         print "<p/>\n";
         $html->StartBlockTable( "Host Owner Update", 600 );
@@ -1179,7 +1179,7 @@ AUTOSUGGEST
 
             print "<td><a href=\"?mode=delstatic&host=$host&ip=$ip\">Delete</a>\n";
 
-            if ( $privs{"netdb-admin"} ) {
+            if ( $privs{"netdb-user"} ) {
                 print " - <a href=\"?mode=enable_static_dns&host=$host&ip=$ip\">";
                 print "Enable Static DNS</a> ";
             }
@@ -1195,7 +1195,7 @@ AUTOSUGGEST
             $html->EndInnerRow();
         }
 
-        if ( $privs{"netdb-admin"} ) {
+        if ( $privs{"netdb-user"} ) {
             $html->StartInnerRow();
             print "<td align=center colspan=2>\n";
 

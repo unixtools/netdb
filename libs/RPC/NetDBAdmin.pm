@@ -637,7 +637,7 @@ sub CreateHost {
     }
 
     if ( $nametype eq "ownername" ) {
-        if ( ! &PrivSys_CheckPriv($ENV{REMOTE_USER}, "netdb-admin") ) {
+        if ( ! &PrivSys_CheckPriv($ENV{REMOTE_USER}, "netdb-user") ) {
             if ( $owner ne $ENV{REMOTE_USER} ) {
                 die "Permission Denied (Owner mismatch).";
             }
@@ -710,7 +710,7 @@ sub GetUtilityCNames {
     my @groups = @_;
 
     foreach my $grp (@groups) {
-        &PrivSys_QuietRequirePriv("netdb-admin");
+        &PrivSys_QuietRequirePriv("netdb-user");
     }
 
     my $db  = $self->_init_db();

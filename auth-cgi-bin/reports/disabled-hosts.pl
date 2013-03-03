@@ -22,7 +22,7 @@ require NetMaint::Logging;
 require NetMaint::Hosts;
 
 use Local::PrivSys;
-&PrivSys_RequirePriv("netdb-admin");
+&PrivSys_RequirePriv("netdb-user");
 
 &HTMLGetRequest();
 &HTMLContentType();
