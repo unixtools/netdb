@@ -253,9 +253,9 @@ sub GetHostNameType {
         return "ownername";
     }
 
-    elsif ($host !~ /^[0-9a-z]+[0-9a-z-]*[0-9a-z]+\.[0-9a-z]+\.spirenteng\.com$/o
-        && $host !~ /^[0-9a-z]+[0-9a-z-]*[0-9a-z]+\.spirenteng\.com$/o &&
-        $host !~ /^[0-9]+\.[0-9a-z]+\.spirenteng\.com/o )
+    elsif ($host !~ /^[0-9a-z]+[0-9a-z-]*[0-9a-z]+\.[0-9a-z]+\.[a-z]+\.[a-z]+$/o
+        && $host !~ /^[0-9a-z]+[0-9a-z-]*[0-9a-z]+\.[a-z]+\.[a-z]+$/o &&
+        $host !~ /^[0-9]+\.[0-9a-z]+\.[a-z]+\.[a-z]+/o )
     {
         return "invalidname";
     }
