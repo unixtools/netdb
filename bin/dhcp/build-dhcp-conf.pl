@@ -290,12 +290,6 @@ foreach my $sn ( sort( keys(%$subnets) ) ) {
     }
 
     #
-    # For now, we want more traffic for initial testing of netdb
-    #
-    $def_lease_time = 10*60;
-    $max_lease_time = 10*60;
-
-    #
     # Scan subnet for any default/max lease time overrides
     #
     foreach my $option ( @{ $sn_options->{$sn} } ) {
