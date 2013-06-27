@@ -84,6 +84,9 @@ if ( $privs{"netdb-admin"} ) {
     $html->StartInnerRow();
     print "<td><a href=\"net-map.pl\">Display All Lab DNS/IP Info</a></td>\n";
     $html->EndInnerRow();
+    $html->StartInnerRow();
+    print "<td><a href=\"/vm-map.html\">Display Lab VM Inventory</a></td>\n";
+    $html->EndInnerRow();
 
     $html->EndInnerTable();
     $html->EndBlockTable();
