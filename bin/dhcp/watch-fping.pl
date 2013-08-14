@@ -21,33 +21,30 @@ my $server = hostname;
 $server =~ s|\..*||gio;
 
 my @targets = @ARGV;
-if ( scalar(@targets) == 0 )
-{
+if ( scalar(@targets) == 0 ) {
+
     # Grab from locally attached networks
-    open(my $route, "-|") || exec("netstat", "-rn");
-    while ( defined(my $routeline = <$route>) )
-    {
-        if ( $routeline =~ m|^([\d\.]+)\s+0\.0\.0\.0\s+([\d\.]+)| )
-        {
-            my $ip = $1;
+    open( my $route, "-|" ) || exec( "netstat", "-rn" );
+    while ( defined( my $routeline = <$route> ) ) {
+        if ( $routeline =~ m|^([\d\.]+)\s+0\.0\.0\.0\s+([\d\.]+)| ) {
+            my $ip   = $1;
             my $mask = $2;
 
-            if ( $mask eq "255.255.255.0" )
-            {
-                push(@targets, "$1/24");
+            if ( $mask eq "255.255.255.0" ) {
+                push( @targets, "$1/24" );
             }
         }
 
-#Kernel IP routing table
-#Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
-#0.0.0.0         10.155.2.1      0.0.0.0         UG        0 0          0 eth0
-#10.155.0.0      0.0.0.0         255.255.255.0   U         0 0          0 eth1
-#169.254.0.0     0.0.0.0         255.255.0.0     U         0 0          0 eth2
+        #Kernel IP routing table
+        #Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
+        #0.0.0.0         10.155.2.1      0.0.0.0         UG        0 0          0 eth0
+        #10.155.0.0      0.0.0.0         255.255.255.0   U         0 0          0 eth1
+        #169.254.0.0     0.0.0.0         255.255.0.0     U         0 0          0 eth2
     }
     close($route);
 }
 
-
+print "Done generating subnet list.\n";
 
 my $debug = 0;
 open( STDERR, ">&STDOUT" );
@@ -78,31 +75,26 @@ foreach my $target (@targets) {
     } while ( ++$ip );
 }
 unlink($tf);
-open(my $out, ">$tf");
-print $out join("\n", @ips);
+open( my $out, ">$tf" );
+print $out join( "\n", @ips );
 close($out);
 
-my $lastarp;
+print "Done generating IP list.\n";
 
-my $ping_count = 0;
+my $ping_count       = 0;
 my $last_count_print = time;
 
-open(SV_STDIN, ">&STDIN");
-open(STDIN, "<$tf");
+open( my $in, "/usr/sbin/fping -l -p 30000 -q 2>&1 <$tf |" );
+sleep(1);
 unlink($tf);
-open( my $in, "-|" ) || exec( "fping", "-c", "10", "-p", "30000", "-q" );
-open(STDIN, ">&SV_STDIN");
 
-# Give fping a head start so that arp table will populate
-sleep(30);
-
+my $stime = time;
 while ( defined( my $line = <$in> ) ) {
     chomp($line);
     $debug && print $line, "\n";
 
-    # 10.155.2.228 : [0], 84 bytes, 0.33 ms (0.33 avg, 0% loss)
-    if ( $line =~ /^([0-9\.]+)\s+:.*bytes,\s+\d/o ) {
-        my $ip    = $1;
+    if ( $line =~ m{^([0-9\.]+)\s+:.*bytes}o ) {
+        my $ip = $1;
 
         $db->SQL_ExecQuery( $cid, $ip, $server ) || $db->SQL_Error("inserting $ip: $qry") && die;
         $ping_count++;
@@ -111,11 +103,12 @@ while ( defined( my $line = <$in> ) ) {
         alarm($max_idle);
     }
 
-    if ( time - $last_count_print > 30 )
-    {
+    if ( time - $last_count_print > 30 ) {
         print "Ping Count: $ping_count\n";
         $last_count_print = time;
     }
+
+    last if ( time - $stime > 1200 );
 }
 close($in);
 
