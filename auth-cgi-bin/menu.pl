@@ -61,6 +61,14 @@ if ( $privs{"netdb-user"} ) {
 $html->StartInnerRow();
 print "<td><a href=\"view-my-info.pl\">View Current Connection Info</a></td>\n";
 $html->EndInnerRow();
+
+$html->StartInnerRow();
+print "<td><a href=\"net-map.pl\">Display All Lab DNS/IP Info</a></td>\n";
+$html->EndInnerRow();
+$html->StartInnerRow();
+print "<td><a href=\"/vm-map.html\">Display Lab VM Inventory</a></td>\n";
+$html->EndInnerRow();
+
 $html->EndInnerTable();
 $html->EndBlockTable();
 
@@ -80,12 +88,6 @@ if ( $privs{"netdb-admin"} ) {
     $html->EndInnerRow();
     $html->StartInnerRow();
     print "<td><a href=\"edit-quotas.pl\">Edit Registration Quotas</a></td>\n";
-    $html->EndInnerRow();
-    $html->StartInnerRow();
-    print "<td><a href=\"net-map.pl\">Display All Lab DNS/IP Info</a></td>\n";
-    $html->EndInnerRow();
-    $html->StartInnerRow();
-    print "<td><a href=\"/vm-map.html\">Display Lab VM Inventory</a></td>\n";
     $html->EndInnerRow();
 
     $html->EndInnerTable();

@@ -180,6 +180,8 @@ foreach my $i ( 0 .. 255 ) {
 
 $debug && print "Generating HTML...\n";
 
+print "<br><b>Boldfaced</b> hostnames are staticly assigned to that IP.<br>\n";
+
 $html->StartBlockTable("DNS/IP Info for Labs", 800);
 $html->StartInnerTable();
 
@@ -250,7 +252,16 @@ foreach my $ip ( sort { $ip_to_sort{$a} cmp $ip_to_sort{$b} } keys(%ip_to_sort) 
     {
         my $sname = $name;
         $sname =~ s/.spirenteng.com//go;
-        push(@editlinks, "<a href=\"${editprefix}$name\">$sname</a>");
+        
+        my ($pre,$post);
+        
+        if ( $name eq $ip_to_alloc{$ip} )
+        {
+            $pre = "<font color=red><b>";
+            $post = "</b></font>";
+        }
+
+        push(@editlinks, "${pre}<a href=\"${editprefix}$name\">$sname</a>${post}");
     }
     print "<td>", join("<br>\n", @editlinks), "</td>\n";
 
