@@ -40,7 +40,7 @@ while (1) {
 
         # (10.155.2.161) at 00:1b:21:bf:6f:b4 [ether] on eth0
         if ( $arpline =~ m|.*\(([0-9\.]+)\) at ([0-9a-f:]+) | ) {
-            my $ip  = $2;
+            my $ip  = $1;
             my $ether = $2;
 
             $db->SQL_ExecQuery( $cid, $ip, $ether, $server ) || $db->SQL_Error("inserting $ip, $ether: $qry") && die;
