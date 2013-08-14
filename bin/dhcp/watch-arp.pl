@@ -32,7 +32,7 @@ my $cid = $db->SQL_OpenBoundQuery($qry) || $db->SQL_Error($qry) && die;
 my %ip_to_ether = ();
 
 while (1) {
-    open( my $arp, "-|" ) || exec( "arp", "-an" );
+    open( my $arp, "-|" ) || exec( "/usr/sbin/arp", "-an" );
     while ( defined( my $arpline = <$arp> ) ) {
 
         next if ( $arpline =~ /incomplete/o );
@@ -41,7 +41,7 @@ while (1) {
         # (10.155.2.161) at 00:1b:21:bf:6f:b4 [ether] on eth0
         if ( $arpline =~ m|.*\(([0-9\.]+)\) at ([0-9a-f:]+) | ) {
             my $ip  = $2;
-            my $eth = $2;
+            my $ether = $2;
 
             $db->SQL_ExecQuery( $cid, $ip, $ether, $server ) || $db->SQL_Error("inserting $ip, $ether: $qry") && die;
         }
