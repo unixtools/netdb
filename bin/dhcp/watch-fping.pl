@@ -91,7 +91,7 @@ my $last_count_print = time;
 open(SV_STDIN, ">&STDIN");
 open(STDIN, "<$tf");
 unlink($tf);
-open( my $in, "-|" ) || exec( "fping", "-l", "-p", "30000", "-q" );
+open( my $in, "-|" ) || exec( "fping", "-c", "10", "-p", "30000", "-q" );
 open(STDIN, ">&SV_STDIN");
 
 # Give fping a head start so that arp table will populate
@@ -101,9 +101,13 @@ while ( defined( my $line = <$in> ) ) {
     chomp($line);
     $debug && print $line, "\n";
 
+    # Clear on each pass
+    %ip_to_ether = ();
     if ( time - $lastarp > 15 ) {
         open( my $arp, "-|" ) || exec( "arp", "-an" );
         while ( defined( my $arpline = <$arp> ) ) {
+
+            next if ( $arpline =~ /incomplete/o );
 
             # (10.155.2.161) at 00:1b:21:bf:6f:b4 [ether] on eth0
             if ( $arpline =~ m|.*\(([0-9\.]+)\) at ([0-9a-f:]+) | ) {
