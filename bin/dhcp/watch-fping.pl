@@ -63,7 +63,7 @@ $SIG{PIPE} = "die";
 # Connect to db
 #
 my $db  = new NetMaint::DB;
-my $qry = "replace into last_ping_ip(ip,ether,source,tstamp) values (?,?,?,now())";
+my $qry = "replace into last_ping_ip(ip,source,tstamp) values (?,?,now())";
 my $cid = $db->SQL_OpenBoundQuery($qry) || $db->SQL_Error($qry) && die;
 
 #
@@ -83,7 +83,6 @@ print $out join("\n", @ips);
 close($out);
 
 my $lastarp;
-my %ip_to_ether = ();
 
 my $ping_count = 0;
 my $last_count_print = time;
@@ -101,31 +100,11 @@ while ( defined( my $line = <$in> ) ) {
     chomp($line);
     $debug && print $line, "\n";
 
-    # Clear on each pass
-    %ip_to_ether = ();
-    if ( time - $lastarp > 15 ) {
-        open( my $arp, "-|" ) || exec( "arp", "-an" );
-        while ( defined( my $arpline = <$arp> ) ) {
-
-            next if ( $arpline =~ /incomplete/o );
-
-            # (10.155.2.161) at 00:1b:21:bf:6f:b4 [ether] on eth0
-            if ( $arpline =~ m|.*\(([0-9\.]+)\) at ([0-9a-f:]+) | ) {
-                $ip_to_ether{$1} = $2;
-            }
-        }
-        close($arp);
-
-        $lastarp = time;
-    }
-
     # 10.155.2.228 : [0], 84 bytes, 0.33 ms (0.33 avg, 0% loss)
     if ( $line =~ /^([0-9\.]+)\s+:.*bytes,\s+\d/o ) {
         my $ip    = $1;
-        # don't insert nulls
-        my $ether = $ip_to_ether{$ip} || "00:00:00:00:00:00";
 
-        $db->SQL_ExecQuery( $cid, $ip, $ether, $server ) || $db->SQL_Error("inserting $ip, $ether: $qry") && die;
+        $db->SQL_ExecQuery( $cid, $ip, $server ) || $db->SQL_Error("inserting $ip: $qry") && die;
         $ping_count++;
 
         # Extend timeout
