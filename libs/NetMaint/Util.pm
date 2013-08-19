@@ -81,8 +81,14 @@ sub CheckValidHost {
     $host =~ s/\.\.//go;
 
     if ( $host ne $orighost ) {
-        return "Invalid host name ($host vs. $orighost)";
+        return "Invalid host name ($orighost)";
     }
+
+    if ( $host !~ /[a-z0-9\-]+\.[a-z0-9\-]+/o )
+    {
+        return "Invalid host name (missing at least one dot)";
+    }
+
     return undef;
 }
 

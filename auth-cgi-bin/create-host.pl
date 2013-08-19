@@ -61,13 +61,13 @@ $log->Log();
 
 my %host_types = (
     "device" => "Device",
-    "cname"   => "Canonical Name (CNAME)",
-    "server"  => "Server",
+    "cname"  => "Canonical Name (CNAME)",
+    "server" => "Server",
 );
 
 my %name_types = (
-    "ownername"     => "Owner Host Names [s##owner]",
-    "customname"    => "Custom Host Name [*.domain]",
+    "ownername"  => "Owner Host Names [s##owner]",
+    "customname" => "Custom Host Name [*.domain]",
 );
 
 my %privs = &PrivSys_FetchPrivs( $ENV{REMOTE_USER} );
@@ -111,9 +111,8 @@ if ( $mode eq "hosttype" ) {
                     )
                 {
 
-                    if ($privs{"netdb-user"}
-                        && (   $ntype eq "ownername" )
-                        )
+                    if ( $privs{"netdb-user"}
+                        && ( $ntype eq "ownername" ) )
                     {
                         print "<li><a href=\"?mode=${ntype}&type=$type&nametype=$ntype\">";
                         print $name_types{$ntype}, " [$ntype]</a>\n";
@@ -157,10 +156,8 @@ elsif ( $mode eq "nametype" ) {
             )
             )
         {
-            if ($privs{"netdb-user"}
-                && (   $ntype eq "ownername"
-                    )
-                )
+            if ( $privs{"netdb-user"}
+                && ( $ntype eq "ownername" ) )
             {
                 print "<li><a href=\"?mode=${ntype}&type=$type&nametype=$ntype\">";
                 print $name_types{$ntype}, " [$ntype]</a>\n";
@@ -185,7 +182,8 @@ elsif ( $mode eq "hostname" ) {
     if ( $nametype eq "ownername" ) {
         if ( length($owner) > 11 ) {
             $html->ErrorExit(
-                "Owner named devices limited to 11 character owner names. Contact EngOps to make a custom registration.");
+                "Owner named devices limited to 11 character owner names. Contact EngOps to make a custom registration."
+            );
         }
     }
 
@@ -198,8 +196,7 @@ elsif ( $mode eq "hostname" ) {
         print "s";
     }
 
-    if ($nametype eq "ownername" )
-    {
+    if ( $nametype eq "ownername" ) {
         &SimpleHostIndexMenu();
         print $owner;
 
@@ -245,8 +242,7 @@ elsif ( $mode eq "hostname" ) {
     print "<p/>\n";
 
 }
-elsif ($mode eq "ownername" )
-{
+elsif ( $mode eq "ownername" ) {
     &HTMLStartForm( &HTMLScriptURL, "GET" );
     &HTMLHidden( "mode",     "hostname" );
     &HTMLHidden( "nametype", $nametype );
@@ -286,24 +282,6 @@ elsif ( $mode eq "create" ) {
     }
     $index = int($index);
 
-    my $shorthost = $hostname;
-    $shorthost =~ s/\..*//gio;
-    my @old_hosts = $hosts->SearchByName($shorthost);
-    foreach my $old_host (@old_hosts) {
-        my $shost = $old_host;
-        $shost =~ s/\..*//gio;
-        if ( $shost eq $shorthost ) {
-            print "<h3>Short hostname might conflict with '<tt>";
-            print $html->SearchLink_Host($old_host);
-            print "</tt>'.</h3>\n";
-        }
-    }
-
-    my $host_check_msg = $util->CheckValidHost($hostname);
-    if ($host_check_msg) {
-        $html->ErrorExit($host_check_msg);
-    }
-
     my $eth_check_msg = $util->CheckValidEther($ether);
     if ( $ether && $eth_check_msg ) {
         $html->ErrorExit("$eth_check_msg");
@@ -327,6 +305,24 @@ elsif ( $mode eq "create" ) {
 
     if ( !$host ) {
         $html->ErrorExit("Unable to generate hostname from parameters.");
+    }
+
+    my $shorthost = $host;
+    $shorthost =~ s/\..*//gio;
+    my @old_hosts = $hosts->SearchByName($shorthost);
+    foreach my $old_host (@old_hosts) {
+        my $shost = $old_host;
+        $shost =~ s/\..*//gio;
+        if ( $shost eq $shorthost ) {
+            print "<h3>Short hostname might conflict with '<tt>";
+            print $html->SearchLink_Host($old_host);
+            print "</tt>'.</h3>\n";
+        }
+    }
+
+    my $host_check_msg = $util->CheckValidHost($host);
+    if ($host_check_msg) {
+        $html->ErrorExit($host_check_msg);
     }
 
     my $foundtype = $access->GetHostNameType($host);
@@ -515,17 +511,17 @@ sub SimpleDHCPOptionMenu {
 # Description: print out a available host index menu
 # End-Doc
 sub SimpleHostIndexMenu {
-        my @tmp = $hosts->GetFreeIndexes( owner => $owner, nametype => $nametype );
-        if ( scalar(@tmp) > 1 ) {
-            &HTMLStartSelect( "index", 1 );
-            print "<option value=\"##\">auto\n";
-            foreach my $i ( $hosts->GetFreeIndexes( owner => $owner, nametype => $nametype ) ) {
-                print "<option>$i\n";
-            }
-            &HTMLEndSelect();
+    my @tmp = $hosts->GetFreeIndexes( owner => $owner, nametype => $nametype );
+    if ( scalar(@tmp) > 1 ) {
+        &HTMLStartSelect( "index", 1 );
+        print "<option value=\"##\">auto\n";
+        foreach my $i ( $hosts->GetFreeIndexes( owner => $owner, nametype => $nametype ) ) {
+            print "<option>$i\n";
         }
-        else {
-            print $tmp[0];
-            &HTMLHidden( "index", $tmp[0] );
-        }
+        &HTMLEndSelect();
+    }
+    else {
+        print $tmp[0];
+        &HTMLHidden( "index", $tmp[0] );
+    }
 }
