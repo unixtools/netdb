@@ -187,6 +187,10 @@ elsif ( $mode eq "hostname" ) {
         }
     }
 
+    if ( $owner && !$util->UserInfo($owner) ) {
+        $html->ErrorExit("Invalid owner, userid does not exist.");
+    }
+
     &HTMLStartForm( &HTMLScriptURL, "GET" );
     &HTMLHidden( "mode",     "create" );
     &HTMLHidden( "nametype", $nametype );
