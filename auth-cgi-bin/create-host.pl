@@ -299,6 +299,11 @@ elsif ( $mode eq "create" ) {
         }
     }
 
+    my $host_check_msg = $util->CheckValidHost($hostname);
+    if ($host_check_msg) {
+        $html->ErrorExit($host_check_msg);
+    }
+
     my $eth_check_msg = $util->CheckValidEther($ether);
     if ( $ether && $eth_check_msg ) {
         $html->ErrorExit("$eth_check_msg");

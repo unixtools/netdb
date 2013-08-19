@@ -146,6 +146,12 @@ elsif ( $mode eq "addether" ) {
         $html->ErrorExit("Invalid Ether ($ether)");
     }
 
+    my $host_check_msg = $util->CheckValidHost($host);
+    if ( $host_check_msg )
+    {
+        $html->ErrorExit($host_check_msg);
+    }
+
     my $eth_check_msg = $util->CheckValidEther($ether);
     if ( $ether && $eth_check_msg ) {
         $html->ErrorExit("$eth_check_msg");

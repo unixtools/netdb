@@ -65,6 +65,28 @@ sub CondenseEther {
 }
 
 # Begin-Doc
+# Name: CheckValidHost
+# Type: method
+# Description: returns error message if hostname isn't valid
+# Syntax: $msg = $util->CheckValidHost($host)
+# End-Doc
+sub CheckValidHost {
+    my $self     = shift;
+    my $orighost = lc shift;
+
+    my $host = lc $orighost;
+    $host =~ tr/a-z0-9\-\.//cd;
+    $host =~ s/^\.//go;
+    $host =~ s/\.$//go;
+    $host =~ s/\.\.//go;
+
+    if ( $host ne $orighost ) {
+        return "Invalid host name ($host vs. $orighost)";
+    }
+    return undef;
+}
+
+# Begin-Doc
 # Name: CheckValidEther
 # Type: method
 # Description: returns error message if ethernet address is invalid

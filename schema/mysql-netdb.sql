@@ -514,12 +514,10 @@ create table last_ping_ip
 (
  ip varchar(15) not null, 
  source varchar(50) not null,
- ether varchar(20),
  tstamp datetime not null
 );
 
-create unique index lpi_ipse ON last_ping_ip (ip,source,ether);
-create index lpi_ether ON last_ping_ip (ether);
+create unique index lpi_ipse ON last_ping_ip (ip,source);
 create index lpi_tstamp ON last_ping_ip (tstamp,ip);
 
 
@@ -535,5 +533,19 @@ create unique index lni_ips ON last_nmap_ip (ip,source);
 create index lni_tstamp ON last_nmap_ip (tstamp,ip);
 
 
+
+
+drop table if exists last_arp_ip;
+create table last_arp_ip 
+(
+ ip varchar(15) not null, 
+ source varchar(50) not null,
+ ether varchar(20),
+ tstamp datetime not null
+);
+
+create unique index lai_ipse ON last_arp_ip (ip,source,ether);
+create index lai_ether ON last_arp_ip (ether);
+create index lai_tstamp ON last_arp_ip (tstamp,ip);
 
 

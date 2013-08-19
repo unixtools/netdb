@@ -212,6 +212,7 @@ foreach my $ip ( sort { $ip_to_sort{$a} cmp $ip_to_sort{$b} } keys(%ip_to_sort) 
     my $dns  = "";
     foreach my $host ( sort( keys( %{ $ip_to_dns{$ip} } ) ) ) {
         next if ( $host eq "" );
+        next if ( $host =~ /^dyn-/o );
         $poss_names{$host} = 1;
     }
 
@@ -219,6 +220,7 @@ foreach my $ip ( sort { $ip_to_sort{$a} cmp $ip_to_sort{$b} } keys(%ip_to_sort) 
     my $ncount = 0;
     foreach my $host ( sort( keys( %{ $ip_to_resv{$ip} } ) ) ) {
         next if ( $host eq "" );
+        next if ( $host =~ /^dyn-/o );
         $poss_names{$host} = 1;
         $ncount++;
     }

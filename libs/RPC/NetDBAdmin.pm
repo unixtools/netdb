@@ -74,7 +74,6 @@ sub new {
     my $class = ref($self) || $self;
     my $tmp   = {};
 
-
     bless $tmp, $class;
 
     return $tmp;
@@ -90,7 +89,6 @@ sub GetHostInfo {
     my $self = shift;
     my $host = lc shift;
     my ( $qry, $cid );
-
 
     my $access = new NetMaint::Access;
     my $hosts  = new NetMaint::Hosts;
@@ -115,7 +113,6 @@ sub GetHostDescription {
     my $self = shift;
     my $host = lc shift;
     my ( $qry, $cid );
-
 
     my $db = $self->_init_db();
 
@@ -147,7 +144,6 @@ sub SetHostDescription {
     my $desc = shift;
     my ( $qry, $cid );
 
-
     my $db = $self->_init_db();
 
     my $access = new NetMaint::Access;
@@ -173,7 +169,6 @@ sub GetHostLocation {
     my $self = shift;
     my $host = lc shift;
     my ( $qry, $cid );
-
 
     my $db = $self->_init_db();
 
@@ -205,7 +200,6 @@ sub SetHostLocation {
     my $loc  = shift;
     my ( $qry, $cid );
 
-
     my $db = $self->_init_db();
 
     my $access = new NetMaint::Access;
@@ -231,7 +225,6 @@ sub AutoAllocateVMWareAddr {
     my $self = shift;
     my $host = lc shift;
     my ( $qry, $cid );
-
 
     my $db = $self->_init_db();
 
@@ -259,7 +252,6 @@ sub AddEther {
     my $host  = lc shift;
     my $ether = shift;
     my ( $qry, $cid );
-
 
     my $db = $self->_init_db();
 
@@ -318,7 +310,6 @@ sub RemoveEther {
     my $ether = shift;
     my ( $qry, $cid );
 
-
     my $db = $self->_init_db();
 
     my $access = new NetMaint::Access;
@@ -352,7 +343,6 @@ sub GetHostOptions {
     my $self = shift;
     my $host = lc shift;
     my ( $qry, $cid );
-
 
     my $db = $self->_init_db();
 
@@ -389,7 +379,6 @@ sub GetAdminOptions {
     my $self = shift;
     my $host = lc shift;
     my ( $qry, $cid );
-
 
     my $db = $self->_init_db();
 
@@ -428,7 +417,6 @@ sub AddHostOption {
     my $option = shift;
     my ( $qry, $cid );
 
-
     my $access = new NetMaint::Access;
     my $dhcp   = new NetMaint::DHCP;
     my $hosts  = new NetMaint::Hosts;
@@ -463,7 +451,6 @@ sub RemoveHostOption {
     my $option = shift;
     my ( $qry, $cid );
 
-
     my $access = new NetMaint::Access;
     my $dhcp   = new NetMaint::DHCP;
     my $hosts  = new NetMaint::Hosts;
@@ -491,7 +478,6 @@ sub AddAdminOption {
     my $host   = lc shift;
     my $option = shift;
     my ( $qry, $cid );
-
 
     my $access = new NetMaint::Access;
     my $dhcp   = new NetMaint::DHCP;
@@ -531,7 +517,6 @@ sub RemoveAdminOption {
     my $option = shift;
     my ( $qry, $cid );
 
-
     my $access = new NetMaint::Access;
     my $dhcp   = new NetMaint::DHCP;
     my $hosts  = new NetMaint::Hosts;
@@ -563,7 +548,6 @@ sub DeleteHost {
     my $host = lc shift;
     my ( $qry, $cid );
 
-
     my $access   = new NetMaint::Access;
     my $hosts    = new NetMaint::Hosts;
     my $register = new NetMaint::Register;
@@ -590,7 +574,6 @@ sub CreateHost {
     my $self = shift;
     my %opts = @_;
     my ( $qry, $cid );
-
 
     my $access = new NetMaint::Access;
     my $dhcp   = new NetMaint::DHCP;
@@ -631,13 +614,17 @@ sub CreateHost {
         die "Unable to generate hostname from parameters.";
     }
 
+    if ( my $msg = $util->CheckValidHost($host) ) {
+        die $msg;
+    }
+
     my $foundtype = $access->GetHostNameType($host);
     if ( $foundtype ne $nametype ) {
         die "Hostname ($host) Invalid - request type ($nametype), determined type ($foundtype)";
     }
 
     if ( $nametype eq "ownername" ) {
-        if ( ! &PrivSys_CheckPriv($ENV{REMOTE_USER}, "netdb-user") ) {
+        if ( !&PrivSys_CheckPriv( $ENV{REMOTE_USER}, "netdb-user" ) ) {
             if ( $owner ne $ENV{REMOTE_USER} ) {
                 die "Permission Denied (Owner mismatch).";
             }
@@ -769,7 +756,6 @@ sub UpdateUtilityCName {
     my $self = shift;
     my $host = lc shift;
     my $tgt  = lc shift;
-
 
     if ( $host =~ m|^([^.]+)\.([^.]+)\.spirenteng\.com$| ) {
         &PrivSys_QuietRequirePriv("netdb-admin");
