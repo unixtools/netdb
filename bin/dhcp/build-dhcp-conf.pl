@@ -96,7 +96,7 @@ open( my $tmpfh, ">${fname}.tmp" );
 
 print "Generating header.\n";
 print $tmpfh "option domain-name \"spirenteng.com\";\n";
-print $tmpfh "option domain-name-servers 10.40.50.60, 10.40.50.61;\n";
+print $tmpfh "option domain-name-servers 10.40.50.20, 10.40.50.21;\n";
 print $tmpfh "next-server ${server};\n";
 # This is apparently not recommended unless no other choice
 #print $tmpfh "one-lease-per-client true;\n";
