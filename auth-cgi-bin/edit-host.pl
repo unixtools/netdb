@@ -147,8 +147,7 @@ elsif ( $mode eq "addether" ) {
     }
 
     my $host_check_msg = $util->CheckValidHost($host);
-    if ( $host_check_msg )
-    {
+    if ($host_check_msg) {
         $html->ErrorExit($host_check_msg);
     }
 
@@ -1289,36 +1288,34 @@ EOF
         my @static_a   = $dns->Get_Static_A_Records($host);
         my @static_ptr = $dns->Get_Static_PTR_Records($host);
 
-        if ( $ipcnt != 0 || $#static_a >= 0 || $#static_ptr >= 0 ) {
-            $html->StartBlockTable( "Staticly Assigned DNS Records", 600 );
-            if ( $#static_a < 0 && $#static_ptr < 0 ) {
-                $html->StartInnerTable();
-                $html->StartInnerRow();
-                print "<td align=center>This host has no staticly assigned DNS records.</td>\n";
-                $html->EndInnerRow();
-                $html->EndInnerTable();
-            }
-            else {
-                $html->StartInnerTable( "Name", "Target" );
-
-                foreach my $entry ( $dns->Get_Static_A_Records($host) ) {
-                    $html->StartInnerRow();
-                    print "<td>", $entry->{name},    "</td>\n";
-                    print "<td>", $entry->{address}, "</td>\n";
-                    $html->EndInnerRow();
-                }
-
-                foreach my $entry ( $dns->Get_Static_PTR_Records($host) ) {
-                    $html->StartInnerRow();
-                    print "<td>", $entry->{name}, " [", $util->ARPAToIP( $entry->{name} ), "]", "</td>\n";
-                    print "<td>", $entry->{address}, "</td>\n";
-                    $html->EndInnerRow();
-                }
-
-                $html->EndInnerTable();
-            }
-            $html->EndBlockTable();
+        $html->StartBlockTable( "Staticly Assigned DNS Records", 600 );
+        if ( $#static_a < 0 && $#static_ptr < 0 ) {
+            $html->StartInnerTable();
+            $html->StartInnerRow();
+            print "<td align=center>This host has no staticly assigned DNS records.</td>\n";
+            $html->EndInnerRow();
+            $html->EndInnerTable();
         }
+        else {
+            $html->StartInnerTable( "Name", "Target" );
+
+            foreach my $entry ( $dns->Get_Static_A_Records($host) ) {
+                $html->StartInnerRow();
+                print "<td>", $entry->{name},    "</td>\n";
+                print "<td>", $entry->{address}, "</td>\n";
+                $html->EndInnerRow();
+            }
+
+            foreach my $entry ( $dns->Get_Static_PTR_Records($host) ) {
+                $html->StartInnerRow();
+                print "<td>", $entry->{name}, " [", $util->ARPAToIP( $entry->{name} ), "]", "</td>\n";
+                print "<td>", $entry->{address}, "</td>\n";
+                $html->EndInnerRow();
+            }
+
+            $html->EndInnerTable();
+        }
+        $html->EndBlockTable();
     }
 
     if ( $hosttype eq "cname" ) {
