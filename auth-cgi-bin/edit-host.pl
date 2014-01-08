@@ -462,7 +462,7 @@ elsif ( $mode eq "manualadd_ipv6" ) {
     }
 
     # Canonicalize the format
-    $ip = NetAddr::IP->new( $ip, "IPv6" )->addr();
+    $ip = NetAddr::IP->new6($ip)->addr();
 
     print "<b>Attempting to add static AAAA record for $host/$ip.</b><br/>\n";
     $dns->Add_Static_AAAA( $host, $ip );

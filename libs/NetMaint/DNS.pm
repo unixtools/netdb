@@ -953,10 +953,10 @@ sub Delete_A_ByHostIP {
 
     my $util = $self->{util};
 
-    $ip = $util->CondenseIP($ip);
+    my $cip = $util->CondenseIP($ip);
 
-    $qry = "delete from dns_a where name=? and address=?";
-    $db->SQL_ExecQuery( $qry, $host, $ip ) || $db->SQL_Error($qry);
+    $qry = "delete from dns_a where name=? and (address=? or address=?)";
+    $db->SQL_ExecQuery( $qry, $host, $ip, $cip ) || $db->SQL_Error($qry);
 
     $self->{log}->Log(
         action => "deleted static a record",
@@ -983,10 +983,10 @@ sub Delete_AAAA_ByHostIP {
 
     my $util = $self->{util};
 
-    $ip = $util->CondenseIP($ip);
+    my $cip = $util->CondenseIPv6($ip);
 
-    $qry = "delete from dns_aaaa where name=? and address=?";
-    $db->SQL_ExecQuery( $qry, $host, $ip ) || $db->SQL_Error($qry);
+    $qry = "delete from dns_aaaa where name=? and (address=? or address=?)";
+    $db->SQL_ExecQuery( $qry, $host, $ip, $cip ) || $db->SQL_Error($qry);
 
     $self->{log}->Log(
         action => "deleted static aaaa record",

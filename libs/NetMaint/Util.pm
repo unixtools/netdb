@@ -123,7 +123,7 @@ sub CheckValidIPv6 {
     my $self = shift;
     my $addr = lc shift;
 
-    my $ip = NetAddr::IP->new( $addr, "IPv6" );
+    my $ip = NetAddr::IP->new6( $addr );
     if ( !$ip ) {
         return "invalid IPv6 address";
     }
@@ -213,8 +213,20 @@ sub CondenseIP {
     my $self = shift;
     my $ip   = shift;
 
-    my @tmp = split( /\./, $ip );
-    return join( ".", map( int, split( /\./, $ip ) ) );
+    return NetAddr::IP->new($ip,"255.255.255.255")->addr();
+}
+
+# Begin-Doc
+# Name: CondenseIPv6
+# Type: method
+# Description: condenses an ip address or returns undef
+# Syntax: $ip = $util->CondenseIPv6($ip)
+# End-Doc
+sub CondenseIPv6 {
+    my $self = shift;
+    my $ip   = shift;
+
+    return NetAddr::IP->new6($ip)->addr();
 }
 
 # Begin-Doc
