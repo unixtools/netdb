@@ -43,7 +43,6 @@ sub new {
     $tmp->{touch}   = new NetMaint::LastTouch;
     $tmp->{dbcache} = new NetMaint::DBCache;
 
-
     return bless $tmp, $class;
 }
 
@@ -135,8 +134,7 @@ sub Bump_Serial {
         elsif ( $host =~ /(.in-addr\.arpa)/o ) {
             $zone = ".in-addr.arpa";
         }
-        else
-        {
+        else {
             die;
         }
     }
@@ -294,6 +292,48 @@ sub Get_Static_A_Records {
     }
 
     $qry = "select zone,ttl,address,mtime,ctime,dynamic from dns_a where dynamic=0 and name=?";
+    $cid = $dbcache->open($qry);
+
+    $db->SQL_ExecQuery( $cid, $host )
+        || $db->SQL_Error( $qry . " ($host)" ) && return undef;
+
+    while ( my ( $zone, $tty, $address, $mtime, $ctime, $dynamic ) = $db->SQL_FetchRow($cid) ) {
+        push(
+            @recs,
+            {   zone    => $zone,
+                name    => $host,
+                address => $address,
+                mtime   => $mtime,
+                ctime   => $ctime,
+                dynamic => $dynamic,
+            }
+        );
+    }
+
+    return @recs;
+}
+
+# Begin-Doc
+# Name: Get_Static_AAAA_Records
+# Type: method
+# Description: Returns array of AAAA records as hashes with zone, name, address, etc. fields
+# Syntax: @records = $obj->Get_Static_AAAA_Records($host);
+# End-Doc
+sub Get_Static_AAAA_Records {
+    my $self = shift;
+    my $host = shift;
+
+    my $db      = $self->{db};
+    my $dbcache = $self->{dbcache};
+
+    my ( $qry, $cid );
+    my @recs;
+
+    if ( !$host || ( lc $host ne $host ) ) {
+        return undef;
+    }
+
+    $qry = "select zone,ttl,address,mtime,ctime,dynamic from dns_aaaa where dynamic=0 and name=?";
     $cid = $dbcache->open($qry);
 
     $db->SQL_ExecQuery( $cid, $host )
@@ -928,6 +968,36 @@ sub Delete_A_ByHostIP {
 }
 
 # Begin-Doc
+# Name: Delete_AAAA_ByHostIP
+# Type: method
+# Description: Deletes any AAAA records for an IP addr and host
+# Syntax: $obj->Delete_AAAA_ByHostIP($host, $ip);
+# End-Doc
+sub Delete_AAAA_ByHostIP {
+    my $self = shift;
+    my $host = shift;
+    my $ip   = shift;
+    my $db   = $self->{db};
+    my $qry;
+    my $arpa;
+
+    my $util = $self->{util};
+
+    $ip = $util->CondenseIP($ip);
+
+    $qry = "delete from dns_aaaa where name=? and address=?";
+    $db->SQL_ExecQuery( $qry, $host, $ip ) || $db->SQL_Error($qry);
+
+    $self->{log}->Log(
+        action => "deleted static aaaa record",
+        ip     => $ip,
+        host   => $host,
+    );
+
+    $self->TriggerUpdate();
+}
+
+# Begin-Doc
 # Name: Add_Static_PTR
 # Type: method
 # Description: Adds or updates PTR record for a ip & host
@@ -1005,6 +1075,45 @@ sub Add_Static_A {
 
     $self->{log}->Log(
         action => "added static host a record",
+        host   => $host,
+        ip     => $ip,
+    );
+
+    $self->TriggerUpdate();
+}
+
+# Begin-Doc
+# Name: Add_Static_AAAA
+# Type: method
+# Description: Adds or updates AAAA record for a ip & host
+# Syntax: $obj->Add_Static_AAAA($host, $ip);
+# End-Doc
+sub Add_Static_AAAA {
+    my $self = shift;
+    my $host = lc shift;
+    my $ip   = shift;
+    my $qry;
+
+    my $db = $self->{db};
+
+    my $zone = $self->Get_Host_Zone($host);
+    if ( !$zone ) {
+        print "Unable to handle ptr addr update request for ($host).\n";
+        return;
+    }
+
+    $self->{touch}->UpdateLastTouch( host => $host, ip => $ip );
+
+    $qry = "delete from dns_aaaa where address=? and name=?";
+    $db->SQL_ExecQuery( $qry, $ip, $host )
+        || $db->SQL_Error($qry) && return "sql error";
+
+    $qry = "insert into dns_aaaa(zone,ttl,name,address,mtime,ctime,dynamic) values (?,0,?,?,now(),now(),0)";
+    $db->SQL_ExecQuery( $qry, $zone, $host, $ip )
+        || $db->SQL_Error($qry) && return "sql error";
+
+    $self->{log}->Log(
+        action => "added static host aaaa record",
         host   => $host,
         ip     => $ip,
     );
