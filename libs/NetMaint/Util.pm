@@ -213,7 +213,12 @@ sub CondenseIP {
     my $self = shift;
     my $ip   = shift;
 
-    return NetAddr::IP->new($ip,"255.255.255.255")->addr();
+    my $x = NetAddr::IP->new($ip, "255.255.255.255");
+    if ( $x )
+    {
+        return $x->addr();
+    }
+    return undef;
 }
 
 # Begin-Doc
@@ -226,7 +231,12 @@ sub CondenseIPv6 {
     my $self = shift;
     my $ip   = shift;
 
-    return NetAddr::IP->new6($ip)->addr();
+    my $x = NetAddr::IP->new6($ip);
+    if ( $x )
+    {
+        return $x->addr();
+    }
+    return undef;
 }
 
 # Begin-Doc

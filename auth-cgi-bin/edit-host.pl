@@ -1463,20 +1463,12 @@ EOF
             &HTMLHidden( "mode", "manualadd_ipv4" );
             &HTMLHidden( "host", $host );
 
-            print "<td>Manual Assign IPv4:</td>\n";
+            print "<td>Manual Assign IPv4 (A):</td>\n";
             print "<td>";
             &HTMLInputText( "ip", 20 );
             print "</td>\n";
             print "<td>";
             &HTMLSubmit("Add");
-            print "</td>\n";
-            $html->EndInnerRow();
-
-            $html->StartInnerRow();
-            print "<td colspan=3 align=center>\n";
-            print "This form may be used to add an IPv4 (A) address to DNS only. It should only be used\n";
-            print "for addresses that cannot be assigned/allocated to the host using the standard allocation\n";
-            print "tool above. For example, an external IP, duplicate registration, or round-robin DNS.\n";
             print "</td>\n";
             $html->EndInnerRow();
 
@@ -1487,7 +1479,7 @@ EOF
             &HTMLHidden( "mode", "manualadd_ipv6" );
             &HTMLHidden( "host", $host );
 
-            print "<td>Manual Assign IPv6:</td>\n";
+            print "<td>Manual Assign IPv6 (AAAA):</td>\n";
             print "<td>";
             &HTMLInputText( "ip", 40 );
             print "</td>\n";
@@ -1498,7 +1490,8 @@ EOF
 
             $html->StartInnerRow();
             print "<td colspan=3 align=center>\n";
-            print "This form may be used to add an IPv6 (AAAA) address to DNS only. It should only be used\n";
+            print
+                "This form may be used to add an IPv4 (A) or IPv6 (AAAA) address to DNS only. It should only be used\n";
             print "for addresses that cannot be assigned/allocated to the host using the standard allocation\n";
             print "tool above. For example, an external IP, duplicate registration, or round-robin DNS.\n";
             print "</td>\n";
