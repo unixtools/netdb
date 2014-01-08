@@ -427,6 +427,9 @@ elsif ( $mode eq "manualadd_ipv4" ) {
         $html->ErrorExit("Cannot have IP addr on CNAME host.");
     }
 
+    # Canonicalize the format
+    $ip = NetAddr::IP->new( $ip, "255.255.255.255" )->addr();
+
     print "<b>Attempting to add static A record for $host/$ip.</b><br/>\n";
     $dns->Add_Static_A( $host, $ip );
 

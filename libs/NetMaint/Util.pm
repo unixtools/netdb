@@ -14,6 +14,7 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 use Data::Dumper;
 use Local::ADSObject;
 use Socket;
+use NetAddr::IP;
 
 @ISA    = qw(Exporter);
 @EXPORT = qw();
@@ -28,7 +29,6 @@ sub new {
     my $self  = shift;
     my $class = ref($self) || $self;
     my $tmp   = {};
-
 
     return bless $tmp, $class;
 }
@@ -84,8 +84,7 @@ sub CheckValidHost {
         return "Invalid host name ($orighost)";
     }
 
-    if ( $host !~ /[a-z0-9\-]+\.[a-z0-9\-]+/o )
-    {
+    if ( $host !~ /[a-z0-9\-]+\.[a-z0-9\-]+/o ) {
         return "Invalid host name (missing at least one dot)";
     }
 
@@ -102,17 +101,35 @@ sub CheckValidIPv4 {
     my $self = shift;
     my $addr = lc shift;
 
-    if ( $addr =~ /^(\d+)\.(\d+)\.(\d+)\.(\d+)$/o ) {
-        my @octets = ( $1, $2, $3, $4 );
-
-        foreach my $octet (@octets) {
-            if ( $octet < 0 || $octet > 255 ) {
-                return "invalid ip address";
-            }
-        }
+    my $ip = NetAddr::IP->new( $addr, "255.255.255.255" );
+    if ( !$ip ) {
+        return "invalid IPv4 address";
     }
-    else {
-        return "invalid ip address";
+
+    if ( $ip->bits() != 32 ) {
+        return "invalid IPv4 address";
+    }
+
+    return undef;
+}
+
+# Begin-Doc
+# Name: CheckValidIPv6
+# Type: method
+# Description: returns error message if IP isn't valid
+# Syntax: $msg = $util->CheckValidIPv6($addr)
+# End-Doc
+sub CheckValidIPv6 {
+    my $self = shift;
+    my $addr = lc shift;
+
+    my $ip = NetAddr::IP->new( $addr, "IPv6" );
+    if ( !$ip ) {
+        return "invalid IPv6 address";
+    }
+
+    if ( $ip->bits() != 128 ) {
+        return "invalid IPv6 address";
     }
 
     return undef;
