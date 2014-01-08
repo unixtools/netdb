@@ -427,8 +427,6 @@ elsif ( $mode eq "manualadd_ipv4" ) {
         $html->ErrorExit("Cannot have IP addr on CNAME host.");
     }
 
-    print "<b>Target IP Address: $ip</b><br/>\n";
-
     print "<b>Attempting to add static A record for $host/$ip.</b><br/>\n";
     $dns->Add_Static_A( $host, $ip );
 
