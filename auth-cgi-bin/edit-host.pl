@@ -409,7 +409,39 @@ elsif ( $mode eq "updateadmincomm" ) {
 
     &DisplayHost($host);
 }
+elsif ( $mode eq "manualadd_ipv4" ) {
+    &CheckHostAndEditAccess();
 
+    my $ip = $rqpairs{address};
+
+    if ( !$access->CheckHostEditAccess( host => $host, action => "update", flag => "manualaddr" ) ) {
+        $html->ErrorExit("Permission Denied for Manual Address update.");
+    }
+
+    if ( $util->CheckValidIPv4($ip) ) {
+        $html->ErrorExit("Invalid IPv4 Address");
+    }
+
+    my $info = $hosts->GetHostInfo($host);
+    if ( $info->{type} eq "cname" ) {
+        $html->ErrorExit("Cannot have IP addr on CNAME host.");
+    }
+
+    print "<b>Target IP Address: $ip</b><br/>\n";
+
+    print "<b>Attempting to add static A record for $host/$ip.</b><br/>\n";
+    $dns->Add_Static_A( $host, $ip );
+
+    $hosts->MarkUpdated($host);
+
+    $dhcp->TriggerUpdate();
+
+    print "<p/><hr/><p/>\n";
+    &DisplaySearchForms();
+    print "<p/><hr/><p/>\n";
+
+    &DisplayHost($host);
+}
 elsif ( $mode eq "autoaddstatic" ) {
     &CheckHostAndEditAccess();
 
@@ -691,6 +723,28 @@ elsif ( $mode eq "delstatic" ) {
 
     print "<h3>Attempting to deallocate $ip from $host.</h3><p/>\n";
     $network->DeallocateAddress( $ip, $host );
+
+    $hosts->MarkUpdated($host);
+
+    $dhcp->TriggerUpdate();
+
+    print "<p/><hr/><p/>\n";
+    &DisplaySearchForms();
+    print "<p/><hr/><p/>\n";
+
+    &DisplayHost($host);
+}
+elsif ( $mode eq "manualdel_ipv4" ) {
+    &CheckHostAndEditAccess();
+
+    if ( !$access->CheckHostEditAccess( host => $host, action => "update", flag => "manualaddr" ) ) {
+        $html->ErrorExit("Permission Denied for Manual Address update.");
+    }
+
+    my $ip = $rqpairs{ip};
+
+    print "<h3>Removing any A records for $host/$ip.</h3><p/>\n";
+    $dns->Delete_A_ByHostIP( $host, $ip );
 
     $hosts->MarkUpdated($host);
 
@@ -1291,25 +1345,37 @@ EOF
         my @static_a   = $dns->Get_Static_A_Records($host);
         my @static_ptr = $dns->Get_Static_PTR_Records($host);
 
+        my $maddr_ok = $access->CheckHostEditAccess( host => $host, action => "update", flag => "manualaddr" );
+
         $html->StartBlockTable( "Staticly Assigned DNS Records", 600 );
+        $html->StartInnerTable();
         if ( $#static_a < 0 && $#static_ptr < 0 ) {
-            $html->StartInnerTable();
             $html->StartInnerRow();
-            print "<td align=center>This host has no staticly assigned DNS records.</td>\n";
+            print "<td align=center colspan=3>This host has no staticly assigned DNS records.</td>\n";
             $html->EndInnerRow();
-            $html->EndInnerTable();
         }
         else {
-            $html->StartInnerTable( "Name", "Target" );
 
             foreach my $entry ( $dns->Get_Static_A_Records($host) ) {
+                my $addr = $entry->{address};
+
                 $html->StartInnerRow();
                 print "<td>", $entry->{name}, "</td>\n";
                 print "<td>", $entry->{address};
-                if ( !$allocated_addr{ $entry->{address} } ) {
+                if ( !$allocated_addr{$addr} ) {
                     print " (Unallocated/Unmanaged)";
+                    print "</td>\n";
+                    if ($maddr_ok) {
+                        print "<td><a href=\"?mode=manualdel_ipv4&host=$host&ip=$addr\">Delete</a></td>\n";
+                    }
+                    else {
+                        print "<td>&nbsp</td>\n";
+                    }
                 }
-                print "</td>\n";
+                else {
+                    print "</td>\n";
+                    print "<td>&nbsp</td>\n";
+                }
                 $html->EndInnerRow();
             }
 
@@ -1317,11 +1383,38 @@ EOF
                 $html->StartInnerRow();
                 print "<td>", $entry->{name}, " [", $util->ARPAToIP( $entry->{name} ), "]", "</td>\n";
                 print "<td>", $entry->{address}, "</td>\n";
+                print "<td>&nbsp</td>\n";
                 $html->EndInnerRow();
             }
-
-            $html->EndInnerTable();
         }
+
+        if ($maddr_ok) {
+            $html->StartInnerRow();
+            &HTMLStartForm( &HTMLScriptURL, "GET" );
+            &HTMLHidden( "mode", "manualadd_ipv4" );
+            &HTMLHidden( "host", $host );
+
+            print "<td>Manual Assign IPv4:</td>\n";
+            print "<td>";
+            &HTMLInputText( "address", 20 );
+            print "</td>\n";
+            print "<td>";
+            &HTMLSubmit("Add");
+            print "</td>\n";
+            $html->EndInnerRow();
+
+            $html->StartInnerRow();
+            print "<td colspan=3 align=center>\n";
+            print "This form may be used to add an IPv4 address to DNS only. It should only be used\n";
+            print "for addresses that cannot be assigned/allocated to the host using the standard allocation\n";
+            print "tool above. For example, an external IP, duplicate registration, or round-robin DNS.\n";
+            print "</td>\n";
+            $html->EndInnerRow();
+
+            &HTMLEndForm();
+        }
+
+        $html->EndInnerTable();
         $html->EndBlockTable();
     }
 

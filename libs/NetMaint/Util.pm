@@ -93,6 +93,32 @@ sub CheckValidHost {
 }
 
 # Begin-Doc
+# Name: CheckValidIPv4
+# Type: method
+# Description: returns error message if IP isn't valid
+# Syntax: $msg = $util->CheckValidIPv4($addr)
+# End-Doc
+sub CheckValidIPv4 {
+    my $self = shift;
+    my $addr = lc shift;
+
+    if ( $addr =~ /^(\d+)\.(\d+)\.(\d+)\.(\d+)$/o ) {
+        my @octets = ( $1, $2, $3, $4 );
+
+        foreach my $octet (@octets) {
+            if ( $octet < 0 || $octet > 255 ) {
+                return "invalid ip address";
+            }
+        }
+    }
+    else {
+        return "invalid ip address";
+    }
+
+    return undef;
+}
+
+# Begin-Doc
 # Name: CheckValidEther
 # Type: method
 # Description: returns error message if ethernet address is invalid
