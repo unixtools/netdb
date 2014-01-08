@@ -188,6 +188,7 @@ print "<option value=\"\">none\n";
 print "<option>*\n";
 print "<option value=ownername>ownername - r##owner.domain\n";
 print "<option value=customname>customname - oneword.domain\n";
+print "<option value=manualaddr>manualaddr - assign unmanaged static ip\n";
 &HTMLEndSelect();
 print "</td>\n";
 
