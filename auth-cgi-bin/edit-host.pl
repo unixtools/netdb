@@ -1367,7 +1367,7 @@ EOF
                     print " (Unallocated/Unmanaged)";
                     print "</td>\n";
                     if ($maddr_ok) {
-                        print "<td><a href=\"?mode=manualdel_ipv4&host=$host&ip=$addr\">Delete</a></td>\n";
+                        print "<td><a href=\"?mode=manualdel_ipv4&host=$host&ip=$addr\">Delete DNS Only</a></td>\n";
                     }
                     else {
                         print "<td>&nbsp</td>\n";
