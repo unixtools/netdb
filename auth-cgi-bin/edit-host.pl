@@ -1175,9 +1175,12 @@ AUTOSUGGEST
         $html->StartBlockTable( "Allocated IP Addresses", 600 );
         $html->StartInnerTable();
 
-        my @addrs = $network->GetHostAddresses($host);
-        my $ipcnt = 0;
+        my @addrs          = $network->GetHostAddresses($host);
+        my %allocated_addr = ();
+        my $ipcnt          = 0;
         foreach my $ip ( $network->NetworkSort(@addrs) ) {
+            $allocated_addr{$ip} = 1;
+
             $ipcnt++;
             $html->StartInnerRow();
             print "<td>$ip";
@@ -1301,8 +1304,12 @@ EOF
 
             foreach my $entry ( $dns->Get_Static_A_Records($host) ) {
                 $html->StartInnerRow();
-                print "<td>", $entry->{name},    "</td>\n";
-                print "<td>", $entry->{address}, "</td>\n";
+                print "<td>", $entry->{name}, "</td>\n";
+                print "<td>", $entry->{address};
+                if ( !$allocated_addr{ $entry->{address} } ) {
+                    print " (Unallocated/Unmanaged)";
+                }
+                print "</td>\n";
                 $html->EndInnerRow();
             }
 
