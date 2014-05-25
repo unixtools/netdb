@@ -170,6 +170,9 @@ foreach my $zone ( sort(@zones) ) {
     if ( $stat[7] < 150 ) {
         print "Zone ($zone) file too small (", $stat[7], " bytes). Not installing new version.\n";
     }
+    elsif ( $fname =~ /spirenteng/ && $linecount < 875 ) {
+        print "Zone($zone) file too small (", $linecount, " lines). Not installing new version.\n";
+    }
     elsif ( $linecount < 4 ) {
         print "Zone($zone) file too small (", $linecount, " lines). Not installing new version.\n";
     }
