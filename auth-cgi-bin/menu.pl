@@ -66,7 +66,7 @@ $html->StartInnerRow();
 print "<td><a href=\"net-map.pl\">Display All Lab DNS/IP Info</a></td>\n";
 $html->EndInnerRow();
 $html->StartInnerRow();
-print "<td><a href=\"/vm-map.html\">Display Lab VM Inventory</a></td>\n";
+print "<td><a href=\"/auth-cgi-bin/cgiwrap/vmcontrol/vm-list-byhost.pl\">Display Lab VM Inventory</a></td>\n";
 $html->EndInnerRow();
 
 $html->EndInnerTable();
