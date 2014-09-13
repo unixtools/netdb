@@ -304,7 +304,12 @@ sub handle_ignore {
         if ( time - $lastnotify > 10 * 60 ) {
             open( my $out, "|/usr/sbin/sendmail -t" );
 
-            print $out "To: nneul\@neulinger.org\n";
+            my $warnto = "nneul\@neulinger.org";
+            if ( $sn =~ /^10\.155/ ) {
+                $warnto .= ",angel.comonfort\@spirent.com";
+            }
+
+            print $out "To: $warnto\n";
             print $out "From: NetDB DHCP <netdb\@spirenteng.com>\n";
             print $out "Subject: DHCP leases exhausted ($sn)\n";
             print $out "\n";
