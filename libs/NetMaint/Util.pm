@@ -16,8 +16,12 @@ use Local::ADSObject;
 use Socket;
 use NetAddr::IP;
 
+require NetMaint::DB;
+
 @ISA    = qw(Exporter);
 @EXPORT = qw();
+
+our $arpa_zones;
 
 # Begin-Doc
 # Name: new
@@ -123,7 +127,7 @@ sub CheckValidIPv6 {
     my $self = shift;
     my $addr = lc shift;
 
-    my $ip = NetAddr::IP->new6( $addr );
+    my $ip = NetAddr::IP->new6($addr);
     if ( !$ip ) {
         return "invalid IPv6 address";
     }
@@ -213,9 +217,8 @@ sub CondenseIP {
     my $self = shift;
     my $ip   = shift;
 
-    my $x = NetAddr::IP->new($ip, "255.255.255.255");
-    if ( $x )
-    {
+    my $x = NetAddr::IP->new( $ip, "255.255.255.255" );
+    if ($x) {
         return $x->addr();
     }
     return undef;
@@ -232,8 +235,7 @@ sub CondenseIPv6 {
     my $ip   = shift;
 
     my $x = NetAddr::IP->new6($ip);
-    if ( $x )
-    {
+    if ($x) {
         return $x->addr();
     }
     return undef;
@@ -305,9 +307,27 @@ sub IPToARPAZone {
 
     my $arpa = $self->IPToARPA($ip);
 
+    if ( !$arpa_zones ) {
+        my $db = new NetMaint::DB;
+
+        my $qry = "select zone from dns_soa where zone like '%.in-addr.arpa'";
+        my $cid = $db->SQL_OpenQuery($qry) || return undef;
+        $arpa_zones = {};
+        while ( my ($zone) = $db->SQL_FetchRow($cid) ) {
+            $arpa_zones->{$zone} = 1;
+        }
+        $db->SQL_CloseQuery($cid);
+    }
+
     my ( $a, $b, $c, $d, $rest ) = split( /\./, $arpa, 5 );
 
-    return join( ".", $b, $c, $d, $rest );
+    foreach my $suffix ( "$b.$c.$d.$rest", "$c.$d.$rest", "$d.$rest" ) {
+        if ( $arpa_zones->{$suffix} ) {
+            return $suffix;
+        }
+    }
+
+    return undef;
 }
 
 1;
