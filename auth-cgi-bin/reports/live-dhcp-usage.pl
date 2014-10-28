@@ -31,7 +31,7 @@ my $mode = $rqpairs{"mode"};
 my $html = new NetMaint::HTML;
 $html->PageHeader( title => "DHCP Current Usage Status" );
 
-my $log  = new NetMaint::Logging;
+my $log = new NetMaint::Logging;
 
 $log->Log();
 
@@ -91,48 +91,50 @@ foreach my $sn ( keys(%$sninfo) ) {
 # Purge known hosts in case it changes
 print "Scanning DHCP lease status... ";
 unlink("/local/netdb/.ssh/known_hosts");
-open( STDERR_SV, ">&STDERR" );
-open( STDERR,    ">/dev/null" );
-# this is invalid SPIRENT - need to change when I set up an actual dhcp server
-open( my $in,    "-|" )
-    || exec( "/usr/bin/ssh", "netdb\@fc-mgmt-ito.spirenteng.com", "cat", "/local/dhcp-root/etc/dhcpd.leases" );
-open( STDERR, ">&STDERR_SV" );
 my $tmpinfo;
 my $ip;
 my %seen;
 
-while ( defined( my $line = <$in> ) ) {
-    if ( $line =~ /^lease\s+([\d\.]+)\s+{/o ) {
-        if ($tmpinfo) {
+foreach my $dhcpserver ( "fc-dhcp-ito.spirenteng.com", "fc-dhcp-ent.spirenteng.com" ) {
+    print "Processing $dhcpserver...\n";
+    open( STDERR_SV, ">&STDERR" );
+    open( STDERR,    ">/dev/null" );
+    open( my $in, "-|", "/usr/bin/ssh", "netdb\@$dhcpserver", "cat", "/local/dhcp-root/etc/dhcpd.leases" );
+    open( STDERR, ">&STDERR_SV" );
+
+    while ( defined( my $line = <$in> ) ) {
+        if ( $line =~ /^lease\s+([\d\.]+)\s+{/o ) {
+            if ($tmpinfo) {
+                undef $tmpinfo;
+            }
+
+            $ip      = $1;
+            $tmpinfo = {};
+        }
+        elsif ( $line =~ /^}/o ) {
+            my $state = $tmpinfo->{state};
+            my $ether = $tmpinfo->{ether};
+
+            my $sn   = $ip_to_sn{$ip}   || "unknown";
+            my $type = $ip_to_type{$ip} || "unknown";
+
+            if ( !$seen{"$ip/$state"} ) {
+                $info{$sn}->{$type}->{$state}++;
+                $seen{"$ip/$state"} = 1;
+            }
             undef $tmpinfo;
         }
-
-        $ip      = $1;
-        $tmpinfo = {};
-    }
-    elsif ( $line =~ /^}/o ) {
-        my $state = $tmpinfo->{state};
-        my $ether = $tmpinfo->{ether};
-
-        my $sn   = $ip_to_sn{$ip}   || "unknown";
-        my $type = $ip_to_type{$ip} || "unknown";
-
-        if ( !$seen{"$ip/$state/$ether"} ) {
-            $info{$sn}->{$type}->{$state}++;
-            $seen{"$ip/$state/$ether"} = 1;
+        elsif ( $line =~ /^\s+binding state (.*?);/o ) {
+            $tmpinfo->{state} = $1;
         }
-        undef $tmpinfo;
+        elsif ( $line =~ /^\s+hardware ethernet (.*?);/o ) {
+            my $eth = uc $1;
+            $eth =~ s/://go;
+            $tmpinfo->{ether} = $eth;
+        }
     }
-    elsif ( $line =~ /^\s+binding state (.*?);/o ) {
-        $tmpinfo->{state} = $1;
-    }
-    elsif ( $line =~ /^\s+hardware ethernet (.*?);/o ) {
-        my $eth = uc $1;
-        $eth =~ s/://go;
-        $tmpinfo->{ether} = $eth;
-    }
+    close($in);
 }
-close($in);
 print "Done.<br>\n";
 
 #
