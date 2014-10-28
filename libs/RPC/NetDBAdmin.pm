@@ -810,4 +810,198 @@ sub UpdateUtilityCName {
     return undef;
 }
 
+# Begin-Doc
+# Name: SetAdminComment
+# Type: method
+# Description: Sets admin comment for a host
+# Syntax: $info = $obj->SetAdminComment($host, $comment);
+# End-Doc
+sub SetAdminComment {
+    my $self    = shift;
+    my $host    = lc shift;
+    my $comment = shift;
+    my ( $qry, $cid );
+
+    &LogAPIUsage();
+
+    my $access = new NetMaint::Access;
+    my $dhcp   = new NetMaint::DHCP;
+    my $hosts  = new NetMaint::Hosts;
+
+    my $edit_ok = $access->CheckHostEditAccess( host => $host, action => "update" );
+
+    if ( !$edit_ok ) {
+        die "User doesn't have permission to edit this host.";
+    }
+
+    if ( !$access->Check( flag => "adminoption", action => "update" ) ) {
+        die "Permission Denied to set admin comments.";
+    }
+
+    $hosts->SetAdminComments( $host, $comment );
+    $hosts->MarkUpdated($host);
+
+    return {};
+}
+
+# Begin-Doc
+# Name: SetAdminLock
+# Type: method
+# Description: Sets admin lock for a host
+# Syntax: $info = $obj->SetAdminLock($host, $lockstate);
+# End-Doc
+sub SetAdminLock {
+    my $self = shift;
+    my $host = lc shift;
+    my $lock = shift;
+    my ( $qry, $cid );
+
+    &LogAPIUsage();
+
+    my $access = new NetMaint::Access;
+    my $dhcp   = new NetMaint::DHCP;
+    my $hosts  = new NetMaint::Hosts;
+
+    my $edit_ok = $access->CheckHostEditAccess( host => $host, action => "update" );
+
+    if ( !$edit_ok ) {
+        die "User doesn't have permission to edit this host.";
+    }
+
+    if ( !$access->Check( flag => "adminoption", action => "update" ) ) {
+        die "Permission Denied to set admin lock status.";
+    }
+
+    if ($lock) {
+        $hosts->SetAdminLock($host);
+    }
+    else {
+        $hosts->ClearAdminLock($host);
+    }
+    $hosts->MarkUpdated($host);
+
+    return {};
+}
+
+# Begin-Doc
+# Name: SetUserQuota
+# Type: method
+# Description: Sets user registration quota, -1 to clear/reset to default
+# Syntax: $info = $obj->SetUserQuota($user, $quota)
+# End-Doc
+sub SetUserQuota {
+    my $self  = shift;
+    my $user  = lc shift;
+    my $quota = shift;
+    my ( $qry, $cid );
+
+    &LogAPIUsage();
+
+    my $access = new NetMaint::Access;
+
+    &PrivSys_QuietRequirePriv("sysprog:netdb:quota");
+
+    my $def = $access->GetDefaultRegistrationQuota($user);
+
+    if ( $quota < 0 || $quota == $def ) {
+        $access->DeleteRegistrationQuota($user);
+    }
+    else {
+        $access->UpdateRegistrationQuota( $user, int($quota) );
+    }
+
+    return {};
+}
+
+# Begin-Doc
+# Name: GetUserQuota
+# Type: method
+# Description: Gets user registration quota
+# Syntax: $quota = $obj->GetUserQuota($user)
+# End-Doc
+sub GetUserQuota {
+    my $self = shift;
+    my $user = lc shift;
+    my ( $qry, $cid );
+
+    &LogAPIUsage();
+
+    my $access = new NetMaint::Access;
+    &PrivSys_QuietRequirePriv("sysprog:netdb:quota");
+
+    return $access->GetRegistrationQuota($user);
+}
+
+# Begin-Doc
+# Name: GetAdminLock
+# Type: method
+# Description: Gets admin lock status for a host
+# Syntax: $info = $obj->GetAdminLock($host)
+# End-Doc
+sub GetAdminLock {
+    my $self = shift;
+    my $host = lc shift;
+    my ( $qry, $cid );
+
+    &LogAPIUsage();
+
+    my $access = new NetMaint::Access;
+    my $dhcp   = new NetMaint::DHCP;
+    my $hosts  = new NetMaint::Hosts;
+
+    my $edit_ok = $access->CheckHostEditAccess( host => $host, action => "update" );
+
+    if ( !$edit_ok ) {
+        die "User doesn't have permission to edit this host.";
+    }
+
+    if ( !$access->Check( flag => "adminoption", action => "update" ) ) {
+        die "Permission Denied to set admin lock status.";
+    }
+
+    my $info = $hosts->GetHostInfo($host);
+    if ($info) {
+        return $info->{adminlock};
+    }
+    else {
+        return 0;
+    }
+}
+
+# Begin-Doc
+# Name: GetAdminComment
+# Type: method
+# Description: Gets admin comment for a host
+# Syntax: $info = $obj->GetAdminComment($host)
+# End-Doc
+sub GetAdminComment {
+    my $self = shift;
+    my $host = lc shift;
+    my ( $qry, $cid );
+
+    &LogAPIUsage();
+
+    my $access = new NetMaint::Access;
+    my $dhcp   = new NetMaint::DHCP;
+    my $hosts  = new NetMaint::Hosts;
+
+    my $edit_ok = $access->CheckHostEditAccess( host => $host, action => "update" );
+
+    if ( !$edit_ok ) {
+        die "User doesn't have permission to edit this host.";
+    }
+
+    if ( !$access->Check( flag => "adminoption", action => "update" ) ) {
+        die "Permission Denied to set admin comment status.";
+    }
+
+    my $info = $hosts->GetHostInfo($host);
+    if ($info) {
+        return $info->{admin_comments};
+    }
+    else {
+        return 0;
+    }
+}
+
 1;
