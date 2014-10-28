@@ -1,9 +1,9 @@
 #!/usr/bin/perl
 
 # Begin-Doc
-# Name: build-dns-zones.pl
+# Name: update-thresholds.pl
 # Type: script
-# Description: generate the bind dns zone config files
+# Description: update threshold values to approximately 75%
 # End-Doc
 
 use lib "/local/perllib/libs";
