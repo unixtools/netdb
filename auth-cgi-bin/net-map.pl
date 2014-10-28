@@ -205,7 +205,7 @@ foreach my $ip ( sort { $ip_to_sort{$a} cmp $ip_to_sort{$b} } keys(%ip_to_sort) 
         $html->EndInnerHeaderRow();
     }
 
-    my $editprefix = "https://netmgr.spirenteng.com/auth-cgi-bin/cgiwrap/netdb/edit-host.pl?mode=view&host=";
+    my $editprefix = "/auth-cgi-bin/cgiwrap/netdb/edit-host.pl?mode=view&host=";
 
     my %poss_names = ();
 
