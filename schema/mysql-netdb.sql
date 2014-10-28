@@ -52,13 +52,26 @@ create table dhcp_acklog
  server varchar(128) not null, 
  gateway varchar(128)
 )
-partition by key(tstamp)
-partitions 96;
+partition by hash(to_days(tstamp))
+partitions 7;
 
 create index dhcp_acklog_ether ON dhcp_acklog (ether);
 create index dhcp_acklog_ip ON dhcp_acklog (ip);
 create index dhcp_acklog_tstamp ON dhcp_acklog (tstamp);
 create index dhcp_acklog_tstype ON dhcp_acklog (tstamp,type);
+create index dhcp_acklog_tei ON dhcp_acklog(ether,ip,type);
+
+-- Schema definition for TABLE DHCP_ACKLOG_QUEUE
+create table dhcp_acklog_queue
+(
+ id integer not null primary key auto_increment,
+ type varchar(20) not null, 
+ ether varchar(20) not null, 
+ ip varchar(20), 
+ tstamp datetime not null, 
+ server varchar(128) not null, 
+ gateway varchar(128)
+);
 
 -- Schema definition for TABLE DHCP_CURLEASES
 create table dhcp_curleases 
@@ -381,8 +394,8 @@ create table log
  address varchar(128), 
  status varchar(20), 
  msg varchar(500)
-) partition by key(tstamp)
-partitions 16;
+) partition by hash(to_days(tstamp))
+partitions 7;
 
 create index log_host ON log (host);
 create index log_tu ON log (tstamp, userid);
