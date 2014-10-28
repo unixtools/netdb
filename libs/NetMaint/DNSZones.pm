@@ -264,7 +264,7 @@ sub Format_Zone_Record {
     }
     elsif ( $type eq "SPF" ) {
         my $name = $rec->{name};
-        my $txt  = $rec->{spf};
+        my $spf  = $rec->{spf};
         my $ttl  = int( $rec->{ttl} ) || "";
         return "${name}. $ttl IN SPF \"${spf}\"";
     }
