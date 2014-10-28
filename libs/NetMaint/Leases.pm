@@ -136,7 +136,7 @@ sub RecordNewLease {
     $debug && print "recording new lease for ether $ether at ip $ip\n";
     $self->{touch}->UpdateLastTouch( ether => $ether, ip => $ip );
 
-    $qry = "insert into dhcp_acklog (type,ether,ip,tstamp,server,gateway) values (?,?,?,from_unixtime(?),?,?)";
+    $qry = "insert into dhcp_acklog_queue (type,ether,ip,tstamp,server,gateway) values (?,?,?,from_unixtime(?),?,?)";
     $cid = $dbcache->open($qry);
 
     # ignore errors
@@ -269,7 +269,7 @@ sub RecordIgnoredLease {
 
     $self->{touch}->UpdateLastTouch( ether => $ether );
 
-    my $qry = "insert into dhcp_acklog (type,ether,ip,tstamp,server,gateway) values (?,?,'',from_unixtime(?),?,?)";
+    my $qry = "insert into dhcp_acklog_queue (type,ether,ip,tstamp,server,gateway) values (?,?,'',from_unixtime(?),?,?)";
     $cid = $dbcache->open($qry);
 
     $db->SQL_ExecQuery( $cid, "IGNORE", $ether, $ts, $server, $gw );    # ignore errors
@@ -283,6 +283,31 @@ sub RecordIgnoredLease {
     $cid = $dbcache->open($qry);
     $db->SQL_ExecQuery( $cid, "IGNORE", $ts, $server, $ether )
         || $db->SQL_Error($qry);
+}
+
+# Begin-Doc
+# Name: RecordErrorLease
+# Type: method
+# Description: Updates records that a lease was ignored
+# Syntax: $obj->RecordErrorLease(%details);
+# End-Doc
+sub RecordErrorLease {
+    my $self  = shift;
+    my %opts  = @_;
+    my $util  = $self->{util};
+    my $ts    = $opts{tstamp} || time;
+    my $ether = $util->CondenseEther( $opts{ether} );
+    my $gw    = $util->CondenseIP( $opts{gateway} );
+    my $ip    = $util->CondenseIP( $opts{ip} );
+    my $db    = $self->{db};
+    my $cid;
+    my $dbcache = $self->{dbcache};
+    my $server  = lc $opts{server};
+
+    # insert into queue - ignore errors
+    my $qry = "insert into dhcp_acklog_queue (type,ether,ip,tstamp,server,gateway) values (?,?,?,from_unixtime(?),?,?)";
+    $cid = $dbcache->open($qry);
+    $db->SQL_ExecQuery( $cid, "ERROR", $ether, $ip, $ts, $server, $gw );
 }
 
 1;

@@ -12,6 +12,7 @@ use lib "/local/perllib/libs";
 use lib "/local/spirentlib/libs";
 use lib "/local/netdb/libs";
 use Local::SetUID;
+use Getopt::Long;
 require NetMaint::Leases;
 require NetMaint::DNS;
 require NetMaint::DB;
@@ -19,6 +20,7 @@ require NetMaint::Util;
 require NetMaint::Hosts;
 require NetMaint::DHCP;
 require NetMaint::Access;
+require NetMaint::Network;
 use POSIX ":sys_wait_h";
 
 use Time::HiRes qw(time);
@@ -28,16 +30,32 @@ use Sys::Hostname;
 
 my $base = "/local/dhcp-root/netdb-logs";
 
+my $help    = 0;
+my $trace   = 0;
+my $once    = 0;
+my $onefile = 0;
+my $debug   = 0;
+my $res     = GetOptions(
+    "help"    => \$help,
+    "trace+"  => \$trace,
+    "debug+"  => \$debug,
+    "once"    => \$once,
+    "onefile" => \$onefile,
+);
+
+if ( !$res || $help ) {
+    print "Usage: $0 [--help] [--debug] [--trace] [--once] [--onefile]\n";
+    exit;
+}
+
 my $server = hostname;
 $server =~ s|\..*||gio;
 
-my $debug = 0;
 open( STDERR, ">&STDOUT" );
 
+# Should never go more than $max_idle minutes stuck in a call
 my $max_idle = 30 * 60;
 
-# Should never go 2 minutes stuck in a call
-# Disabled at spirent, dhcp traffic is low
 alarm($max_idle);
 
 my $trace    = 0;
@@ -52,6 +70,10 @@ my $dhcp;
 my $dns;
 my $hosts;
 my $access;
+my $net;
+
+my $last_backlog;
+my $last_backlog_notify;
 
 while (1) {
     if ( -e "/local/dhcp-root/netdb-logs/restart" ) {
@@ -71,6 +93,7 @@ while (1) {
         $dhcp   = new NetMaint::DHCP;
         $hosts  = new NetMaint::Hosts;
         $access = new NetMaint::Access;
+        $net    = new NetMaint::Network;
 
         $lastopen = time;
     }
@@ -83,7 +106,7 @@ while (1) {
 
         my @stat = stat("$base/$file");
         my $age  = time - $stat[9];
-        if ( ( $age > 30 * 60 ) && $stat[9] ) {
+        if ( ( $age > 90 * 60 ) && $stat[9] ) {
             print "EXPIRED LOG FILE $base/$file (age=${age}s).\n";
             unlink("$base/$file");
             next;
@@ -100,6 +123,40 @@ while (1) {
             $linecount++;
             alarm($max_idle);
 
+            if ( !$last_backlog || time - $last_backlog > 30 ) {
+                my $tstamp = $line;
+                $tstamp =~ s/:.*//go;
+                $tstamp = int($tstamp);
+
+                my $secs = int( time - $tstamp );
+                print "Current Log Processing Backlog: $secs seconds \n";
+
+                if ( $secs > 300 ) {
+                    if ( time - $last_backlog_notify > 30 * 60 * 60 ) {
+                        print "Sending backlog notice.\n";
+
+                        open( my $out, "|/usr/sbin/sendmail -t" );
+
+                        print $out "To: nathan.neulinger\@spirent.com\n";
+                        print $out "From: NetDB DHCP <netmgr\@spirenteng.com>\n";
+                        print $out "Subject: NetDB DHCP Excessive Backlog\n";
+                        print $out "\n";
+                        print $out "Notice will be sent at most once every 30 minutes until condition clears.\n";
+                        print $out "Current Backlog: $secs seconds\n";
+                        print $out "\n";
+                        print $out `find /local/dhcp-root/netdb-logs -ls`;
+                        close($out);
+
+                        $last_backlog_notify = time;
+                    }
+                    else {
+                        print "Skipping backlog notice.\n";
+                    }
+                }
+
+                $last_backlog = time;
+            }
+
             if ( $line =~ m{network ([\d\.]+/\d+): no free leases} ) {
                 &handle_no_free_leases( $1, $line );
             }
@@ -111,7 +168,9 @@ while (1) {
                 &handle_ack( $1, $2, $3, $4 );
             }
             elsif ( $line =~ /^(\d+): DHCPACK to ([\d\.]+) \(([A-Fa-f0-9:]+)\) via (.*)/o ) {
-                &handle_ack( $1, $2, $3, $4 );
+
+                # these seem to be generated solely in response to DHCPINFORM, which should not trigger
+                # lease behavior
             }
             elsif ( $line =~ /^(\d+): DHCPRELEASE of ([\d\.]+) from ([A-Fa-f0-9:]+) via (.*)/o ) {
                 &handle_release( $1, $2, $3, $4 );
@@ -142,6 +201,18 @@ while (1) {
             }
             elsif ( $line =~ /^(\d+): BOOTREQUEST from ([A-Fa-f0-9:]+) via (.*): BOOTP from dynamic client/o ) {
                 &handle_ignore( $1, $2, $3 );
+            }
+            elsif ( $line =~ /^(\d+): DHCPNAK on ([\d\.]+) to ([A-Fa-f0-9:]+) via (.*)/o ) {
+                &handle_error( $1, $3, $2, $4 );
+            }
+            elsif ( $line =~ /^(\d+): ICMP Echo reply while lease ([\d\.]+) valid/o ) {
+                &handle_error( $1, "", $2, "" );
+            }
+            elsif ( $line =~ /^(\d+): Abandoning IP address ([\d\.]+):/o ) {
+                &handle_error( $1, "", $2, "" );
+            }
+            elsif ( $line =~ /^(\d+): DHCPDECLINE of ([\d\.]+) from ([A-Fa-f0-9:]+) via (.*)/o ) {
+                &handle_error( $1, $3, $2, $4 );
             }
             elsif ( $line =~ /^(\d+): DHCPDISCOVER from/ ) {
 
@@ -177,6 +248,10 @@ while (1) {
             "Processed $base/$file at rate of %.1f lines/sec for $linecount lines.\n",
             $rate;
 
+        if ($onefile) {
+            print "exiting, single file was requested.\n";
+            exit;
+        }
     }
     closedir($logdir);
 
@@ -184,7 +259,7 @@ while (1) {
         sleep 2;
     }
 
-    if ( $ARGV[0] eq "-once" ) {
+    if ($once) {
         print "exiting, single run was requested.\n";
         exit;
     }
@@ -265,6 +340,26 @@ sub handle_ignore {
 
     $trace && print "RIL[";
     $leases->RecordIgnoredLease(
+        server  => $server,
+        tstamp  => $ts,
+        ether   => $ether,
+        gateway => $gw,
+    );
+    $trace && print "]\n";
+}
+
+# Begin-Doc
+# Name: handle_error
+# Description: helper routine for handling error notices
+# End-Doc
+sub handle_error {
+    my ( $ts, $ether, $ip, $gw ) = @_;
+
+    $debug && print "got error for $ether or $ip via $gw\n";
+
+    $trace && print "REL[";
+    $leases->RecordErrorLease(
+        ip      => $ip,
         server  => $server,
         tstamp  => $ts,
         ether   => $ether,
