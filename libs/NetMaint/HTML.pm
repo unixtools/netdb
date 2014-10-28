@@ -12,6 +12,7 @@ use strict;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 
 use Local::HTMLUtil;
+use NetMaint::Config;
 use NetMaint::Util;
 use Data::Dumper;
 use NetMaint::Leases;
@@ -614,7 +615,7 @@ sub StartMailWrapper {
         my $mailtofh;
 
         open( $mailtofh, "|/usr/lib/sendmail -t" );
-        print $mailtofh "From: Network Management Tool <netdb\@spirenteng.com>\n";
+        print $mailtofh "From: NetDB Tool <$NETDB_MAIL_FROM>\n";
         print $mailtofh "Subject: $title - " . scalar(localtime) . "\n";
         print $mailtofh "Mime-Version: 1.0\n";
         print $mailtofh "Content-type: text/html\n";
