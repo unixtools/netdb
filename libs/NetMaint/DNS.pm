@@ -11,6 +11,7 @@ use strict;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 
+use NetMaint::Config;
 require NetMaint::DB;
 require NetMaint::Util;
 require NetMaint::Logging;
@@ -92,8 +93,9 @@ sub TriggerUpdate {
 
     $self->{log}->Log( action => "triggered dns update", );
 
-    foreach my $server ("netmgr.spirenteng.com") {
+    foreach my $server (@$NETDB_DNS_SERVERS) {
         my $sock = IO::Socket::INET->new(
+            Timeout  => 2,
             PeerAddr => "${server}:2405",
             Proto    => "tcp"
         );

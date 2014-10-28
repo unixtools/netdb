@@ -14,6 +14,8 @@ use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 use Local::MySQLObject;
 use Sys::Hostname;
 
+use NetMaint::Config;
+
 @ISA    = qw(Exporter);
 @EXPORT = qw();
 
@@ -42,7 +44,7 @@ sub new {
         }
         else {
             $DB = new Local::MySQLObject;
-            $DB->SQL_OpenDatabase( "netdb", user => "netdb", host => "netmgr.spirenteng.com" )
+            $DB->SQL_OpenDatabase( "netdb", user => "netdb", host => $NETDB_DB_HOST )
                 || die "Couldn't open mysql DB!";
         }
     }
