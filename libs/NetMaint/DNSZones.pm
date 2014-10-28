@@ -128,6 +128,42 @@ sub GetSignableZones {
 }
 
 # Begin-Doc
+# Name: GetThresholds
+# Type: method
+# Description: Returns hash of zone threshold information
+# Syntax: $info = $obj->GetThresholds()
+# End-Doc
+sub GetThresholds {
+    my $self = shift;
+    my $db   = $self->{db};
+    my $res = {};
+
+    my $cid;
+    my $qry = "select zone,thresh_lines,thresh_size from dns_soa";
+
+    unless ( $cid = $db->SQL_OpenQuery($qry) ) {
+        $db->SQL_Error($qry);
+        $error->set("sql error opening query for zone thresdholds");
+        return undef;
+    }
+
+    while ( my ($zone,$lines,$size) = $db->SQL_FetchRow($cid) ) {
+        if ( $db->SQL_ErrorCode() ) {
+            $error->set("sql error fetching zone threshold row");
+            last;
+        }
+        $res->{$zone}->{lines} = $lines;
+        $res->{$zone}->{size} = $size;
+    }
+    if ( $db->SQL_ErrorCode() ) {
+        $error->set("sql error fetching zone threshold row");
+    }
+    $db->SQL_CloseQuery($cid);
+
+    return $res;
+}
+
+# Begin-Doc
 # Name: GetChangedZones
 # Type: method
 # Description: Returns array of zones change recently
