@@ -274,10 +274,10 @@ sub RecordIgnoredLease {
 
     $self->{touch}->UpdateLastTouch( ether => $ether );
 
+    # insert into queue - ignore errors
     my $qry
         = "insert into dhcp_acklog_queue (type,ether,ip,tstamp,server,gateway) values (?,?,'',from_unixtime(?),?,?)";
     $cid = $dbcache->open($qry);
-
     $db->SQL_ExecQuery( $cid, "IGNORE", $ether, $ts, $server, $gw );
 
     # We know we're going to likely get an error on this, so ignore it.
@@ -310,10 +310,9 @@ sub RecordErrorLease {
     my $dbcache = $self->{dbcache};
     my $server  = lc $opts{server};
 
+    # insert into queue - ignore errors
     my $qry = "insert into dhcp_acklog_queue (type,ether,ip,tstamp,server,gateway) values (?,?,?,from_unixtime(?),?,?)";
     $cid = $dbcache->open($qry);
-
-    # ignore errors
     $db->SQL_ExecQuery( $cid, "ERROR", $ether, $ip, $ts, $server, $gw );
 }
 
