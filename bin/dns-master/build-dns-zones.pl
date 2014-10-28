@@ -43,6 +43,11 @@ my $base          = "/local/config/data";
 my $lastbase      = "/local/config/data-last";
 my $zones_updated = 0;
 
+my $thresh = $dnszones->GetThresholds();
+if ( ref($thresh) ne "HASH" ) {
+    die "Could not retrieve thresholds.\n";
+}
+
 foreach my $zone ( sort(@zones) ) {
     my $fname     = "${base}/${zone}";
     my $lastfname = "${lastbase}/${zone}";
@@ -134,6 +139,7 @@ foreach my $zone ( sort(@zones) ) {
 
     my $errorcnt = 0;
     print "  Checking new zone file for validity:\n";
+
     # -k ignore - ignore underscores
     open( my $checkh, "-|" ) || exec( "/local/bind/sbin/named-checkzone", "-k", "ignore", $zone, "${fname}.tmp" );
     my $saw_serial = 0;
@@ -167,13 +173,10 @@ foreach my $zone ( sort(@zones) ) {
 
     # Should move this to database in dns_soa...
     my @stat = stat("${fname}.tmp");
-    if ( $stat[7] < 150 ) {
+    if ( $stat[7] < $thresh->{$zone}->{size} ) {
         print "Zone ($zone) file too small (", $stat[7], " bytes). Not installing new version.\n";
     }
-    elsif ( $fname =~ /spirenteng/ && $linecount < 875 ) {
-        print "Zone($zone) file too small (", $linecount, " lines). Not installing new version.\n";
-    }
-    elsif ( $linecount < 4 ) {
+    elsif ( $linecount < $thresh->{$zone}->{lines} ) {
         print "Zone($zone) file too small (", $linecount, " lines). Not installing new version.\n";
     }
     else {
