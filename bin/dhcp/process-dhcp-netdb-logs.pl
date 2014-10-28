@@ -405,7 +405,7 @@ sub handle_error {
         my $snlabel = $sninfo->{$sn}->{description};
 
         if ( $sn =~ /^10\.155/ || $snlabel =~ /Sunnyvale/io ) {
-                $target .= ",angel.comonfort\@spirent.com";
+            $target .= ",angel.comonfort\@spirent.com";
         }
 
         # Add some code here to figure out if the requesting mac addr is unknown, if so, can probably
