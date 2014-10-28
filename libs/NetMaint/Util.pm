@@ -153,7 +153,7 @@ sub CheckValidEther {
 
     if ( $origether =~ /^\d+\.\d+\.\d+\.\d+$/ ) {
         return
-            "'$origether' is an ip address, not an ethernet address. Look for something that looks like XX:XX:XX:XX:XX:XX";
+            "'$origether' is an IP address, not an ethernet address. Look for something that looks like XX:XX:XX:XX:XX:XX";
     }
 
     if ( !$ether ) {

@@ -43,7 +43,6 @@ sub new {
     $tmp->{touch}   = new NetMaint::LastTouch;
     $tmp->{dbcache} = new NetMaint::DBCache;
 
-
     return bless $tmp, $class;
 }
 
@@ -158,7 +157,8 @@ sub RecordNewLease {
     }
 
     # Clear any old dynamic registrations
-    my @oldips      = $self->GetCurLeases($ether);
+    my @oldips = $self->GetCurLeases($ether);
+
     #my $dynhostname = "dyn-ether-" . lc($ether) . ".device.spirenteng.com";
 
     my $daship = $ip;
@@ -275,15 +275,16 @@ sub RecordIgnoredLease {
 
     $self->{touch}->UpdateLastTouch( ether => $ether );
 
-    my $qry = "insert into dhcp_acklog_queue (type,ether,ip,tstamp,server,gateway) values (?,?,'',from_unixtime(?),?,?)";
+    my $qry
+        = "insert into dhcp_acklog_queue (type,ether,ip,tstamp,server,gateway) values (?,?,'',from_unixtime(?),?,?)";
     $cid = $dbcache->open($qry);
 
-    $db->SQL_ExecQuery( $cid, "IGNORE", $ether, $ts, $server, $gw );    # ignore errors
+    $db->SQL_ExecQuery( $cid, "IGNORE", $ether, $ts, $server, $gw );
 
     # We know we're going to likely get an error on this, so ignore it.
     $qry = "insert into dhcp_lastack (type,ether,ip,tstamp,server) values (?,?,'',from_unixtime(?),?)";
     $cid = $dbcache->open($qry);
-    $db->SQL_ExecQuery( $cid, "IGNORE", $ether, $ts, $server );         # ignore errors
+    $db->SQL_ExecQuery( $cid, "IGNORE", $ether, $ts, $server );
 
     $qry = "update dhcp_lastack set type=?, ip='', tstamp=from_unixtime(?), server=? where ether=?";
     $cid = $dbcache->open($qry);
