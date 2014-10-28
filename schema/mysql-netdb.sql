@@ -245,7 +245,9 @@ create table dns_soa
  ctime datetime not null, 
  dynamic integer DEFAULT 0 not null, 
  visible varchar(1) DEFAULT 1 not null,
- signzone varchar(1) DEFAULT 0 not null
+ signzone varchar(1) DEFAULT 0 not null,
+ thresh_size integer not null,
+ thresh_lines integer not null
 );
 
 create unique index dns_soa_zone ON dns_soa (zone);
