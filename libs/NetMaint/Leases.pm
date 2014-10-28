@@ -193,6 +193,12 @@ sub RecordNewLease {
         $debug && print "static count = $cnt\n";
     }
 
+    #
+    # This is creating a record for 'dyn-$host' even when it doesn't need to
+    # Should fetch the A records, see if only one, and only if different put
+    # the lease in.
+    #
+
     if ( $cnt > 0 ) {
         my $tmphost = "dyn-$hostname";
         $debug && print "using host = $tmphost\n";
