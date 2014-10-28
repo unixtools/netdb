@@ -10,7 +10,7 @@ use strict;
 
 use lib "/local/perllib/libs";
 use lib "/local/netdb/libs";
-use Local::SysProg::SetUID;
+use Local::SetUID;
 use Getopt::Long;
 require NetMaint::DB;
 
