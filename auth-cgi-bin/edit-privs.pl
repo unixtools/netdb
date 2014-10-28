@@ -66,12 +66,6 @@ elsif ( $mode eq "add" ) {
     $flags   =~ s/[,\s]+/,/gio;
     $actions =~ s/[,\s]+/,/gio;
 
-    if ( $types   =~ /\*/ ) { $types   = "*"; }
-    if ( $domains =~ /\*/ ) { $domains = "*"; }
-    if ( $subnets =~ /\*/ ) { $subnets = "*"; }
-    if ( $flags   =~ /\*/ ) { $flags   = "*"; }
-    if ( $actions =~ /\*/ ) { $actions = "*"; }
-
     if ( $who eq "" || $who eq "," ) {
         print "<h3>Must specify user list.</h3>\n";
     }
@@ -95,7 +89,7 @@ if ( $rqpairs{mode} eq "" ) {
     $html->StartMailWrapper("Existing Access Rules");
 }
 
-$html->StartBlockTable( "Existing Access Rules", 700 );
+$html->StartBlockTable( "Existing Access Rules", 800 );
 $html->StartInnerTable( "Rule ID", "Who", "Types", "Domains", "Subnets", "Flags", "Actions" );
 
 my $info = $access->GetAllRules();
