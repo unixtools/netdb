@@ -11,6 +11,7 @@ use strict;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 
+use NetMaint::Config;
 require NetMaint::DB;
 require NetMaint::Util;
 require NetMaint::Logging;
@@ -46,7 +47,6 @@ sub new {
     $tmp->{log}     = new NetMaint::Logging;
     $tmp->{touch}   = new NetMaint::LastTouch;
     $tmp->{dbcache} = new NetMaint::DBCache;
-
 
     return bless $tmp, $class;
 }
@@ -98,8 +98,9 @@ sub TriggerUpdate {
 
     $log->Log( action => "triggered dhcp update" );
 
-    foreach my $server ( "fc-dhcp-ito.spirenteng.com", "fc-dhcp-ent.spirenteng.com" ) {
+    foreach my $server (@$NETDB_DHCP_SERVERS) {
         my $sock = IO::Socket::INET->new(
+            Timeout  => 2,
             PeerAddr => "${server}:2405",
             Proto    => "tcp"
         );

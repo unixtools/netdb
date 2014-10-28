@@ -36,7 +36,9 @@ our $NETDB_DB_HOST = "netmgr.spirenteng.com";
 
 our $NETDB_DEFAULT_TTL = 900;
 
-our $NETDB_MAIL_FROM = "netdb\@spirenteng.com";
+our $NETDB_MAIL_FROM      = "netdb\@spirenteng.com";
 our $NETDB_DEFAULT_NOTIFY = "nneul\@neulinger.org";
+
+our $NETDB_DHCP_SERVERS = [ "fc-dhcp-ito.spirenteng.com", "fc-dhcp-ent.spirenteng.com" ];
 
 1;
