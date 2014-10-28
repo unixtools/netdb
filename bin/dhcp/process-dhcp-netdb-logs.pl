@@ -379,39 +379,87 @@ sub handle_error {
         my $sn   = shift;
         my $line = shift;
 
+        # ignore known server subnets
         if ( $sn eq "131.151.0.0/23" ) {
-
-            # ignore known server subnets
             return;
         }
 
+        # ignore spurious notices from MS iSCSI initiator startup
         if ( $line =~ /e1:6c:d6:ae:52:90/i || $line =~ /e9:eb:b3:a6:db:3c/ ) {
-
-            # ignore spurious notices from MS iSCSI initiator startup
             return;
         }
 
         my $lastnotify = $last_notify_no_free{$sn};
 
+        my $target = "nneul\@neulinger.org";
+
+        my $hname = "";
+        my $mac   = "";
+        if ( $line =~ /(..:..:..:..:..:..)/ ) {
+            $mac = $1;
+        }
+        if ($mac) {
+            $hname = $dhcp->SearchByEtherExact($mac);
+        }
+        my $sninfo  = $net->GetSubnets();
+        my $snlabel = $sninfo->{$sn}->{description};
+
+        if ( $sn =~ /^10\.155/ || $snlabel =~ /Sunnyvale/io ) {
+                $target .= ",angel.comonfort\@spirent.com";
+        }
+
         # Add some code here to figure out if the requesting mac addr is unknown, if so, can probably
         # skip the notification since it's likely for an unreg pool
+        my $msg_delta = 10 * 60;
 
-        if ( time - $lastnotify > 10 * 60 ) {
+        if ( $target && time - $lastnotify > $msg_delta ) {
+            my %type_counts = $net->GetAllocationTypeCounts($sn);
+
+            print "Sending notice for $snlabel to $target for host ($hname) / addr ($mac).\n";
+
             open( my $out, "|/usr/sbin/sendmail -t" );
 
-            my $warnto = "nneul\@neulinger.org";
-            if ( $sn =~ /^10\.155/ ) {
-                $warnto .= ",angel.comonfort\@spirent.com";
-            }
-
-            print $out "To: $warnto\n";
+            print $out "To: $target\n";
             print $out "From: NetDB DHCP <netdb\@spirenteng.com>\n";
             print $out "Subject: DHCP leases exhausted ($sn)\n";
-            print $out "\n";
-            print $out "No available leases on subnet: $sn\n\n";
 
-            print $out "Triggering log line: $line\n";
+            print $out "\n";
+
+            print $out "Triggering log line: $line\n\n";
+
+            print $out "Notification Target: $target\n";
+            print $out "Triggering Address: $mac\n";
+            print $out "Subnet: $sn\n";
+            print $out "Subnet Template: ", $sninfo->{$sn}->{template}, "\n";
+            print $out "Subnet VLAN: ",     $sninfo->{$sn}->{vlan},     "\n";
+            print $out "Description: $snlabel\n\n";
+
+            if ( $hname ne "" ) {
+                print $out "Host ($hname) is known. Exhaustion likely in normal pool.\n";
+                if ( $type_counts{dynamic} == 0 ) {
+                    print $out "No dynamic addresses on subnet: $sn\n";
+                }
+            }
+            elsif ( $type_counts{dynamic} == 0 && $type_counts{unreg} == 0 ) {
+                print $out "Host is not known and no dynamic addresses on subnet.\n";
+                print $out "This is likely an infrastructure subnet.\n";
+            }
+            else {
+                print $out "Host is not known. Exhaustion is likely in unreg pool.\n";
+                if ( $type_counts{unreg} == 0 ) {
+                    print $out "No unreg addresses on subnet: $sn\n";
+                }
+            }
+
+            print $out "\n";
+            print $out "IP Address Allocation on Subnet: (not usage)\n";
+            foreach my $type ( sort( keys(%type_counts) ) ) {
+                print $out "  $type: ", $type_counts{$type}, "\n";
+            }
+
             close($out);
+
+            print "Done sending notice for $snlabel to $target for host ($hname) / addr ($mac).\n";
 
             $last_notify_no_free{$sn} = time;
         }
