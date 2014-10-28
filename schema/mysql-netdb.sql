@@ -289,6 +289,22 @@ create table dns_txt
 create index dns_txt_name ON dns_txt (name);
 create index dns_txt_zone ON dns_txt (zone);
 
+-- Schema definition for TABLE DNS_SPF
+create table dns_spf 
+(
+ zone varchar(120) not null, 
+ ttl integer DEFAULT 0 not null, 
+ name varchar(120) not null, 
+ spf varchar(250) not null, 
+ mtime datetime not null, 
+ ctime datetime not null, 
+ dynamic integer DEFAULT 0 not null, 
+ visible varchar(1) DEFAULT 1 not null
+);
+
+create index dns_spf_name ON dns_spf (name);
+create index dns_spf_zone ON dns_spf (zone);
+
 -- Schema definition for TABLE DOMAINS
 create table domains 
 (
