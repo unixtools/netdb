@@ -135,10 +135,9 @@ sub RecordNewLease {
     $debug && print "recording new lease for ether $ether at ip $ip\n";
     $self->{touch}->UpdateLastTouch( ether => $ether, ip => $ip );
 
+    # insert into queue - ignore errors
     $qry = "insert into dhcp_acklog_queue (type,ether,ip,tstamp,server,gateway) values (?,?,?,from_unixtime(?),?,?)";
     $cid = $dbcache->open($qry);
-
-    # ignore errors
     $db->SQL_ExecQuery( $cid, $type, $ether, $ip, $ts, $server, $gw );
 
     $qry = "update dhcp_lastack set type=?, ip=?, tstamp=from_unixtime(?), server=? where ether=?";
