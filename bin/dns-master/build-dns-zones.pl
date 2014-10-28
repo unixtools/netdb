@@ -9,6 +9,7 @@
 use lib "/local/perllib/libs";
 use lib "/local/spirentlib/libs";
 use lib "/local/netdb/libs";
+use NetMaint::Config;
 require NetMaint::DNSZones;
 require NetMaint::Error;
 
@@ -67,7 +68,7 @@ foreach my $zone ( sort(@zones) ) {
     unlink( $fname . ".tmp" );
     open( my $tmpfh, ">${fname}.tmp" );
     print $tmpfh "\$ORIGIN $zone.\n";
-    print $tmpfh "\$TTL 900\n";
+    print $tmpfh "\$TTL $NETDB_DEFAULT_TTL\n";
 
     # Need to add dnssec record types here for subzone signing
     my @types = ();
@@ -78,7 +79,7 @@ foreach my $zone ( sort(@zones) ) {
         @types = ( "SOA", "NS", "PTR" );
     }
     else {
-        @types = ( "SOA", "NS", "SRV", "TXT", "A", "AAAA", "MX", "CNAME" );
+        @types = ( "SOA", "NS", "SRV", "TXT", "SPF", "A", "AAAA", "MX", "CNAME" );
     }
 
     my %counts = ();
