@@ -13,6 +13,7 @@ use lib "/local/spirentlib/libs";
 use lib "/local/netdb/libs";
 use Local::SetUID;
 use Getopt::Long;
+use NetMaint::Config;
 require NetMaint::Leases;
 require NetMaint::DNS;
 require NetMaint::DB;
@@ -137,8 +138,8 @@ while (1) {
 
                         open( my $out, "|/usr/sbin/sendmail -t" );
 
-                        print $out "To: nathan.neulinger\@spirent.com\n";
-                        print $out "From: NetDB DHCP <netmgr\@spirenteng.com>\n";
+                        print $out "To: $NETDB_DEFAULT_NOTIFY\n";
+                        print $out "From: NetDB DHCP <$NETDB_MAIL_FROM>\n";
                         print $out "Subject: NetDB DHCP Excessive Backlog\n";
                         print $out "\n";
                         print $out "Notice will be sent at most once every 30 minutes until condition clears.\n";
@@ -391,7 +392,7 @@ sub handle_error {
 
         my $lastnotify = $last_notify_no_free{$sn};
 
-        my $target = "nneul\@neulinger.org";
+        my $target = $NETDB_DEFAULT_NOTIFY;
 
         my $hname = "";
         my $mac   = "";
@@ -420,7 +421,7 @@ sub handle_error {
             open( my $out, "|/usr/sbin/sendmail -t" );
 
             print $out "To: $target\n";
-            print $out "From: NetDB DHCP <netdb\@spirenteng.com>\n";
+            print $out "From: NetDB DHCP <$NETDB_MAIL_FROM>\n";
             print $out "Subject: DHCP leases exhausted ($sn)\n";
 
             print $out "\n";
