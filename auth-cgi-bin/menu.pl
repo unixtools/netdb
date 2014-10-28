@@ -14,6 +14,7 @@ use Local::HTMLUtil;
 use Local::PrivSys;
 use lib "/local/netdb/libs";
 
+use NetMaint::Config;
 require NetMaint::HTML;
 require NetMaint::Access;
 
@@ -53,7 +54,7 @@ $html->StartInnerRow();
 print "<td><a href=\"create-host.pl\">Create New Host</a> (Expert)</td>\n";
 $html->EndInnerRow();
 
-if ( $privs{"netdb-user"} ) {
+if ( $privs{$NETDB_PRIV_DEFAULT} ) {
     $html->StartInnerRow();
     print "<td><a href=\"search-hosts.pl\">Search Hosts</a></td>\n";
     $html->EndInnerRow();
@@ -94,7 +95,7 @@ if ( $privs{"netdb-admin"} ) {
     $html->EndBlockTable();
 }
 
-if ( $privs{"netdb-user"} ) {
+if ( $privs{$NETDB_PRIV_REPORTS} ) {
     print "<p/>\n";
     $html->StartBlockTable( "System and Host Status Reports", 500 );
     $html->StartInnerTable();
