@@ -304,9 +304,10 @@ sub RecordErrorLease {
     my $dbcache = $self->{dbcache};
     my $server  = lc $opts{server};
 
-    # insert into queue - ignore errors
     my $qry = "insert into dhcp_acklog_queue (type,ether,ip,tstamp,server,gateway) values (?,?,?,from_unixtime(?),?,?)";
     $cid = $dbcache->open($qry);
+
+    # ignore errors
     $db->SQL_ExecQuery( $cid, "ERROR", $ether, $ip, $ts, $server, $gw );
 }
 
