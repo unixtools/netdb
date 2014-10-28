@@ -35,7 +35,6 @@ sub new {
     $tmp->{util}    = new NetMaint::Util;
     $tmp->{dbcache} = new NetMaint::DBCache;
 
-
     return bless $tmp, $class;
 }
 
@@ -282,6 +281,33 @@ sub GetAllocatedAddresses {
     $db->SQL_CloseQuery($cid);
 
     return @res;
+}
+
+# Begin-Doc
+# Name: GetAllocationTypeCounts
+# Type: method
+# Description: Returns hash of allocated addresses for a given subnet of a particular type
+# Syntax: %counts = $obj->GetAllocationTypeCounts($subnet);
+# End-Doc
+sub GetAllocationTypeCounts {
+    my $self   = shift;
+    my $subnet = shift;
+    my %counts = ();
+
+    my $db = $self->{db};
+    my ( $qry, $cid );
+    my @res;
+
+    $qry = "select type,count(*) from ip_alloc where subnet=? group by type";
+    $cid = $db->SQL_OpenQuery( $qry, $subnet )
+        || $db->SQL_Error($qry) && return undef;
+
+    while ( my ( $type, $count ) = $db->SQL_FetchRow($cid) ) {
+        $counts{$type} = $count;
+    }
+    $db->SQL_CloseQuery($cid);
+
+    return %counts;
 }
 
 # Begin-Doc
