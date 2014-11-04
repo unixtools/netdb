@@ -132,7 +132,7 @@ while (1) {
                 my $secs = int( time - $tstamp );
                 print "Current Log Processing Backlog: $secs seconds \n";
 
-                if ( $secs > 300 ) {
+                if ( !$NETDB_DISABLE_BACKLOG_REPORT && $secs > 300 ) {
                     if ( time - $last_backlog_notify > 30 * 60 * 60 ) {
                         print "Sending backlog notice.\n";
 
