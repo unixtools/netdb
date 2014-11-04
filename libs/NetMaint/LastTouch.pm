@@ -5,7 +5,6 @@
 # End-Doc
 
 package NetMaint::LastTouch;
-require 5.000;
 require Exporter;
 use strict;
 

@@ -5,7 +5,6 @@
 # End-Doc
 
 package NetMaint::Hosts;
-require 5.000;
 require Exporter;
 use strict;
 

@@ -7,7 +7,6 @@
 # End-Doc
 
 package NetMaint::Leases;
-require 5.000;
 require Exporter;
 use strict;
 

@@ -7,7 +7,6 @@
 # End-Doc
 
 package NetMaint::Error;
-require 5.000;
 require Exporter;
 use strict;
 

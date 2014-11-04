@@ -5,7 +5,6 @@
 # End-Doc
 
 package NetMaint::DB;
-require 5.000;
 require Exporter;
 use strict;
 

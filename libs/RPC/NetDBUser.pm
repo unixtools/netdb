@@ -10,7 +10,6 @@ End-Doc
 =cut
 
 package RPC::NetDBUser;
-require 5.000;
 require Exporter;
 use strict;
 

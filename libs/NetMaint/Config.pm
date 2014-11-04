@@ -5,7 +5,6 @@
 # End-Doc
 
 package NetMaint::Config;
-require 5.000;
 require Exporter;
 use strict;
 
