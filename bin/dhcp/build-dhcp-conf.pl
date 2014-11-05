@@ -15,6 +15,7 @@ require NetMaint::Network;
 require NetMaint::DHCP;
 use Digest::MD5 qw(md5_hex);
 use Local::AuthSrv;
+use Sys::Hostname;
 
 use strict;
 
@@ -33,7 +34,7 @@ if ( $ARGV[0] eq "-force" ) {
 }
 
 # Get name of this server
-chomp( my $server = `/bin/hostname` );
+my $server = lc hostname;
 
 # Load host options once
 print "Retrieving host dhcp options.\n";
@@ -56,10 +57,31 @@ $error->clear();
 my $subnets = $net->GetSubnets();
 $error->check_and_die();
 
+print "Determining cluster list.\n";
+my $qry = "select clusters from dhcp_servers where server=?";
+my ($clusters) = $db->SQL_DoQuery( $qry, $server );
+my %dhcp_clusters = ();
+my $cluster_in;
+if ( !$clusters ) {
+    die "Unable to determine dhcp server clusters.";
+}
+else {
+    print "  Server Clusters: $clusters\n";
+    foreach my $c ( split( ' ', $clusters ) ) {
+        $dhcp_clusters{$c} = 1;
+    }
+    $dhcp_clusters{all} = 1;
+    $cluster_in = "(" . join( ",", map { $db->SQL_QuoteString($_) } sort keys %dhcp_clusters ) . ")";
+    print "  Cluster Query: $cluster_in\n";
+}
+
 print "Retrieving subnet dynamic ranges.\n";
 $error->clear();
 my %sn_ranges;
 foreach my $sn ( keys(%$subnets) ) {
+    my $cluster = $subnets->{$sn}->{dhcpcluster};
+    next if ( !$dhcp_clusters{$cluster} );
+
     $sn_ranges{$sn} = [ $net->GetIPRanges( $sn, "dynamic" ) ];
     $error->check_and_die();
 }
@@ -68,6 +90,9 @@ print "Retrieving subnet unreg ranges.\n";
 $error->clear();
 my %sn_unreg_ranges;
 foreach my $sn ( keys(%$subnets) ) {
+    my $cluster = $subnets->{$sn}->{dhcpcluster};
+    next if ( !$dhcp_clusters{$cluster} );
+
     $sn_unreg_ranges{$sn} = [ $net->GetIPRanges( $sn, "unreg" ) ];
     $error->check_and_die();
 }
@@ -98,8 +123,6 @@ print "Generating header.\n";
 print $tmpfh "option domain-name \"spirenteng.com\";\n";
 print $tmpfh "option domain-name-servers 10.40.50.20, 10.40.50.21;\n";
 print $tmpfh "next-server ${server};\n";
-# This is apparently not recommended unless no other choice
-#print $tmpfh "one-lease-per-client true;\n";
 print $tmpfh "ddns-update-style none;\n";
 print $tmpfh "authoritative;\n";
 
@@ -111,7 +134,9 @@ print $tmpfh "# Systems with static registrations\n";
 print $tmpfh "group {\n";
 print $tmpfh "\n";
 
-my $qry = "select distinct a.host,a.ip,b.ether from ip_alloc a,ethers b where a.host=b.name order by a.host,b.ether";
+my $qry = "select distinct a.host,a.ip,b.ether from ip_alloc a,ethers b,subnets s 
+        where a.host=b.name and a.subnet=s.subnet and s.dhcpcluster in ${cluster_in} 
+        order by a.host,b.ether";
 my $cid = $db->SQL_OpenQuery($qry) || $db->SQL_Error($qry) && die;
 
 my %seen_ether = ();
@@ -155,7 +180,8 @@ while ( my ( $name, $ip, $ether ) = $db->SQL_FetchRow($cid) ) {
     print $tmpfh "  option domain-name \"$dname\";\n";
 
     foreach my $option ( @{ $host_options->{$name} } ) {
-        foreach my $line ( split( /[\r\n]/, &ProcessHostOption( host => $name, ether => $ether, option => $option ) ) ) {
+        foreach my $line ( split( /[\r\n]/, &ProcessHostOption( host => $name, ether => $ether, option => $option ) ) )
+        {
             next if ( $line eq "" );
             print $tmpfh "  ", $line, "\n";
         }
@@ -212,7 +238,7 @@ while ( my ( $name, $ether ) = $db->SQL_FetchRow($cid) ) {
                     /[\r\n]/,
                     &ProcessHostOption(
                         host   => $name,
-                        ether => $ether,
+                        ether  => $ether,
                         option => $option
                     )
                 )
@@ -266,6 +292,9 @@ print $tmpfh "} # end of ignored hosts group\n\n";
 
 print "Generating subnet config.\n";
 foreach my $sn ( sort( keys(%$subnets) ) ) {
+    my $cluster = $subnets->{$sn}->{dhcpcluster};
+    next if ( !$dhcp_clusters{$cluster} );
+
     my $baseip = $sn;
     $baseip =~ s|/.*||gio;
 
@@ -531,7 +560,7 @@ sub ProcessHostOption {
     my $host   = $opts{host};
     my $name   = $host;
     my $option = $opts{option};
-    my $ether = $opts{ether};
+    my $ether  = $opts{ether};
     my $conf   = "";
 
     my $shortname = $name;
