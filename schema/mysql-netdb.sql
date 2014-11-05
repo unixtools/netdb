@@ -501,10 +501,21 @@ create table subnets
  vlan varchar(20), 
  gateway varchar(15) not null, 
  template varchar(50), 
- notes varchar(2000)
+ notes varchar(2000),
+ dhcpcluster varchar(50) default 'all' not null
 );
 
 create unique index subnets_subnet ON subnets (subnet);
+
+-- Schema definition for TABLE DHCP_CLUSTERS
+create table dhcp_clusters
+(
+ server varchar(100) not null,
+ clusters varchar(100) not null default 'all',
+ peer varchar(100)
+);
+create unique index dc_s on dhcp_clusters(server);
+
 
 -- Schema definition for TABLE SWITCH_VLANS
 create table switch_vlans 
