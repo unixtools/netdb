@@ -553,12 +553,12 @@ sub GetSubnets {
 
     my $util = $self->{util};
 
-    my $qry = "select subnet,description,mask,vlan,gateway,template,notes from subnets";
+    my $qry = "select subnet,description,mask,vlan,gateway,template,notes,dhcpcluster from subnets";
     my $cid = $db->SQL_OpenQuery($qry)
         || $db->SQL_Error($qry) && return undef;
 
     my $res = {};
-    while ( my ( $subnet, $desc, $mask, $vlan, $gateway, $tmpl, $notes ) = $db->SQL_FetchRow($cid) ) {
+    while ( my ( $subnet, $desc, $mask, $vlan, $gateway, $tmpl, $notes, $cluster ) = $db->SQL_FetchRow($cid) ) {
         my $tmp      = {};
         my $subnetip = $subnet;
 
@@ -570,6 +570,7 @@ sub GetSubnets {
         $tmp->{mask}        = $mask;
         $tmp->{vlan}        = $vlan;
         $tmp->{ip}          = $subnetip;
+        $tmp->{dhcpcluster} = $cluster;
         $tmp->{template}    = $tmpl || "standard";
 
         $tmp->{gateway}                          = $gateway;
@@ -808,7 +809,7 @@ sub CreateVLAN {
 # Name: ChangeSubnet
 # Type: method
 # Description: Updates a subnet with new description, vlan, and template
-# Syntax: $obj->ChangeSubnet($subnet, $description, $vlan, $template, $notes);
+# Syntax: $obj->ChangeSubnet($subnet, $description, $vlan, $template, $notes, $cluster);
 # End-Doc
 sub ChangeSubnet {
     my $self        = shift;
@@ -817,12 +818,13 @@ sub ChangeSubnet {
     my $vlan        = shift;
     my $tmpl        = shift;
     my $notes       = shift;
+    my $cluster     = shift;
 
     my $db = $self->{db};
     my ( $qry, $cid );
 
-    $qry = "update subnets set description=?,vlan=?,template=?, notes=? where subnet=?";
-    $db->SQL_ExecQuery( $qry, $description, $vlan, $tmpl, $notes, $subnet )
+    $qry = "update subnets set description=?,vlan=?,template=?, notes=?, dhcpcluster=? where subnet=?";
+    $db->SQL_ExecQuery( $qry, $description, $vlan, $tmpl, $notes, $cluster, $subnet )
         || $db->SQL_Error($qry) && return "failed to update sn";
 }
 
@@ -830,7 +832,7 @@ sub ChangeSubnet {
 # Name: CreateSubnet
 # Type: method
 # Description: Creates a new subnet with a given mask
-# Syntax: $obj->CreateSubnet($subnet_base_ip, $mask, $description, $vlan, $tmpl, $notes);
+# Syntax: $obj->CreateSubnet($subnet_base_ip, $mask, $description, $vlan, $tmpl, $notes, $cluster);
 # End-Doc
 sub CreateSubnet {
     my $self        = shift;
@@ -840,6 +842,7 @@ sub CreateSubnet {
     my $vlan        = shift;
     my $tmpl        = shift;
     my $notes       = shift;
+    my $cluster     = shift;
 
     my $db = $self->{db};
     my ( $qry, $cid );
@@ -857,8 +860,9 @@ sub CreateSubnet {
 
     my $subnetname = $subnet . "/" . $self->MaskToBits($mask);
 
-    $qry = "insert into subnets(subnet,description,mask,vlan,gateway,template,notes) values (?,?,?,?,?,?,?)";
-    $db->SQL_ExecQuery( $qry, $subnetname, $description, $mask, $vlan, $gw, $tmpl, $notes )
+    $qry
+        = "insert into subnets(subnet,description,mask,vlan,gateway,template,notes,dhcpcluster) values (?,?,?,?,?,?,?,?)";
+    $db->SQL_ExecQuery( $qry, $subnetname, $description, $mask, $vlan, $gw, $tmpl, $notes, $cluster )
         || $db->SQL_Error($qry) && return "failed to insert sn";
 
     $qry = "lock tables ip_alloc write";

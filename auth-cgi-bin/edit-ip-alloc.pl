@@ -49,6 +49,7 @@ my $vlan      = $rqpairs{vlan};
 my $notes     = $rqpairs{notes};
 my $desc      = $rqpairs{description};
 my $tmpl      = $rqpairs{template};
+my $cluster   = $rqpairs{dhcpcluster};
 
 print "<b><a href=\"", &HTMLScriptURL, "\">Refresh to subnet listing</a></b><p/>\n";
 
@@ -66,8 +67,13 @@ elsif ( $mode eq "Create Subnet" ) {
             $html->ErrorExit($err);
         }
 
-        print "<h3>Creating subnet $subnetip with mask $mask with template $tmpl.</h3>\n";
-        $net->CreateSubnet( $subnetip, $mask, $desc, $vlan, $tmpl, $notes );
+        my $cinfo = $dhcp->GetSubnets();
+        if ( !$cinfo->{$cluster} ) {
+            $html->ErrorExit("Must specify dhcp cluster.");
+        }
+
+        print "<h3>Creating subnet $subnetip with mask $mask with template $tmpl in cluster $cluster.</h3>\n";
+        $net->CreateSubnet( $subnetip, $mask, $desc, $vlan, $tmpl, $notes, $cluster );
         print "<h3>Subnet created.</h3>\n";
 
         $dhcp->TriggerUpdate();
@@ -119,8 +125,13 @@ elsif ( $mode eq "Edit Subnet Allocations" ) {
     &DisplayIPList($subnet);
 }
 elsif ( $mode eq "Change Subnet Details" ) {
-    print "<h3>Updating subnet $subnetip with desc, vlan, template, and notes.</h3>\n";
-    $net->ChangeSubnet( $subnet, $desc, $vlan, $tmpl, $notes );
+    my $cinfo = $dhcp->GetSubnets();
+    if ( !$cinfo->{$cluster} ) {
+        $html->ErrorExit("Must specify dhcp cluster.");
+    }
+
+    print "<h3>Updating subnet $subnetip with desc, vlan, template, notes and cluster.</h3>\n";
+    $net->ChangeSubnet( $subnet, $desc, $vlan, $tmpl, $notes, $cluster );
     $dhcp->TriggerUpdate();
     print "<h3>Subnet updated.</h3>\n";
 
@@ -234,7 +245,8 @@ sub DisplaySubnetList {
         print "<option value=\"$sn\">$sn - " . "["
             . $info->{$sn}->{vlan} . "] ["
             . $info->{$sn}->{template} . "] "
-            . $info->{$sn}->{description} . "\n";
+            . $info->{$sn}->{description} . " {"
+            . $info->{$sn}->{dhcpcluster} . "}\n";
     }
     &HTMLEndSelect();
     print "<p/>\n";
@@ -261,10 +273,11 @@ sub DisplaySubnetDetails {
 
     my $subnets = $net->GetSubnets();
 
-    my $desc   = $subnets->{$sn}->{description};
-    my $snvlan = $subnets->{$sn}->{vlan};
-    my $sntmpl = $subnets->{$sn}->{template};
-    my $notes  = $subnets->{$sn}->{notes};
+    my $desc    = $subnets->{$sn}->{description};
+    my $snvlan  = $subnets->{$sn}->{vlan};
+    my $sntmpl  = $subnets->{$sn}->{template};
+    my $notes   = $subnets->{$sn}->{notes};
+    my $cluster = $subnets->{$sn}->{dhcpcluster};
 
     &HTMLStartForm( &HTMLScriptURL(), "GET" );
     &HTMLHidden( "subnet", $sn );
@@ -291,7 +304,33 @@ sub DisplaySubnetDetails {
         print "<option value=\"$lctmpl\" ", $sntmpl eq $lctmpl ? " selected" : "", ">$opttmpl</option>\n";
     }
     &HTMLEndSelect();
+
     print "<br/>";
+    print "Cluster: ";
+    &HTMLStartSelect( "dhcpcluster", 1 );
+    my $cinfo    = $dhcp->GetClusters();
+    my $scnt     = 0;
+    my @clusters = ();
+    print "<option value=\"\">Choose a cluster</option>\n";
+    foreach my $tmpc ( sort( keys(%$cinfo) ) ) {
+        next if ( $tmpc eq "all" );
+        push( @clusters, $tmpc );
+    }
+    push( @clusters, "all" );
+
+    foreach my $tmpc (@clusters) {
+        my $name = $cinfo->{$tmpc}->{name} || $tmpc;
+
+        print "<option value=\"$tmpc\"";
+        if ( $cluster eq $tmpc || ( $tmpc eq "all" && !$scnt ) ) {
+            print " selected";
+            $scnt++;
+        }
+        print ">$name</option>\n";
+    }
+    &HTMLEndSelect();
+
+    print "<p/>";
     print "Notes: ";
     &HTMLTextArea( "notes", $notes, 70, 8, "BOTH" );
     print "<br/>";
@@ -344,7 +383,26 @@ sub DisplayAddSubnet {
         print "<option value=\"$lctmpl\">$opttmpl</option>\n";
     }
     &HTMLEndSelect();
+
     print "<br/>";
+    print "Cluster: ";
+    &HTMLStartSelect( "dhcpcluster", 1 );
+    print "<option value=\"\">Choose a cluster</option>\n";
+    my $cinfo    = $dhcp->GetClusters();
+    my @clusters = ();
+    foreach my $tmpc ( sort( keys(%$cinfo) ) ) {
+        next if ( $tmpc eq "all" );
+        push( @clusters, $tmpc );
+    }
+    push( @clusters, "all" );
+
+    foreach my $tmpc (@clusters) {
+        my $name = $cinfo->{$tmpc}->{name} || $tmpc;
+        print "<option value=\"$tmpc\">$name</option>\n";
+    }
+    &HTMLEndSelect();
+
+    print "<p/>";
     print "Notes: ";
     &HTMLTextArea( "notes", "", 70, 8, "BOTH" );
     print "<br/>";

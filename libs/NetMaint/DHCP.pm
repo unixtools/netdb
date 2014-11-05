@@ -147,6 +147,29 @@ sub GetEthers {
 }
 
 # Begin-Doc
+# Name: GetClusters
+# Type: method
+# Description: Returns hash of dhcp clusters
+# Syntax: %clusters = $obj->GetClusters();
+# End-Doc
+sub GetClusters {
+    my $self = shift;
+
+    my $res = {};
+    my $db  = $self->{db};
+
+    my $qry = "select cluster from dhcp_clusters";
+    my $cid = $db->SQL_OpenQuery($qry) || $db->SQL_Error($qry) && return ();
+    while ( my ($c) = $db->SQL_FetchRow($cid) ) {
+        $res->{$c}->{name} = $c;
+    }
+    $res->{all}->{name} = "All Servers";
+    $db->SQL_CloseQuery($cid);
+
+    return $res;
+}
+
+# Begin-Doc
 # Name: GetOptionInfo
 # Type: method
 # Description: Returns hash of dhcp option labels/info

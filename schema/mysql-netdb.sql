@@ -507,14 +507,22 @@ create table subnets
 
 create unique index subnets_subnet ON subnets (subnet);
 
--- Schema definition for TABLE DHCP_CLUSTERS
-create table dhcp_clusters
+-- Schema definition for TABLE DHCP_SERVERS
+create table dhcp_servers
 (
  server varchar(100) not null,
  clusters varchar(100) not null default 'all',
  peer varchar(100)
 );
-create unique index dc_s on dhcp_clusters(server);
+create unique index ds_s on dhcp_servers(server);
+
+-- Schema definition for TABLE DHCP_CLUSTERS
+create table dhcp_clusters
+(
+ cluster varchar(100) not null,
+ label varchar(100) not null default 'all'
+);
+create unique index dc_c on dhcp_clusters(cluster);
 
 
 -- Schema definition for TABLE SWITCH_VLANS
