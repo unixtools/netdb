@@ -61,7 +61,8 @@ print "Determining cluster list.\n";
 my $qry = "select clusters from dhcp_servers where server=?";
 my ($clusters) = $db->SQL_DoQuery( $qry, $server );
 my %dhcp_clusters = ();
-my $cluster_in;
+my $cluster_in_parms;
+my @cluster_in_args;
 if ( !$clusters ) {
     die "Unable to determine dhcp server clusters.";
 }
@@ -71,8 +72,8 @@ else {
         $dhcp_clusters{$c} = 1;
     }
     $dhcp_clusters{all} = 1;
-    $cluster_in = "(" . join( ",", map { $db->SQL_QuoteString($_) } sort keys %dhcp_clusters ) . ")";
-    print "  Cluster Query: $cluster_in\n";
+    @cluster_in_args = sort keys %dhcp_clusters;
+    $cluster_in_parms = join(",", ("?") x scalar(@cluster_in_args));
 }
 
 print "Retrieving subnet dynamic ranges.\n";
@@ -135,9 +136,9 @@ print $tmpfh "group {\n";
 print $tmpfh "\n";
 
 my $qry = "select distinct a.host,a.ip,b.ether from ip_alloc a,ethers b,subnets s 
-        where a.host=b.name and a.subnet=s.subnet and s.dhcpcluster in ${cluster_in} 
-        order by a.host,b.ether";
-my $cid = $db->SQL_OpenQuery($qry) || $db->SQL_Error($qry) && die;
+        where a.host=b.name and a.subnet=s.subnet and s.dhcpcluster in ($cluster_in_parms)
+        order by a.host,b.ether,a.ip";
+my $cid = $db->SQL_OpenQuery($qry, @cluster_in_args) || $db->SQL_Error($qry) && die;
 
 my %seen_ether = ();
 
