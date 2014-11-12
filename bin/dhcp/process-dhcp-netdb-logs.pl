@@ -203,6 +203,9 @@ while (1) {
             elsif ( $line =~ /^(\d+): BOOTREQUEST from ([A-Fa-f0-9:]+) via (.*): BOOTP from dynamic client/o ) {
                 &handle_ignore( $1, $2, $3 );
             }
+            elsif ( $line =~ /^(\d+): BOOTREQUEST from ([A-Fa-f0-9:]+) via (.*)/o ) {
+                &handle_ignore( $1, $2, $3 );
+            }
             elsif ( $line =~ /^(\d+): DHCPNAK on ([\d\.]+) to ([A-Fa-f0-9:]+) via (.*)/o ) {
                 &handle_error( $1, $3, $2, $4 );
             }
