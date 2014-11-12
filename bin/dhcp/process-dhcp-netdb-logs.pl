@@ -54,7 +54,7 @@ $server =~ s|\..*||gio;
 
 open( STDERR, ">&STDOUT" );
 
-# Should never go more than $max_idle minutes stuck in a call
+# Should never go more than $max_idle seconds stuck in a call
 my $max_idle = 30 * 60;
 
 alarm($max_idle);
