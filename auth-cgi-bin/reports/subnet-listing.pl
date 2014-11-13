@@ -31,19 +31,20 @@ $log->Log();
 $html->PageHeader( title => "Subnet Listing" );
 
 print <<EOJS;
-<style type="text/css">
-     \@import "/~netdb/js/DataTables/media/css/demo_table.css";
-.dataTables_wrapper {
-    min-height: 60px;
-}
 
+<link rel="stylesheet" type="text/css" href="/~netdb/css/jquery.dataTables.css" />
+<link rel="stylesheet" type="text/css" href="/~netdb/css/custom.dataTables.css" />
+<link rel="stylesheet" type="text/css" href="/~netdb/js/jquery-ui-themes/themes/smoothness/jquery-ui.css" />
+<script type="text/javascript" language="javascript" src="/~netdb/js/jquery.min.js"></script>
+<script type="text/javascript" language="javascript" src="/~netdb/js/jquery-ui/jquery-ui.min.js"></script>
+<script type="text/javascript" language="javascript" src="/~netdb/js/DataTables/media/js/jquery.dataTables.min.js"></script>
+
+<style type="text/css">
 .sn_mono {
     font-family: monospace;
 }
-
 </style>
-<script type="text/javascript" src="/~netdb/js/jquery/jquery.js"></script>
-<script type="text/javascript" src="/~netdb/js/DataTables/media/js/jquery.dataTables.js"></script>
+
 <script type="text/javascript" src="/~netdb/subnet-sort.js"></script>
 EOJS
 
@@ -81,7 +82,7 @@ $html->StartMailWrapper("Currently Defined Subnets ($which)");
 
 $html->StartBlockTable( "Currently Defined Subnets ($which)", 1000 );
 
-print "<table border=0 class=\"display\" id=\"subnets\">\n";
+print "<table border=0 class=\"display cell-border compact\" id=\"subnets\">\n";
 
 print "<thead><tr><th>Subnet</th><th>Action</th><th>VLAN</th><th>Template</th><th>Netmask</th>";
 print "<th>Gateway</th><th>Desc</th></tr></thead>\n";
@@ -120,13 +121,10 @@ $html->EndBlockTable();
 
 print <<EOJS;
 <script type="text/javascript">
-   \$('#subnets').dataTable( {
-        "bPaginate": false,
-        "bAutoWidth": false,
-        "bProcessing": true,
-        "oLanguage": {
-            "sSearch" : "Quick Search/Filter:"
-        }
+   \$('#subnets').DataTable( {
+        "deferRender" : true,
+        "processing": true,
+        "paging": false
     });
 </script>
 EOJS
