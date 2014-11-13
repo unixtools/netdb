@@ -67,7 +67,7 @@ elsif ( $mode eq "Create Subnet" ) {
             $html->ErrorExit($err);
         }
 
-        my $cinfo = $dhcp->GetSubnets();
+        my $cinfo = $dhcp->GetClusters();
         if ( !$cinfo->{$cluster} ) {
             $html->ErrorExit("Must specify dhcp cluster.");
         }
@@ -125,7 +125,7 @@ elsif ( $mode eq "Edit Subnet Allocations" ) {
     &DisplayIPList($subnet);
 }
 elsif ( $mode eq "Change Subnet Details" ) {
-    my $cinfo = $dhcp->GetSubnets();
+    my $cinfo = $dhcp->GetClusters();
     if ( !$cinfo->{$cluster} ) {
         $html->ErrorExit("Must specify dhcp cluster.");
     }
