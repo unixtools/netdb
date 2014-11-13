@@ -47,8 +47,19 @@ sub new {
 }
 td { font-size: 12px; font-family: arial; }
 th { font-size: 12px; font-family: arial; }
+.sn_mono {
+    font-family: monospace;
+}
 EOSTYLE
-
+        head_extra => <<EOEXTRA,
+<link rel="stylesheet" type="text/css" href="/~netdb/css/jquery.dataTables.css" />
+<link rel="stylesheet" type="text/css" href="/~netdb/css/custom.dataTables.css" />
+<link rel="stylesheet" type="text/css" href="/~netdb/js/jquery-ui-themes/themes/smoothness/jquery-ui.css" />
+<script type="text/javascript" language="javascript" src="/~netdb/js/jquery.min.js"></script>
+<script type="text/javascript" language="javascript" src="/~netdb/js/jquery-ui/jquery-ui.min.js"></script>
+<script type="text/javascript" language="javascript" src="/~netdb/js/DataTables/media/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" language="javascript" src="/~netdb/subnet-sort.js"></script>
+EOEXTRA
     );
 
     $tmp->{util}    = new NetMaint::Util;
