@@ -153,8 +153,8 @@ elsif ( $mode eq "Change Allocation" ) {
             print "skipped, allocation unchanged.";
         }
         elsif ($info{type} ne "dynamic"
-            && $newalloc   ne "dynamic"
-            && $newalloc   ne "unreg"
+            && $newalloc ne "dynamic"
+            && $newalloc ne "unreg"
             && $info{type} ne "unreg" )
         {
             print "updating allocation to '$newalloc'.";
@@ -239,16 +239,69 @@ sub DisplaySubnetList {
     my @subnets = $net->NetworkSort( keys( %{$info} ) );
 
     &HTMLStartForm( &HTMLScriptURL(), "GET" );
-    print "Available Subnets:<p/>";
-    &HTMLStartSelect( "subnet", 20 );
-    foreach my $sn (@subnets) {
-        print "<option value=\"$sn\">$sn - " . "["
-            . $info->{$sn}->{vlan} . "] ["
-            . $info->{$sn}->{template} . "] "
-            . $info->{$sn}->{description} . " {"
-            . $info->{$sn}->{dhcpcluster} . "}\n";
+
+    $html->StartBlockTable( "Subnets", 1000 );
+
+    print "<table border=0 class=\"display cell-border compact\" id=\"subnets\">\n";
+
+    my @cols = ( "&nbsp;", "Subnet", "VLAN", "Template", "Description", "DHCP Cluster" );
+    print "<thead><tr>";
+    foreach my $h (@cols) {
+        print "<th>$h</th>\n";
     }
-    &HTMLEndSelect();
+    print "</tr></thead>\n";
+    print "<tbody>\n";
+
+    foreach my $sn (@subnets) {
+        print "<tr>\n";
+        print "<td align=center width=30><input type=\"radio\" name=\"subnet\" value=\"$sn\"></td>\n";
+        print "<td>", $sn, "</td>\n";
+        print "<td>", $info->{$sn}->{vlan},        "</td>\n";
+        print "<td>", $info->{$sn}->{template},    "</td>\n";
+        print "<td>", $info->{$sn}->{description}, "</td>\n";
+        print "<td>", $info->{$sn}->{dhcpcluster}, "</td>\n";
+        print "</tr>\n";
+    }
+
+    print "</tbody>\n";
+
+    print "<tfoot><tr>";
+    foreach my $h (@cols) {
+        print "<th>$h</th>\n";
+    }
+    print "</tr></tfoot>\n";
+
+    print "</table>\n";
+
+    $html->EndBlockTable();
+
+    print <<EOJS;
+<script type="text/javascript">
+   \$('#subnets tfoot th').each( function () {
+       var title = \$('#recips tfoot th').eq( \$(this).index() ).text();
+       \$(this).html( '<input type="text" placeholder="Search '+title+'" />' );
+   } );
+
+   var table = \$('#subnets').DataTable( {
+        "deferRender": true,
+        "processing": false,
+        "paging" : false,
+        "scrollY" : 400,
+    });
+
+    // Apply the search
+    table.columns().eq( 0 ).each( function ( colIdx ) {
+        \$( 'input', table.column( colIdx ).footer() ).on( 'keyup change', function () {
+            table
+                .column( colIdx )
+                .search( this.value )
+                .draw();
+        } );
+    } );
+
+</script>
+EOJS
+
     print "<p/>\n";
     &HTMLSubmit( "Edit Subnet Allocations", "mode" );
     print " ";
