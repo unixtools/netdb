@@ -1,0 +1,25 @@
+tfoot input {
+        width: 100%;
+        padding: 3px;
+        box-sizing: border-box;
+    }
+
+table.dataTable.display tbody td {
+    font-size: 12px; 
+}
+table.dataTable.display thead th {
+    font-size: 12px; 
+}
+table.dataTable.display tfoot th {
+    font-size: 12px; 
+}
+table.dataTable.display tfoot input {
+    font-size: 12px; 
+}
+table.dataTable.display tfoot td {
+    font-size: 12px; 
+}
+
+.dataTables_wrapper {
+	font-size: 12px;
+}
