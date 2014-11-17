@@ -158,6 +158,10 @@ if ( $privs{$NETDB_PRIV_REPORTS} ) {
     print "<td><a href=\"reports/live-dhcp-usage.pl\">Live DHCP Usage</a></td>\n";
     $html->EndInnerRow();
 
+    $html->StartInnerRow();
+    print "<td><a href=\"reports/metadata-schemas.pl\">Metadata Schema Listing</a></td>\n";
+    $html->EndInnerRow();
+
     $html->EndInnerTable();
     $html->EndBlockTable();
 }
