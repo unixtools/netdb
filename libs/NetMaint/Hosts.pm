@@ -91,6 +91,40 @@ sub GetHostInfo {
 }
 
 # Begin-Doc
+# Name: GetHostMetadata
+# Type: method
+# Description: Returns host metadata for a particular host
+# Comments: returns empty hash ref if nothing found, each hash value is a hash of content,ctime,mtime
+# Syntax: $info = $obj->GetHostMetadata($host);
+# End-Doc
+sub GetHostMetadata {
+    my $self = shift;
+    my $host = lc shift;
+
+    my $db = $self->{db};
+    my ( $qry, $cid );
+    my $info = {};
+
+    $qry = "select field,value,unix_timestamp(ctime),unix_timestamp(mtime) from metadata    
+        where host=?";
+    $cid = $db->SQL_OpenBoundQuery($qry)
+        || $db->SQL_Error($qry) && return undef;
+    $db->SQL_ExecQuery( $cid, $host ) || $db->SQL_Error($qry) && return undef;
+
+    while ( my ($field,$value,$ctime,$mtime) = $db->SQL_FetchRow($cid) )
+    {
+        $info->{$field} = {
+            content => $value,
+            ctime => $ctime,
+            mtime => $mtime
+        };
+    }
+    $db->SQL_CloseQuery($cid);
+
+    return $info;
+}
+
+# Begin-Doc
 # Name: SearchByName
 # Type: method
 # Description: Returns array of hostnames matching substring

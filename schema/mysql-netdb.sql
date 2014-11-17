@@ -448,40 +448,33 @@ create table menu_dhcp_options
 create table metadata 
 (
  host varchar(120) not null, 
- fieldgroup varchar(200) not null, 
- fieldname varchar(200) not null, 
+ field varchar(200) not null, 
  value varchar(4000), 
  ctime datetime, 
  mtime datetime
 );
 
-create index metadata_fgroup_fname_idx ON metadata (fieldgroup, fieldname);
-create unique index metadata_pk ON metadata (host, fieldgroup, fieldname);
+create index metadata_fname_idx ON metadata (field);
+create unique index metadata_pk ON metadata (host, field);
 create index metadata_value_idx ON metadata (value);
 
 -- Schema definition for TABLE METADATA_FIELDS
 create table metadata_fields 
 (
- fieldgroup varchar(200) not null, 
- fieldname varchar(200) not null, 
+ field varchar(200) not null, 
  type varchar(20), 
- helper varchar(100), 
- re_valid_value varchar(600), 
- re_invalid_value varchar(600), 
- re_valid_hostname varchar(600), 
- re_invalid_hostname varchar(600), 
+ jsonschema text,
  editpriv varchar(200), 
  viewpriv varchar(200), 
  description varchar(200), 
  label varchar(100), 
- example varchar(300), 
  ctime datetime, 
  mtime datetime, 
  netdb_visible varchar(1), 
  netdb_editable varchar(1)
 );
 
-create unique index metadata_fields_pk ON metadata_fields (fieldgroup, fieldname);
+create unique index metadata_fields_pk ON metadata_fields (field);
 
 -- Schema definition for TABLE QUOTA
 create table quota 
