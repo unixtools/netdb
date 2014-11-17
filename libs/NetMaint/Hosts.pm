@@ -584,7 +584,7 @@ sub GetMetadataFieldAll {
     my $qry = "select host,value from metadata where field=?";
     my $cid = $db->SQL_OpenQuery( $qry, $field );
     while ( my ( $host, $val ) = $db->SQL_FetchRow($cid) ) {
-        $res{$host} = $val;
+        $res->{$host} = $val;
     }
     $db->SQL_CloseQuery($cid);
 

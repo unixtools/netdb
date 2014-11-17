@@ -968,6 +968,12 @@ AUTOSUGGEST
     print "<a target=_history href=\"view-host-history.pl?mode=view&host=$host\">";
     print "View history for $host</a><p/>\n";
 
+    print "<p/>\n";
+    print "<a href=\"edit-host-metadata.pl?mode=view&host=$host\">";
+    print "View host metadata for $host</a>\n";
+    print "<p/>\n";
+
+
     &CheckHostAndEditAccess();
 
     my $info = $hosts->GetHostInfo($host);
