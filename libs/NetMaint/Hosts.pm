@@ -537,6 +537,61 @@ sub SetMetadataField {
 }
 
 # Begin-Doc
+# Name: GetMetadataField
+# Type: method
+# Description: Gets value of a metadata field for a host
+# Syntax: my $value = $obj->GetMetadataField($host, $field);
+# Comments: returns content of field or undef
+# End-Doc
+sub GetMetadataField {
+    my $self  = shift;
+    my $host  = lc shift;
+    my $field = shift;
+
+    my $db = $self->{db};
+    my ( $qry, $cid );
+
+    # get the field info, host perms, etc.
+    my $qry = "select field from metadata_fields where field=?";
+    my ($qf) = $db->SQL_DoQuery( $qry, $field );
+    if ( $qf ne $field ) {
+        return undef;
+    }
+
+    # Ignore error, we just want this to populate ctime
+    my $qry = "select value from metadata where host=? and field=?";
+    my ($value) = $db->SQL_DoQuery( $qry, $host, $field );
+
+    return $value;
+}
+
+# Begin-Doc
+# Name: GetMetadataFieldAll
+# Type: method
+# Description: Gets value of a metadata field for all hosts with that field
+# Syntax: my $value = $obj->GetMetadataFieldAll($field);
+# Comments: returns content of field or undef
+# End-Doc
+sub GetMetadataFieldAll {
+    my $self  = shift;
+    my $field = shift;
+
+    my $db = $self->{db};
+    my ( $qry, $cid );
+
+    # Ignore error, we just want this to populate ctime
+    my $res = {};
+    my $qry = "select host,value from metadata where field=?";
+    my $cid = $db->SQL_OpenQuery( $qry, $field );
+    while ( my ( $host, $val ) = $db->SQL_FetchRow($cid) ) {
+        $res{$host} = $val;
+    }
+    $db->SQL_CloseQuery($cid);
+
+    return $res;
+}
+
+# Begin-Doc
 # Name: ClearAdminLock
 # Type: method
 # Description: Clears administrative lock for a host

@@ -215,6 +215,115 @@ sub SetHostLocation {
 }
 
 # Begin-Doc
+# Name: GetHostMetadataField
+# Type: method
+# Description: Returns metadata field content for a particular hostname
+# Syntax: $info = $obj->GetHostMetadataField($host, $field);
+# End-Doc
+sub GetHostMetadataField {
+    my $self  = shift;
+    my $host  = lc shift;
+    my $field = shift;
+    my ( $qry, $cid );
+
+    my $db = $self->_init_db();
+
+    my $access = new NetMaint::Access;
+    my $view_ok = $access->CheckHostViewAccess( host => $host, action => "update" );
+
+    if ( !$view_ok ) {
+        die "User doesn't have permission to view this host.";
+    }
+
+    $qry = "select field,viewpriv from metadata_fields where field=?";
+    my ( $qf, $viewpriv ) = $db->SQL_DoQuery( $qry, $field );
+    if ( $qf ne $field ) {
+        die "Invalid field.";
+    }
+
+    if ( $viewpriv && !&PrivSys_CheckPriv( $ENV{REMOTE_USER}, $viewpriv ) ) {
+        die "Permission denied to view metadata field.";
+    }
+
+    my $value = $hosts->GetMetadataField( $host, $field );
+
+    return { $host => { $field => $value } };
+}
+
+# Begin-Doc
+# Name: GetHostMetadataFieldAll
+# Type: method
+# Description: Returns metadata field content for all hosts for a particular field
+# Syntax: $info = $obj->GetHostMetadataFieldAll($field);
+# End-Doc
+sub GetHostMetadataFieldAll {
+    my $self  = shift;
+    my $host  = lc shift;
+    my $field = shift;
+    my ( $qry, $cid );
+
+    my $db = $self->_init_db();
+
+    $qry = "select field,viewpriv from metadata_fields where field=?";
+    my ( $qf, $viewpriv ) = $db->SQL_DoQuery( $qry, $field );
+    if ( $qf ne $field ) {
+        die "Invalid field.";
+    }
+    
+    if ( ! $viewpriv )
+    {
+        die "For fetch All, must have view privilege code defined.";
+    }
+
+    if ( $viewpriv && !&PrivSys_CheckPriv( $ENV{REMOTE_USER}, $viewpriv ) ) {
+        die "Permission denied to view metadata field.";
+    }
+
+    my $res = $hosts->GetMetadataFieldAll($field );
+
+    return $res;
+}
+
+# Begin-Doc
+# Name: SetHostMetadataField
+# Type: method
+# Description: Sets metadata field content for a particular hostname
+# Syntax: $info = $obj->SetHostMetadataField($host, $field, $value);
+# End-Doc
+sub SetHostMetadataField {
+    my $self  = shift;
+    my $host  = lc shift;
+    my $field = shift;
+    my $value = shift;
+    my ( $qry, $cid );
+
+    my $db = $self->_init_db();
+
+    my $access = new NetMaint::Access;
+    my $edit_ok = $access->CheckHostEditAccess( host => $host, action => "update" );
+
+    if ( !$edit_ok ) {
+        die "User doesn't have permission to edit this host.";
+    }
+
+    $qry = "select field,editpriv from metadata_fields where field=?";
+    my ( $qf, $editpriv ) = $db->SQL_DoQuery( $qry, $field );
+    if ( $qf ne $field ) {
+        die "Invalid field.";
+    }
+
+    if ( $editpriv && !&PrivSys_CheckPriv( $ENV{REMOTE_USER}, $editpriv ) ) {
+        die "Permission denied to edit metadata field.";
+    }
+
+    my $res = $hosts->SetMetadataField( $host, $field, $value );
+    if ($res) {
+        return undef;
+    }
+    return { $host => { $field => $value } };
+}
+
+# Begin-Doc
 # Name: AutoAllocateVMWareAddr
 # Type: method
 # Description: Adds vmware auto-allocated mac address to a host

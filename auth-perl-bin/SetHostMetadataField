@@ -1,0 +1,38 @@
+#!/usr/bin/perl
+
+=pod
+
+Begin-Doc
+Name: SetHostMetadataField
+Type: RPC Perl Script
+Location: Sets metadata field in netdb for host
+CGI-Parameters: key is 'host' value is hostname, key is 'field' and key is 'value'
+SimpleRPC-Return: none
+End-Doc
+
+=cut
+
+use lib "/local/umrperl/libs";
+use lib "/local/netdb/libs";
+use UMR::SimpleRPC;
+use RPC::NetDBAdmin;
+use strict;
+
+my $rpc = new UMR::SimpleRPC::Server;
+my %opts = $rpc->Init();
+
+$rpc->RequirePriv("rpc:netdb:userops");
+
+my $admin = new RPC::NetDBAdmin;
+
+my $res = $rpc->Try(
+    sub {
+		my $host = $opts{host};
+		my $field = $opts{field};
+		my $value = $opts{value};
+
+        return $admin->SetHostMetadataField($host, $field, $value);
+    }
+);
+
+$rpc->Finish($res);
