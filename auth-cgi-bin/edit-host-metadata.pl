@@ -103,7 +103,7 @@ sub DisplayHost {
     my $info;
     my $db = new NetMaint::DB;
 
-    print <<AUTOSUGGEST;
+    print <<JS_HEAD;
 <link rel="stylesheet" href="/~netdb/js/jquery-ui-themes/themes/smoothness/jquery-ui.css" />
 <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.3/css/font-awesome.css" />
 
@@ -113,7 +113,56 @@ sub DisplayHost {
 <script type="text/javascript">
 JSONEditor.defaults.options.iconlib = 'fontawesome4';
 </script>
-AUTOSUGGEST
+
+<script type="text/javascript">
+function jse_save(host,fieldid,field,jse)
+{
+    console.log("marking " + fieldid + " saved");
+
+    var val = JSON.stringify(jse.getValue());
+    console.log("value = " + val);
+
+    \$.ajax("ajax-metadata-update.pl?" +
+        "host=" + encodeURIComponent(host) + 
+        "&field=" + encodeURIComponent(field) + 
+        "&value=" + encodeURIComponent(val), {
+            dataType: "json",
+        }).always( function(data,status,xhr) {
+
+        if ( status == "success" )
+        {
+            jse_mark_clean(fieldid);
+            console.log("save ok = " + JSON.stringify(data));
+        }
+        else
+        {
+            alert("save failed: " + status);
+            console.log("save failed = " + xhr.responseText);
+        }
+    });
+}
+
+
+function jse_mark_dirty(fieldid)
+{
+    var dname="jse_save_" + fieldid;
+
+    console.log("marking " + fieldid + " dirty");
+    document.getElementById(dname).style.color="#ff0000";
+    document.getElementById(dname).style.fontWeight="bolder";
+}
+
+function jse_mark_clean(fieldid)
+{
+    var dname="jse_save_" + fieldid;
+
+    console.log("marking " + dname + " clean");
+    document.getElementById(dname).style.color="#000000";
+    document.getElementById(dname).style.fontWeight="normal";
+}
+
+</script>
+JS_HEAD
 
     # Need access check
 
@@ -142,10 +191,19 @@ AUTOSUGGEST
         my $fieldid = $field;
         $fieldid =~ s/[\.\:]/_/go;
 
+print <<EOF;
+<script>
+var jse_$fieldid;
+</script>
+EOF
+
         $html->StartBlockTable( "Edit Metadata ($field) - $label", 600 );
         print "<b>$desc</b><p>\n";
 
-        print "<div id=\"editor_holder_$field\"></div>\n";
+        print "<button id=\"jse_save_$fieldid\" onclick=\"jse_save('$host','$fieldid','$field',jse_$fieldid);\">Save</button> ";
+        print "<p/>\n";
+
+        print "<div id=\"editor_holder_$fieldid\"></div>\n";
         print "<script>\n";
 
         print "var js_schema_$fieldid = ";
@@ -154,7 +212,7 @@ AUTOSUGGEST
             print $schema . ";\n";
         }
         else {
-            print "{};\n";
+            print "null;\n";
             print "// ", $@, "\n";
         }
 
@@ -165,16 +223,28 @@ AUTOSUGGEST
             print $content;
         }
         else {
-            print '""';
+            print 'null';
         }
         print ";\n";
 
         print <<EOF;
-var js_ph_$fieldid = document.getElementById("editor_holder_$fieldid");
-var jse_$fieldid = new JSONEditor(js_ph_$fieldid,{
-    schema: js_schema_$fieldid,
-    startval: js_val_$fieldid
-});
+jse_$fieldid = new JSONEditor(
+    document.getElementById("editor_holder_$fieldid"),
+    {
+        schema: js_schema_$fieldid,
+        startval: js_val_$fieldid
+    }
+);
+
+jse_changecount_$field = 0;
+jse_$fieldid.on('ready',function() { console.log("$fieldid now ready"); jse_mark_clean('$fieldid'); });
+jse_$fieldid.on('change',function() { 
+    if ( jse_changecount_$fieldid > 0 )
+    { 
+        jse_mark_dirty('$fieldid'); 
+    }
+    jse_changecount_$fieldid++;
+ });
 EOF
         if ( $editable ne "Y" || ( $editpriv && !$privs{$editpriv} ) ) {
             print "jse_$fieldid.disable();\n";
