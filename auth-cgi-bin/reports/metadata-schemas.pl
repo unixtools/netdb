@@ -9,7 +9,7 @@
 use strict;
 
 use lib "/local/umrperl/libs";
-use UMR::HTMLUtil;
+use Local::HTMLUtil;
 use lib "/local/netdb/libs";
 
 require NetMaint::HTML;
@@ -19,7 +19,7 @@ require NetMaint::Hosts;
 require NetMaint::Logging;
 use JSON;
 
-use UMR::PrivSys;
+use Local::PrivSys;
 &PrivSys_RequirePriv("sysprog:netdb:reports");
 
 &HTMLGetRequest();

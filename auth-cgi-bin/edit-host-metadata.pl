@@ -9,8 +9,8 @@
 use strict;
 
 use lib "/local/umrperl/libs";
-use UMR::HTMLUtil;
-use UMR::PrivSys;
+use Local::HTMLUtil;
+use Local::PrivSys;
 use lib "/local/netdb/libs";
 
 require NetMaint::HTML;

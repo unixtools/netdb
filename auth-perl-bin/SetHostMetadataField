@@ -14,11 +14,11 @@ End-Doc
 
 use lib "/local/umrperl/libs";
 use lib "/local/netdb/libs";
-use UMR::SimpleRPC;
+use Local::SimpleRPC;
 use RPC::NetDBAdmin;
 use strict;
 
-my $rpc = new UMR::SimpleRPC::Server;
+my $rpc = new Local::SimpleRPC::Server;
 my %opts = $rpc->Init();
 
 $rpc->RequirePriv("rpc:netdb:userops");
