@@ -111,12 +111,11 @@ sub GetHostMetadata {
         || $db->SQL_Error($qry) && return undef;
     $db->SQL_ExecQuery( $cid, $host ) || $db->SQL_Error($qry) && return undef;
 
-    while ( my ($field,$value,$ctime,$mtime) = $db->SQL_FetchRow($cid) )
-    {
+    while ( my ( $field, $value, $ctime, $mtime ) = $db->SQL_FetchRow($cid) ) {
         $info->{$field} = {
             content => $value,
-            ctime => $ctime,
-            mtime => $mtime
+            ctime   => $ctime,
+            mtime   => $mtime
         };
     }
     $db->SQL_CloseQuery($cid);
@@ -497,6 +496,44 @@ sub SetAdminLock {
     $self->MarkUpdated($host);
 
     $log->Log( action => "set administrative lock", host => $host );
+}
+
+# Begin-Doc
+# Name: SetMetadataField
+# Type: method
+# Description: Sets value of a metadata field for a host
+# Syntax: my $res = $obj->SetMetadataField($host, $field, $value);
+# Comments: returns undef on success, error msg on failure
+# End-Doc
+sub SetMetadataField {
+    my $self  = shift;
+    my $host  = lc shift;
+    my $field = shift;
+    my $value = shift;
+
+    my $log = $self->{log};
+    my $db  = $self->{db};
+    my ( $qry, $cid );
+
+    # get the field info, host perms, etc.
+    my $qry = "select field from metadata_fields where field=?";
+    my ($qf) = $db->SQL_DoQuery( $qry, $field );
+    if ( $qf ne $field ) {
+        return "invalid field";
+    }
+
+    # Ignore error, we just want this to populate ctime
+    my $qry = "insert into metadata(host,field,ctime) values (?,?,now())";
+    $db->SQL_ExecQuery( $qry, $host, $field );
+
+    my $qry = "update metadata set value=?,mtime=now() where host=? and field=?";
+    $db->SQL_ExecQuery( $qry, $value, $host, $field ) || return "sql error";
+
+    $self->MarkUpdated($host);
+
+    $log->Log( action => "set metadata field", host => $host );
+
+    return;
 }
 
 # Begin-Doc

@@ -77,6 +77,8 @@ elsif ( $mode eq "search" ) {
 }
 elsif ( $mode eq "view" )    # display the host, exact match only
 {
+    &CheckHostAndEditAccess();
+
     my $info = $hosts->GetHostInfo($host);
     if ($info) {
 
@@ -131,8 +133,15 @@ function jse_save(host,fieldid,field,jse)
 
         if ( status == "success" )
         {
-            jse_mark_clean(fieldid);
-            console.log("save ok = " + JSON.stringify(data));
+            if ( data.status != "ok" )
+            {
+                alert(data.message);
+            }
+            else
+            {
+                jse_mark_clean(fieldid);
+                console.log("save ok = " + JSON.stringify(data));
+            }
         }
         else
         {
@@ -145,26 +154,34 @@ function jse_save(host,fieldid,field,jse)
 
 function jse_mark_dirty(fieldid)
 {
-    var dname="jse_save_" + fieldid;
+    var dname;
 
     console.log("marking " + fieldid + " dirty");
+
+    dname="jse_save1_" + fieldid;
+    document.getElementById(dname).style.color="#ff0000";
+    document.getElementById(dname).style.fontWeight="bolder";
+    dname="jse_save2_" + fieldid;
     document.getElementById(dname).style.color="#ff0000";
     document.getElementById(dname).style.fontWeight="bolder";
 }
 
 function jse_mark_clean(fieldid)
 {
-    var dname="jse_save_" + fieldid;
+    var dname;
 
-    console.log("marking " + dname + " clean");
+    console.log("marking " + fieldid + " clean");
+
+    dname="jse_save1_" + fieldid;
+    document.getElementById(dname).style.color="#000000";
+    document.getElementById(dname).style.fontWeight="normal";
+    dname="jse_save2_" + fieldid;
     document.getElementById(dname).style.color="#000000";
     document.getElementById(dname).style.fontWeight="normal";
 }
 
 </script>
 JS_HEAD
-
-    # Need access check
 
     my $info = $hosts->GetHostInfo($host);
     if ( !$info ) {
@@ -191,7 +208,7 @@ JS_HEAD
         my $fieldid = $field;
         $fieldid =~ s/[\.\:]/_/go;
 
-print <<EOF;
+        print <<EOF;
 <script>
 var jse_$fieldid;
 </script>
@@ -200,10 +217,13 @@ EOF
         $html->StartBlockTable( "Edit Metadata ($field) - $label", 600 );
         print "<b>$desc</b><p>\n";
 
-        print "<button id=\"jse_save_$fieldid\" onclick=\"jse_save('$host','$fieldid','$field',jse_$fieldid);\">Save</button> ";
+        print
+            "<button id=\"jse_save1_$fieldid\" onclick=\"jse_save('$host','$fieldid','$field',jse_$fieldid);\">Save</button> ";
         print "<p/>\n";
-
         print "<div id=\"editor_holder_$fieldid\"></div>\n";
+        print "<p/>\n";
+        print
+            "<button id=\"jse_save2_$fieldid\" onclick=\"jse_save('$host','$fieldid','$field',jse_$fieldid);\">Save</button> ";
         print "<script>\n";
 
         print "var js_schema_$fieldid = ";
@@ -275,6 +295,28 @@ sub DisplaySearchForms {
     print "<p/>\n";
 
     print "<a href=\"create-host.pl\">Create a new host</a>\n";
+}
+
+# Begin-Doc
+# Name: CheckHostAndEditAccess
+# Description: check if host exists and if user has rights to edit it
+# End-Doc
+sub CheckHostAndEditAccess {
+    if ( !$host ) {
+        $html->ErrorExit("No host specified.");
+    }
+
+    my $info = $hosts->GetHostInfo($host);
+    if ( !$info ) {
+        $html->ErrorExit( "Host (" . $html->Encode($host) . ") not found." );
+    }
+
+    my $edit_ok   = $access->CheckHostEditAccess( host => $host, action => "update" );
+    my $delete_ok = $access->CheckHostEditAccess( host => $host, action => "delete" );
+
+    if ( !$edit_ok && !$delete_ok ) {
+        $html->ErrorExit( "Access denied to view/edit host (" . $html->Encode($host) . ")" );
+    }
 }
 
 $html->PageFooter();

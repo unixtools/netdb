@@ -224,7 +224,13 @@ sub RenameHost {
             . ", owner="
             . $db->SQL_QuoteString($newowner)
             . ", mtime=now(), modifiedby="
-            . $db->SQL_QuoteString($ENV{REMOTE_USER} || "netdb")
+            . $db->SQL_QuoteString( $ENV{REMOTE_USER} || "netdb" )
+            . " where host="
+            . $db->SQL_QuoteString($oldhost) );
+
+    push( @queries,
+              "update metadata set host="
+            . $db->SQL_QuoteString($newhost)
             . " where host="
             . $db->SQL_QuoteString($oldhost) );
 
