@@ -8,7 +8,7 @@
 
 use strict;
 
-use lib "/local/umrperl/libs";
+use lib "/local/perllib/libs";
 use Local::HTMLUtil;
 use lib "/local/netdb/libs";
 
