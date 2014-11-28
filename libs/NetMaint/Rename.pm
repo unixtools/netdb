@@ -95,6 +95,7 @@ sub RenameHost {
         hosts
         ip_alloc
         log
+        metadata
     );
     my $tablelist = join( ",", @tables );
 
