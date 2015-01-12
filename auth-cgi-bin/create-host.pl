@@ -380,13 +380,6 @@ elsif ( $mode eq "create" ) {
         $html->ErrorExitRaw( "Hostname <tt>" . $html->SearchLink_HostEdit($host) . "</tt> already registered." );
     }
 
-    my $cnt   = $access->GetUsedQuota($owner);
-    my $quota = $access->GetRegistrationQuota($owner);
-
-    if ( $cnt >= $quota ) {
-        $html->ErrorExit("Owner '$owner' is at or has exceeded registration quota. ($quota)");
-    }
-
     print "<h3>Attempting to create host $host.</h3>\n";
 
     my $res = $hosts->CreateHost(

@@ -87,9 +87,6 @@ if ( $privs{"netdb-admin"} ) {
     $html->StartInnerRow();
     print "<td><a href=\"edit-vlans.pl\">VLAN Editor</a></td>\n";
     $html->EndInnerRow();
-    $html->StartInnerRow();
-    print "<td><a href=\"edit-quotas.pl\">Edit Registration Quotas</a></td>\n";
-    $html->EndInnerRow();
 
     $html->EndInnerTable();
     $html->EndBlockTable();
@@ -138,11 +135,6 @@ if ( $privs{$NETDB_PRIV_REPORTS} ) {
     $html->StartInnerRow();
     print "<td><a href=\"reports/disabled-hosts.pl\">Disabled Hosts</a></td>\n";
     print "<td><a href=\"reports/admin-options-report.pl\">Admin Options Report</a></td>\n";
-    $html->EndInnerRow();
-
-    $html->StartInnerRow();
-    print "<td><a href=\"reports/quota-report.pl\">Quota Report</a></td>\n";
-    print "<td><a href=\"reports/quota-usage-report.pl\">Quota Usage Report</a></td>\n";
     $html->EndInnerRow();
 
     $html->StartInnerRow();

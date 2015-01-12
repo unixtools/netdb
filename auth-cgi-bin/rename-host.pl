@@ -358,13 +358,6 @@ elsif ( $mode eq "rename" ) {
         $html->ErrorExit("Attempting to rename host to same hostname.");
     }
 
-    my $cnt   = $access->GetUsedQuota($owner);
-    my $quota = $access->GetRegistrationQuota($owner);
-
-    if ( $cnt >= $quota ) {
-        $html->ErrorExit("Owner '$owner' is at or has exceeded registration quota. ($quota)");
-    }
-
     print "<h3>Attempting to rename host $oldhost to $host.</h3>\n";
 
     my $res = $rename->RenameHost(

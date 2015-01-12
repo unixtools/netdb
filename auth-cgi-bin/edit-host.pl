@@ -167,17 +167,6 @@ elsif ( $mode eq "addether" ) {
 
     my $nametype = $access->GetHostNameType($host);
 
-    if ( $nametype eq "ownername" || $nametype eq "travelname" ) {
-        my $hinfo = $hosts->GetHostInfo($host);
-        my $owner = $hinfo->{owner};
-        my $cnt   = $access->GetUsedQuota($owner);
-        my $quota = $access->GetRegistrationQuota($owner);
-
-        if ( $cnt >= $quota ) {
-            $html->ErrorExit("Owner '$owner' is at or has exceeded registration quota. ($quota)");
-        }
-    }
-
     print "<h3>Adding ether <tt>", $util->FormatEther($ether), "</tt> for host <tt>$host</tt></h3>\n";
     $dhcp->AddHostEther( $host, $ether );
 
@@ -194,18 +183,7 @@ elsif ( $mode eq "auto_alloc_vmware_ether" ) {
 
     my $nametype = $access->GetHostNameType($host);
     my $hinfo    = $hosts->GetHostInfo($host);
-
-    if ( $nametype eq "ownername" || $nametype eq "travelname" ) {
-        my $owner = $hinfo->{owner};
-        my $cnt   = $access->GetUsedQuota($owner);
-        my $quota = $access->GetRegistrationQuota($owner);
-
-        if ( $cnt >= $quota ) {
-            $html->ErrorExit("Owner '$owner' is at or has exceeded registration quota. ($quota)");
-        }
-    }
-
-    my $ether = $dhcp->AutoAllocateVMWareEther($host);
+    my $ether    = $dhcp->AutoAllocateVMWareEther($host);
 
     if ($ether) {
         print "<h3>Allocated ether <tt>", $util->FormatEther($ether), "</tt> for host <tt>$host</tt></h3>\n";
@@ -973,7 +951,6 @@ AUTOSUGGEST
     print "View host metadata for $host</a>\n";
     print "<p/>\n";
 
-
     &CheckHostAndEditAccess();
 
     my $info = $hosts->GetHostInfo($host);
@@ -1234,11 +1211,6 @@ AUTOSUGGEST
 
         }
 
-        #
-        # Need to get a count of how many ethernet addresses this owner
-        # has registered so we can enforce quota
-        #
-
         print "\n<p/>\n";
         $html->StartBlockTable( "Registered Ethernet Addresses", 600 );
         $html->StartInnerTable();
@@ -1251,39 +1223,24 @@ AUTOSUGGEST
             $html->EndInnerRow();
         }
 
-        my $allow_more_eth = 1;
-        if ( ( $nametype eq "ownername" )
-            && $hosttype eq "device" )
-        {
-            my $curreg = $access->GetUsedQuota($owner);
-            my $quota  = $access->GetRegistrationQuota($owner);
-            if ( $curreg >= $quota ) { $allow_more_eth = 0; }
-        }
-        if ($allow_more_eth) {
-            $html->StartInnerRow();
-            print "<td align=center>";
-            &HTMLStartForm( &HTMLScriptURL, "GET" );
-            &HTMLHidden( "mode", "addether" );
-            &HTMLHidden( "host", $host );
-            &HTMLInputText( "ether", 15 );
-            print " ";
-            &HTMLSubmit("Add New Address");
-            print "</td>";
-            &HTMLEndForm();
-            $html->EndInnerRow();
+        $html->StartInnerRow();
+        print "<td align=center>";
+        &HTMLStartForm( &HTMLScriptURL, "GET" );
+        &HTMLHidden( "mode", "addether" );
+        &HTMLHidden( "host", $host );
+        &HTMLInputText( "ether", 15 );
+        print " ";
+        &HTMLSubmit("Add New Address");
+        print "</td>";
+        &HTMLEndForm();
+        $html->EndInnerRow();
 
-            $html->StartInnerRow();
+        $html->StartInnerRow();
 
-            print "<td align=center><a href=\"?mode=auto_alloc_vmware_ether&host=$host\">Automatically Allocate ";
-            print "VMWare Ethernet Address</a></td>\n";
+        print "<td align=center><a href=\"?mode=auto_alloc_vmware_ether&host=$host\">Automatically Allocate ";
+        print "VMWare Ethernet Address</a></td>\n";
 
-            $html->EndInnerRow();
-        }
-        else {
-            $html->StartInnerRow();
-            print "<td colspan=2 align=center>Owner has maximum ethernet addresses registered.</td>\n";
-            $html->EndInnerRow();
-        }
+        $html->EndInnerRow();
 
         $html->EndInnerTable();
         $html->EndBlockTable();

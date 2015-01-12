@@ -476,15 +476,6 @@ create table metadata_fields
 
 create unique index metadata_fields_pk ON metadata_fields (field);
 
--- Schema definition for TABLE QUOTA
-create table quota 
-(
- owner varchar(20) not null, 
- quota integer not null
-);
-
-create index quota_owner ON quota (owner);
-
 -- Schema definition for TABLE SUBNETS
 create table subnets 
 (

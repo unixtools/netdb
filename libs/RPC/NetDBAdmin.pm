@@ -388,18 +388,6 @@ sub AddEther {
         die "Ethernet Address (" . $util->FormatEther($ether) . ") already registered to '" . $newhost . "'.";
     }
 
-    my $nametype = $access->GetHostNameType($host);
-    if ( $nametype eq "ownername" || $nametype eq "travelname" ) {
-        my $hinfo = $hosts->GetHostInfo($host);
-        my $owner = $hinfo->{owner};
-        my $cnt   = $access->GetUsedQuota($owner);
-        my $quota = $access->GetRegistrationQuota($owner);
-
-        if ( $cnt >= $quota ) {
-            die "Owner '$owner' is at or has exceeded registration quota. ($quota)";
-        }
-    }
-
     $dhcp->AddHostEther( $host, $ether );
     $hosts->MarkUpdated($host);
 
@@ -773,13 +761,6 @@ sub CreateHost {
         die "Hostname $host already registered.";
     }
 
-    my $cnt   = $access->GetUsedQuota($owner);
-    my $quota = $access->GetRegistrationQuota($owner);
-
-    if ( $cnt >= $quota ) {
-        die "Owner '$owner' is at or has exceeded registration quota. ($quota)";
-    }
-
     my $res = $hosts->CreateHost(
         host   => $host,
         domain => $domain,
@@ -989,55 +970,6 @@ sub SetAdminLock {
     $hosts->MarkUpdated($host);
 
     return {};
-}
-
-# Begin-Doc
-# Name: SetUserQuota
-# Type: method
-# Description: Sets user registration quota, -1 to clear/reset to default
-# Syntax: $info = $obj->SetUserQuota($user, $quota)
-# End-Doc
-sub SetUserQuota {
-    my $self  = shift;
-    my $user  = lc shift;
-    my $quota = shift;
-    my ( $qry, $cid );
-
-    &LogAPIUsage();
-
-    my $access = new NetMaint::Access;
-
-    &PrivSys_QuietRequirePriv("sysprog:netdb:quota");
-
-    my $def = $access->GetDefaultRegistrationQuota($user);
-
-    if ( $quota < 0 || $quota == $def ) {
-        $access->DeleteRegistrationQuota($user);
-    }
-    else {
-        $access->UpdateRegistrationQuota( $user, int($quota) );
-    }
-
-    return {};
-}
-
-# Begin-Doc
-# Name: GetUserQuota
-# Type: method
-# Description: Gets user registration quota
-# Syntax: $quota = $obj->GetUserQuota($user)
-# End-Doc
-sub GetUserQuota {
-    my $self = shift;
-    my $user = lc shift;
-    my ( $qry, $cid );
-
-    &LogAPIUsage();
-
-    my $access = new NetMaint::Access;
-    &PrivSys_QuietRequirePriv("sysprog:netdb:quota");
-
-    return $access->GetRegistrationQuota($user);
 }
 
 # Begin-Doc
