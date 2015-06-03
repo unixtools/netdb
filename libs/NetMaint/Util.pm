@@ -216,6 +216,12 @@ sub CondenseIP {
     my $self = shift;
     my $ip   = shift;
 
+    # simple check - if it obviously doesn't look like an ip, exit
+    if ( $ip =~ /^(ens|eth|eno)\d+/o )
+    {
+        return undef;
+    }
+
     my $x = NetAddr::IP->new( $ip, "255.255.255.255" );
     if ($x) {
         return $x->addr();
