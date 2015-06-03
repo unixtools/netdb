@@ -108,8 +108,7 @@ my %ip_to_ping = ();
 
 my $qry = "select distinct ip from last_ping_ip where unix_timestamp(now())-unix_timestamp(tstamp) < 120";
 my $cid = $db->SQL_OpenQuery($qry) || $db->SQL_Error($qry) && die;
-while ( my ($ip) = $db->SQL_FetchRow($cid) )
-{
+while ( my ($ip) = $db->SQL_FetchRow($cid) ) {
     $ip_to_ping{$ip} = "YES";
 }
 $db->SQL_CloseQuery($cid);
@@ -117,12 +116,21 @@ $db->SQL_CloseQuery($cid);
 my %ip_to_alloc;
 my $qry = "select ip,host from ip_alloc where host is not null";
 my $cid = $db->SQL_OpenQuery($qry) || $db->SQL_Error($qry) && die;
-while ( my ($ip,$host) = $db->SQL_FetchRow($cid) )
-{
-    if ( $host )
-    {
+while ( my ( $ip, $host ) = $db->SQL_FetchRow($cid) ) {
+    if ($host) {
         $ip_to_alloc{$ip} = $host;
     }
+}
+$db->SQL_CloseQuery($cid);
+
+my %host_to_desc;
+my $qry = "select host,description from hosts";
+my $cid = $db->SQL_OpenQuery($qry) || $db->SQL_Error($qry) && die;
+while ( my ( $host, $desc ) = $db->SQL_FetchRow($cid) ) {
+    $host_to_desc{$host} = $desc;
+
+    $host =~ s/\..*//go;
+    $host_to_desc{$host} = $desc;
 }
 $db->SQL_CloseQuery($cid);
 
@@ -182,7 +190,7 @@ $debug && print "Generating HTML...\n";
 
 print "<br><b>Boldfaced</b> hostnames are staticly assigned to that IP.<br>\n";
 
-$html->StartBlockTable("DNS/IP Info for Labs", 800);
+$html->StartBlockTable( "DNS/IP Info for Labs", 950 );
 $html->StartInnerTable();
 
 my $lastskip = 0;
@@ -195,12 +203,13 @@ foreach my $ip ( sort { $ip_to_sort{$a} cmp $ip_to_sort{$b} } keys(%ip_to_sort) 
     if ( $newprefix ne $prefix ) {
         $prefix = $newprefix;
         $html->StartInnerHeaderRow();
-        print "<td align=center colspan=4><b>Network Prefix ($prefix)</td>\n";
+        print "<td align=center colspan=5><b>Network Prefix ($prefix)</td>\n";
         $html->EndInnerHeaderRow();
 
         $html->StartInnerHeaderRow();
-        print
-            "<td><b>IP</td><td><b>DNS / Alloc<br>(.spirenteng.com)</td><td><b>Ping</td>";
+        print "<td><b>IP</td><td><b>DNS / Alloc<br>(.spirenteng.com)</td>\n";
+        print "<td width=300><b>Description</td>\n";
+        print "<td><b>Ping</td>";
         print "<td width=600><b>OS and Services</td>\n";
         $html->EndInnerHeaderRow();
     }
@@ -209,14 +218,14 @@ foreach my $ip ( sort { $ip_to_sort{$a} cmp $ip_to_sort{$b} } keys(%ip_to_sort) 
 
     my %poss_names = ();
 
-    my $dns  = "";
+    my $dns = "";
     foreach my $host ( sort( keys( %{ $ip_to_dns{$ip} } ) ) ) {
         next if ( $host eq "" );
         next if ( $host =~ /^dyn-/o );
         $poss_names{$host} = 1;
     }
 
-    my $resv = "";
+    my $resv   = "";
     my $ncount = 0;
     foreach my $host ( sort( keys( %{ $ip_to_resv{$ip} } ) ) ) {
         next if ( $host eq "" );
@@ -226,8 +235,7 @@ foreach my $ip ( sort { $ip_to_sort{$a} cmp $ip_to_sort{$b} } keys(%ip_to_sort) 
     }
 
     my $alloc = $ip_to_alloc{$ip};
-    if ( $alloc )
-    {
+    if ($alloc) {
         $poss_names{$alloc} = 1;
         $ncount++;
     }
@@ -250,22 +258,28 @@ foreach my $ip ( sort { $ip_to_sort{$a} cmp $ip_to_sort{$b} } keys(%ip_to_sort) 
     print "<td>$ip</td>\n";
 
     my @editlinks = ();
-    foreach my $name ( sort(keys(%poss_names)) )
-    {
+    foreach my $name ( sort( keys(%poss_names) ) ) {
         my $sname = $name;
         $sname =~ s/.spirenteng.com//go;
-        
-        my ($pre,$post);
-        
-        if ( $name eq $ip_to_alloc{$ip} )
-        {
-            $pre = "<font color=red><b>";
+
+        my ( $pre, $post );
+
+        if ( $name eq $ip_to_alloc{$ip} ) {
+            $pre  = "<font color=red><b>";
             $post = "</b></font>";
         }
 
-        push(@editlinks, "${pre}<a href=\"${editprefix}$name\">$sname</a>${post}");
+        push( @editlinks, "${pre}<a href=\"${editprefix}$name\">$sname</a>${post}" );
     }
-    print "<td>", join("<br>\n", @editlinks), "</td>\n";
+    print "<td>", join( "<br>\n", @editlinks ), "</td>\n";
+
+    print "<td width=300><font size=-1>\n";
+    foreach my $host ( keys(%poss_names) ) {
+        if ( $host_to_desc{$host} ) {
+            print $host_to_desc{$host}, "<br>\n";
+        }
+    }
+    print "</td>\n";
 
     print "<td align=center>\n";
     print $ip_to_ping{$ip};
