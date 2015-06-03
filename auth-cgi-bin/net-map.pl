@@ -124,13 +124,16 @@ while ( my ( $ip, $host ) = $db->SQL_FetchRow($cid) ) {
 $db->SQL_CloseQuery($cid);
 
 my %host_to_desc;
-my $qry = "select host,description from hosts";
+my %host_to_owner;
+my $qry = "select host,owner,description from hosts";
 my $cid = $db->SQL_OpenQuery($qry) || $db->SQL_Error($qry) && die;
-while ( my ( $host, $desc ) = $db->SQL_FetchRow($cid) ) {
+while ( my ( $host, $owner, $desc ) = $db->SQL_FetchRow($cid) ) {
     $host_to_desc{$host} = $desc;
+    $host_to_owner{$host} = $owner;
 
     $host =~ s/\..*//go;
     $host_to_desc{$host} = $desc;
+    $host_to_owner{$host} = $owner;
 }
 $db->SQL_CloseQuery($cid);
 
@@ -208,7 +211,7 @@ foreach my $ip ( sort { $ip_to_sort{$a} cmp $ip_to_sort{$b} } keys(%ip_to_sort) 
 
         $html->StartInnerHeaderRow();
         print "<td><b>IP</td><td><b>DNS / Alloc<br>(.spirenteng.com)</td>\n";
-        print "<td width=300><b>Description</td>\n";
+        print "<td width=300><b>Owner / Description</td>\n";
         print "<td><b>Ping</td>";
         print "<td width=600><b>OS and Services</td>\n";
         $html->EndInnerHeaderRow();
@@ -276,7 +279,7 @@ foreach my $ip ( sort { $ip_to_sort{$a} cmp $ip_to_sort{$b} } keys(%ip_to_sort) 
     print "<td width=300><font size=-1>\n";
     foreach my $host ( keys(%poss_names) ) {
         if ( $host_to_desc{$host} ) {
-            print $host_to_desc{$host}, "<br>\n";
+            print $host_to_owner{$host} . " / " . $host_to_desc{$host}, "<br>\n";
         }
     }
     print "</td>\n";
