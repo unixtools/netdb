@@ -249,7 +249,7 @@ foreach my $ip ( sort { $ip_to_sort{$a} cmp $ip_to_sort{$b} } keys(%ip_to_sort) 
         }
         else {
             $html->StartInnerHeaderRow();
-            print "<td colspan=5 align=center>... skipped ...</td>\n";
+            print "<td colspan=5 align=left>... skipped ...</td>\n";
             $html->EndInnerHeaderRow();
             $lastskip = 1;
             next;
