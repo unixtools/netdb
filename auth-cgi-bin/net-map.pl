@@ -114,13 +114,19 @@ while ( my ($ip) = $db->SQL_FetchRow($cid) ) {
 $db->SQL_CloseQuery($cid);
 
 my %ip_to_alloc;
-my %ip_to_alloctype;
 my $qry = "select ip,host,type from ip_alloc where host is not null";
 my $cid = $db->SQL_OpenQuery($qry) || $db->SQL_Error($qry) && die;
 while ( my ( $ip, $host, $type ) = $db->SQL_FetchRow($cid) ) {
     if ($host) {
         $ip_to_alloc{$ip} = $host;
     }
+}
+$db->SQL_CloseQuery($cid);
+
+my %ip_to_alloctype;
+my $qry = "select ip,type from ip_alloc";
+my $cid = $db->SQL_OpenQuery($qry) || $db->SQL_Error($qry) && die;
+while ( my ( $ip, $type ) = $db->SQL_FetchRow($cid) ) {
     $ip_to_alloctype{$ip} = $type;
 }
 $db->SQL_CloseQuery($cid);
