@@ -114,12 +114,14 @@ while ( my ($ip) = $db->SQL_FetchRow($cid) ) {
 $db->SQL_CloseQuery($cid);
 
 my %ip_to_alloc;
-my $qry = "select ip,host from ip_alloc where host is not null";
+my %ip_to_alloctype;
+my $qry = "select ip,host,type from ip_alloc where host is not null";
 my $cid = $db->SQL_OpenQuery($qry) || $db->SQL_Error($qry) && die;
-while ( my ( $ip, $host ) = $db->SQL_FetchRow($cid) ) {
+while ( my ( $ip, $host, $type ) = $db->SQL_FetchRow($cid) ) {
     if ($host) {
         $ip_to_alloc{$ip} = $host;
     }
+    $ip_to_alloctype{$ip} = $type;
 }
 $db->SQL_CloseQuery($cid);
 
@@ -128,11 +130,11 @@ my %host_to_owner;
 my $qry = "select host,owner,description from hosts";
 my $cid = $db->SQL_OpenQuery($qry) || $db->SQL_Error($qry) && die;
 while ( my ( $host, $owner, $desc ) = $db->SQL_FetchRow($cid) ) {
-    $host_to_desc{$host} = $desc;
+    $host_to_desc{$host}  = $desc;
     $host_to_owner{$host} = $owner;
 
     $host =~ s/\..*//go;
-    $host_to_desc{$host} = $desc;
+    $host_to_desc{$host}  = $desc;
     $host_to_owner{$host} = $owner;
 }
 $db->SQL_CloseQuery($cid);
@@ -206,11 +208,11 @@ foreach my $ip ( sort { $ip_to_sort{$a} cmp $ip_to_sort{$b} } keys(%ip_to_sort) 
     if ( $newprefix ne $prefix ) {
         $prefix = $newprefix;
         $html->StartInnerHeaderRow();
-        print "<td align=center colspan=5><b>Network Prefix ($prefix)</td>\n";
+        print "<td align=center colspan=6><b>Network Prefix ($prefix)</td>\n";
         $html->EndInnerHeaderRow();
 
         $html->StartInnerHeaderRow();
-        print "<td><b>IP</td><td><b>DNS / Alloc<br>(.spirenteng.com)</td>\n";
+        print "<td><b>IP</b></td><td><b>Allocation</td><td><b>DNS / Alloc<br>(.spirenteng.com)</td>\n";
         print "<td width=300><b>Owner / Description</td>\n";
         print "<td><b>Ping</td>";
         print "<td width=600><b>OS and Services</td>\n";
@@ -225,6 +227,7 @@ foreach my $ip ( sort { $ip_to_sort{$a} cmp $ip_to_sort{$b} } keys(%ip_to_sort) 
     foreach my $host ( sort( keys( %{ $ip_to_dns{$ip} } ) ) ) {
         next if ( $host eq "" );
         next if ( $host =~ /^dyn-/o );
+        next if ( $host =~ /^dhcp-\d+-\d+-\d+-\d+/o );
         $poss_names{$host} = 1;
     }
 
@@ -233,6 +236,7 @@ foreach my $ip ( sort { $ip_to_sort{$a} cmp $ip_to_sort{$b} } keys(%ip_to_sort) 
     foreach my $host ( sort( keys( %{ $ip_to_resv{$ip} } ) ) ) {
         next if ( $host eq "" );
         next if ( $host =~ /^dyn-/o );
+        next if ( $host =~ /^dhcp-\d+-\d+-\d+-\d+/o );
         $poss_names{$host} = 1;
         $ncount++;
     }
@@ -249,7 +253,7 @@ foreach my $ip ( sort { $ip_to_sort{$a} cmp $ip_to_sort{$b} } keys(%ip_to_sort) 
         }
         else {
             $html->StartInnerHeaderRow();
-            print "<td colspan=5 align=left>... skipped ...</td>\n";
+            print "<td colspan=6 align=left>... skipped ...</td>\n";
             $html->EndInnerHeaderRow();
             $lastskip = 1;
             next;
@@ -259,6 +263,7 @@ foreach my $ip ( sort { $ip_to_sort{$a} cmp $ip_to_sort{$b} } keys(%ip_to_sort) 
 
     $html->StartInnerRow();
     print "<td>$ip</td>\n";
+    print "<td align=center>", $ip_to_alloctype{$ip}, "</td>\n";
 
     my @editlinks = ();
     foreach my $name ( sort( keys(%poss_names) ) ) {
@@ -274,7 +279,8 @@ foreach my $ip ( sort { $ip_to_sort{$a} cmp $ip_to_sort{$b} } keys(%ip_to_sort) 
 
         push( @editlinks, "${pre}<a href=\"${editprefix}$name\">$sname</a>${post}" );
     }
-    print "<td>", join( "<br>\n", @editlinks ), "</td>\n";
+    print "<td>";
+    print join( "<br>\n", @editlinks ), "</td>\n";
 
     print "<td width=300><font size=-1>\n";
     foreach my $host ( keys(%poss_names) ) {
