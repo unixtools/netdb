@@ -68,7 +68,6 @@ sub RenameHost {
     my $newhost  = lc $opts{newhost}  || return "must specify new hostname";
     my $newowner = lc $opts{newowner} || return "must specify new owner";
     my $newtype  = lc $opts{newtype}  || return "must specify new type";
-    my $skip_cnames = $opts{skip_cnames};
 
     $debug && print "Attempting rename of '$oldhost' to '$newhost'.\n";
     $debug && print "New type '$newtype' and new owner '$newowner'.\n";
@@ -235,13 +234,11 @@ sub RenameHost {
             . " where host="
             . $db->SQL_QuoteString($oldhost) );
 
-    unless ($skip_cnames) {
-        push( @queries,
-                  "update dns_cname set address="
-                . $db->SQL_QuoteString($newhost)
-                . " where address="
-                . $db->SQL_QuoteString($oldhost) );
-    }
+    push( @queries,
+              "update dns_cname set address="
+            . $db->SQL_QuoteString($newhost)
+            . " where address="
+            . $db->SQL_QuoteString($oldhost) );
 
     foreach my $qry (@queries) {
         $debug && print "Attempting query: $qry\n";

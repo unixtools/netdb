@@ -51,8 +51,6 @@ my $domain = $rqpairs{domain};
 my $index  = $rqpairs{index};
 my $image  = $rqpairs{image};
 
-my $skip_cnames = $rqpairs{skip_cnames} eq "on";
-
 $log->Log();
 
 my $type     = $rqpairs{type};
@@ -215,10 +213,7 @@ elsif ( $mode eq "hostname" && $nametype eq "ownername" ) {
     }
     &HTMLEndSelect();
     print "<p/>\n";
-    &HTMLCheckbox( "skip_cnames", 0 );
-    print "Do not update CName targets.";
 
-    print "<p/>\n";
     &HTMLSubmit("Rename");
     &HTMLEndForm();
     print "<p/>\n";
@@ -263,10 +258,7 @@ elsif ( $mode eq "hostname" && $nametype eq "customname" ) {
     print "  Owner: ";
     &HTMLInputText( "owner", 10, $defowner );
     print "<p/>\n";
-    &HTMLCheckbox( "skip_cnames", 0 );
-    print "Do not update CName targets.";
 
-    print "<p/>\n";
     &HTMLSubmit("Rename");
     &HTMLEndForm();
     print "<p/>\n";
@@ -365,7 +357,6 @@ elsif ( $mode eq "rename" ) {
         newhost     => $host,
         newowner    => $owner,
         newtype     => $type,
-        skip_cnames => $skip_cnames,
     );
     if ($res) {
         $html->ErrorExit("Failed to register host: $res");
