@@ -133,7 +133,15 @@ sub DumpTree_A {
     }
 
     if ($name) {
-        print "<tr><td colspan=2><tt>$name: ";
+        print "<tr><td colspan=2><tt>";
+
+        if ( $subnets->{$name} ) {
+            print "<a href=\"subnet-ip-alloc.pl?mode=report&subnet=$name\">$name</a>: ";
+        }
+        else {
+            print "$name: ";
+        }
+
         my $nip = new NetAddr::IP $name;
         print " ", $nip->range(), "</tt>";
 
