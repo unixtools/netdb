@@ -73,7 +73,7 @@ $html->EndInnerRow();
 $html->EndInnerTable();
 $html->EndBlockTable();
 
-if ( $privs{"netdb-admin"} ) {
+if ( $privs{"netmgr-admin"} ) {
     print "<p/>\n";
     $html->StartBlockTable( "Administrative Tools", 400 );
     $html->StartInnerTable();

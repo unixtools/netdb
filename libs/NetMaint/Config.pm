@@ -27,9 +27,9 @@ sub import {
     }
 }
 
-our $NETDB_PRIV_DEFAULT = "netdb-user";
-our $NETDB_PRIV_ADMIN   = "netdb-admin";
-our $NETDB_PRIV_REPORTS = "netdb-user";
+our $NETDB_PRIV_DEFAULT = "netmgr-user";
+our $NETDB_PRIV_ADMIN   = "netmgr-admin";
+our $NETDB_PRIV_REPORTS = "netmgr-user";
 
 our $NETDB_DEFAULT_TTL = 900;
 

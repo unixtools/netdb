@@ -230,7 +230,7 @@ elsif ( $mode eq "updatecname" ) {
 elsif ( $mode eq "adminlockhost" ) {
     &CheckHostAndEditAccess();
 
-    if ( !$privs{"netdb-admin"} ) {
+    if ( !$privs{"netmgr-admin"} ) {
         $html->ErrorExit("Permission Denied.");
     }
 
@@ -248,7 +248,7 @@ elsif ( $mode eq "adminlockhost" ) {
 elsif ( $mode eq "adminunlockhost" ) {
     &CheckHostAndEditAccess();
 
-    if ( !$privs{"netdb-admin"} ) {
+    if ( !$privs{"netmgr-admin"} ) {
         $html->ErrorExit("Permission Denied.");
     }
 
@@ -272,7 +272,7 @@ elsif ( $mode eq "updateowner" ) {
         $html->ErrorExit("Invalid owner userid.");
     }
 
-    if ( !$privs{"netdb-user"} ) {
+    if ( !$privs{"netmgr-user"} ) {
         $html->ErrorExit("Only users that have the user-on-behalf ability can change host owners.");
     }
 
@@ -458,7 +458,7 @@ elsif ( $mode eq "manualadd_ipv6" ) {
 elsif ( $mode eq "autoaddstatic" ) {
     &CheckHostAndEditAccess();
 
-    if ( !$privs{"netdb-user"} ) {
+    if ( !$privs{"netmgr-user"} ) {
         $html->ErrorExit("Permission Denied to add static addresses.");
     }
 
@@ -516,7 +516,7 @@ elsif ( $mode eq "addstatic" ) {
 
     my $submode = $rqpairs{submode} || "listsubnets";
 
-    if ( !$privs{"netdb-user"} ) {
+    if ( !$privs{"netmgr-user"} ) {
         $html->ErrorExit("Permission Denied to add static addresses.");
     }
 
@@ -620,7 +620,7 @@ elsif ( $mode eq "enable_static_dns" ) {
 
     my $ip = $rqpairs{ip};
 
-    if ( !$privs{"netdb-user"} ) {
+    if ( !$privs{"netmgr-user"} ) {
         $html->ErrorExit("Permission Denied.");
     }
 
@@ -643,7 +643,7 @@ elsif ( $mode eq "enable_all_static_dns" ) {
 
     $dns->BlockUpdates();
 
-    if ( !$privs{"netdb-user"} ) {
+    if ( !$privs{"netmgr-user"} ) {
         $html->ErrorExit("Permission Denied.");
     }
 
@@ -970,7 +970,7 @@ AUTOSUGGEST
     );
 
     if (   $access->GetHostNameType($host) eq "customname"
-        && $privs{"netdb-user"} )
+        && $privs{"netmgr-user"} )
     {
         print "<p/>\n";
         $html->StartBlockTable( "Host Owner Update", 600 );
@@ -1261,7 +1261,7 @@ AUTOSUGGEST
 
             print "<td><a href=\"?mode=delstatic&host=$host&ip=$ip\">Delete</a>\n";
 
-            if ( $privs{"netdb-user"} ) {
+            if ( $privs{"netmgr-user"} ) {
                 print " - <a href=\"?mode=enable_static_dns&host=$host&ip=$ip\">";
                 print "Enable Static DNS</a> ";
             }
@@ -1277,7 +1277,7 @@ AUTOSUGGEST
             $html->EndInnerRow();
         }
 
-        if ( $privs{"netdb-user"} ) {
+        if ( $privs{"netmgr-user"} ) {
             $html->StartInnerRow();
             print "<td align=center colspan=2>\n";
 
@@ -1513,7 +1513,7 @@ EOF
         $html->StartInnerTable();
         $html->StartInnerRow();
         print "<td align=center><b>Host is administratively locked. Only administrators can edit.</b></td>\n";
-        if ( $privs{"netdb-admin"} ) {
+        if ( $privs{"netmgr-admin"} ) {
             print "<td>\n";
             print "<a href=\"?mode=adminunlockhost&host=$host\">Unlock Host</a>\n";
             print "</td>\n";
@@ -1523,7 +1523,7 @@ EOF
         $html->EndBlockTable();
     }
     else {
-        if ( $privs{"netdb-admin"} ) {
+        if ( $privs{"netmgr-admin"} ) {
             $html->StartBlockTable( "Administrative Lock Status", 600 );
             $html->StartInnerTable();
             $html->StartInnerRow();

@@ -34,7 +34,7 @@ my $log  = new NetMaint::Logging;
 my $dhcp = new NetMaint::DHCP;
 
 $html->PageHeader();
-$html->RequirePriv("netdb-admin");
+$html->RequirePriv("netmgr-admin");
 
 $log->Log();
 

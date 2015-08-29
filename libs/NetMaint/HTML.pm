@@ -38,7 +38,7 @@ sub new {
     $title = "SpirentEng NetDB: " . $title;
 
 
-    &HTMLImpersonate("netdb-admin");
+    &HTMLImpersonate("netmgr-admin");
 
     $tmp = new Spirent::AppTemplate(
         title => $title,

@@ -111,7 +111,7 @@ elsif ( $mode eq "nametype" ) {
             )
         {
             if (   $ntype eq "ownername"
-                && $privs{"netdb-user"} )
+                && $privs{"netmgr-user"} )
             {
                 print "<li><a href=\"?oldhost=$oldhost&mode=ownername&";
                 print "type=$type&nametype=$ntype\">";
@@ -147,7 +147,7 @@ elsif ( $mode eq "ownername" ) {
 
     print "Owner: ";
     my %privs = &PrivSys_FetchPrivs( $ENV{REMOTE_USER} );
-    if ( $privs{"netdb-user"} ) {
+    if ( $privs{"netmgr-user"} ) {
         &HTMLInputText( "owner", 10, $defowner );
     }
     else {
@@ -296,7 +296,7 @@ elsif ( $mode eq "rename" ) {
     if ( $nametype eq "ownername" ) {
         $host = sprintf( "s%.2d%s.%s", $index, $owner, $domain );
 
-        if ( !$privs{"netdb-user"} ) {
+        if ( !$privs{"netmgr-user"} ) {
             if ( $owner ne $ENV{REMOTE_USER} ) {
                 $html->ErrorExit("Permission Denied. Owner not authorized.");
             }

@@ -71,7 +71,7 @@ my %name_types = (
 );
 
 my %privs = &PrivSys_FetchPrivs( $ENV{REMOTE_USER} );
-if ( !$privs{"netdb-user"} ) {
+if ( !$privs{"netmgr-user"} ) {
 
     # if we don't have impersonate privilege, force owner to authenticated userid regardless of type of registration
     $owner = $ENV{REMOTE_USER};
@@ -111,7 +111,7 @@ if ( $mode eq "hosttype" ) {
                     )
                 {
 
-                    if ( $privs{"netdb-user"}
+                    if ( $privs{"netmgr-user"}
                         && ( $ntype eq "ownername" ) )
                     {
                         print "<li><a href=\"?mode=${ntype}&type=$type&nametype=$ntype\">";
@@ -156,7 +156,7 @@ elsif ( $mode eq "nametype" ) {
             )
             )
         {
-            if ( $privs{"netdb-user"}
+            if ( $privs{"netmgr-user"}
                 && ( $ntype eq "ownername" ) )
             {
                 print "<li><a href=\"?mode=${ntype}&type=$type&nametype=$ntype\">";
@@ -215,7 +215,7 @@ elsif ( $mode eq "hostname" ) {
         &SimpleDomainMenu();
 
         print "<p/>Owner: ";
-        if ( $privs{"netdb-user"} ) {
+        if ( $privs{"netmgr-user"} ) {
             &HTMLInputText( "owner", 10, $hosts->GetDefaultOwner( type => $type, nametype => $nametype ) );
         }
         else {
@@ -255,7 +255,7 @@ elsif ( $mode eq "ownername" ) {
     my $defowner = $hosts->GetDefaultOwner( type => $type, nametype => $nametype );
 
     print "Owner: ";
-    if ( $privs{"netdb-user"} ) {
+    if ( $privs{"netmgr-user"} ) {
         &HTMLInputText( "owner", 10, $defowner );
     }
     else {
@@ -335,7 +335,7 @@ elsif ( $mode eq "create" ) {
     }
 
     if ( $nametype eq "ownername" ) {
-        if ( !$privs{"netdb-user"} ) {
+        if ( !$privs{"netmgr-user"} ) {
             if ( $owner ne $ENV{REMOTE_USER} ) {
                 $html->ErrorExit("Permission Denied (Owner mismatch).");
             }
