@@ -60,6 +60,21 @@ my $owner    = $rqpairs{owner};
 
 print "<h3>Renaming '$oldhost'</h3><p/>\n";
 
+my $info = $hosts->GetHostInfo($oldhost);
+if ( !$info->{type} ) {
+    $html->ErrorExit("Host does not exist.");
+}
+
+if ( $info->{type} eq "cname" && $mode eq "hosttype" ) {
+    if ( $access->Check( type => "cname", action => "insert" ) ) {
+        $type = "cname";
+        $mode = "nametype";
+    }
+    else {
+        $html->ErrorExit("Permission Denied");
+    }
+}
+
 # attempt to rename new host by parms passed
 # need modes for selecting type, domain, and hostname
 
@@ -353,10 +368,10 @@ elsif ( $mode eq "rename" ) {
     print "<h3>Attempting to rename host $oldhost to $host.</h3>\n";
 
     my $res = $rename->RenameHost(
-        oldhost     => $oldhost,
-        newhost     => $host,
-        newowner    => $owner,
-        newtype     => $type,
+        oldhost  => $oldhost,
+        newhost  => $host,
+        newowner => $owner,
+        newtype  => $type,
     );
     if ($res) {
         $html->ErrorExit("Failed to register host: $res");
