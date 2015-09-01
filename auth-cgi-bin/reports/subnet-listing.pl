@@ -60,57 +60,40 @@ elsif ($filterexact) {
     $which = $filterexact;
 }
 
-$html->StartMailWrapper("Currently Defined Subnets ($which)");
-
-$html->StartBlockTable( "Currently Defined Subnets ($which)", 1000 );
-
-print "<table border=0 class=\"display cell-border compact\" id=\"subnets\">\n";
-
-print "<thead><tr><th>Subnet</th><th>Action</th><th>VLAN</th><th>Template</th><th>Netmask</th>";
-print "<th>Gateway</th><th>Desc</th></tr></thead>\n";
-print "<tbody>\n";
-
-foreach my $sn ( $net->NetworkSort( keys( %{$info} ) ) ) {
-    my $vlan      = $info->{$sn}->{vlan};
-    my $vlan_name = $vlans->{$vlan}->{name};
-
-    next
-        if ( $filterexact
-        && index( $info->{$sn}->{description}, $filterexact ) < 0 );
-    next
-        if ( $filter
-        && index( lc( $info->{$sn}->{description} ), lc($filter) ) < 0 );
-
-    print "<tr>\n";
-    print "<td class=sn_mono>$sn</td>\n";
-    print "<td><a href=\"subnet-ip-alloc.pl?mode=report&subnet=$sn\">View</a></td>\n";
-    if ( !$vlan ) {
-        print "<td class=sn_mono>&nbsp;</td>\n";
-    }
-    else {
-        print "<td class=sn_mono>$vlan: $vlan_name</td>\n";
-    }
-    print "<td class=sn_mono>", $info->{$sn}->{template},    "</td>\n";
-    print "<td class=sn_mono>", $info->{$sn}->{mask},        "</td>\n";
-    print "<td class=sn_mono>", $info->{$sn}->{gateway},     "</td>\n";
-    print "<td>",     $info->{$sn}->{description}, "</td>\n";
-    print "</tr>\n";
+my $search;
+if ($filter) {
+    $search .= "filter=$filter&";
+}
+if ($filterexact) {
+    $search .= "filterexact=$filterexact&";
 }
 
-print "</tbody>\n";
-print "</table>\n";
+$html->StartBlockTable( "Subnets ($which)", 1000 );
+
+$html->StartDTable(
+    id             => "subnets",
+    columns        => [ "Subnet", "Actions", "VLan", "Template", "Mask", "Gateway", "Description", ],
+    filter         => $filter,
+    source         => "/auth-cgi-bin/cgiwrap/netdb/reports/json-subnets.pl?${search}",
+    pagesize       => 50,
+    source_columns => [
+        { "data" => "name", width => "90" },
+        { "data" => "link_alloc_view" },
+        { "data" => "vlan" },
+        { "data" => "template" },
+        { "data" => "mask" },
+        { "data" => "gateway" },
+        { "data" => "description" }
+    ],
+    source_columndefs => [
+        {   "targets"    => [1],
+            "visible"    => 0,
+            "searchable" => 1,
+        }
+    ],
+);
+$html->EndDTable( id => "subnets" );
+
 $html->EndBlockTable();
-
-print <<EOJS;
-<script type="text/javascript">
-   \$('#subnets').DataTable( {
-        "deferRender" : true,
-        "processing": true,
-        "paging": false
-    });
-</script>
-EOJS
-
-$html->EndMailWrapper();
 
 $html->PageFooter();

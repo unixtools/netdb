@@ -288,10 +288,10 @@ sub Display_DHCP_History {
         if ($condense) {
             next
                 if ( $entry->{type} eq $last_type
-                && $entry->{ip}      eq $last_ip
-                && $entry->{server}  eq $last_server
+                && $entry->{ip} eq $last_ip
+                && $entry->{server} eq $last_server
                 && $entry->{gateway} eq $last_gateway
-                && $entry->{ether}   eq $last_ether );
+                && $entry->{ether} eq $last_ether );
             next
                 if ( $entry->{gateway} eq "eth0"
                 && $last_gateway =~ /\.1$/o );
@@ -670,6 +670,183 @@ sub EndMailWrapper {
         &HTMLEndForm;
         print "<p>\n";
     }
+}
+
+# Begin-Doc
+# Name: StartDTable
+# Type: method
+# Description: outputs structure for a dynamic table with headers/searches/etc.
+# Comments: options id, filter, columns, source, sortable, source_columns, source_columndefs, source_columns_raw,
+# source_columndefs_raw, search_cols, paging, height, refresh
+# Syntax: $obj->StartDTable(%opts)
+# End-Doc
+sub StartDTable {
+    my $self = shift;
+
+    my %opts               = @_;
+    my $id                 = $opts{id};
+    my $filter             = $opts{filter};
+    my $cols               = $opts{columns};
+    my $ajax_source        = $opts{source};
+    my $sortable           = $opts{sortable};
+    my $source_cols        = $opts{source_columns};
+    my $source_coldefs     = $opts{source_columndefs};
+    my $source_cols_raw    = $opts{source_columns_raw};
+    my $source_coldefs_raw = $opts{source_columndefs_raw};
+    my $search_cols        = $opts{search_cols};
+    my $paging             = $opts{paging};
+    my $height             = $opts{height};
+    my $pagesize           = $opts{pagesize};
+    my $refresh            = int( $opts{refresh} );
+    my $json               = new JSON;
+    $json->canonical(1);
+
+    print "<script type=\"text/javascript\" class=\"init\">\n";
+    my $qfilter = $self->Encode($filter);
+
+    my $proc = "true";
+    if ($refresh) {
+        $proc = "false";
+    }
+
+    if ( !defined($search_cols) ) {
+        $search_cols = 1;
+    }
+
+    print <<EOF;
+
+\$(document).ready(function() {
+    // Setup - add a text input to each footer cell
+    \$('#${id} tfoot th').each( function () {
+        var title = \$('#${id} tfoot th').eq( \$(this).index() ).text();
+        \$(this).html( '<input type="text" placeholder="Search '+title+'" />' );
+    } );
+ 
+    // Default to log msg instead of alert dialog
+    \$.fn.dataTableExt.sErrMode = 'throw';
+
+    // DataTable
+    var table = \$('#${id}').DataTable({
+    // had problems with state save on some firefox versions
+    //    "stateSave" : true,
+        "deferRender": true,
+        "processing" : $proc
+EOF
+    if ( defined($height) && $height ) {
+        print ',"scrollY": "', int($height) . 'px"' . "\n";
+    }
+    elsif ( defined($height) && !$height ) {
+    }
+    else {
+        print ',"scrollY": "300px"' . "\n";
+    }
+    if ( defined($sortable) ) {
+        print ',"ordering": ' . int($sortable) . "\n";
+    }
+    if ($ajax_source) {
+        print ',"ajax": "' . $ajax_source . '"' . "\n";
+    }
+    if ($source_coldefs_raw) {
+        print ',"columnDefs": ' . $source_coldefs_raw . "\n";
+    }
+    elsif ($source_coldefs) {
+        print ',"columnDefs": ' . $json->pretty->encode($source_coldefs) . "\n";
+    }
+    if ($source_cols_raw) {
+        print ',"columns": ' . $source_cols_raw . "\n";
+    }
+    elsif ($source_cols) {
+        print ',"columns": ' . $json->pretty->encode($source_cols) . "\n";
+    }
+
+    if ( defined($paging) && !$paging ) {
+        print ',"paging" : false' . "\n";
+    }
+
+    if ( defined($pagesize) ) {
+        print ',"iDisplayLength" : ' . int($pagesize) . "\n";
+    }
+
+    print " });\n";
+
+    if ($qfilter) {
+        print "table.search(\"$qfilter\");\n";
+    }
+
+    if ($refresh) {
+        my $refresh_ms = int($refresh) * 1000;
+        print "setInterval( function () { table.ajax.reload(); }, $refresh_ms );\n";
+    }
+
+    if ($search_cols) {
+        print <<EOF;
+ 
+    // Apply the search
+    table.columns().eq( 0 ).each( function ( colIdx ) {
+        \$( 'input', table.column( colIdx ).footer() ).on( 'keyup change', function () {
+            table
+                .column( colIdx )
+                .search( this.value )
+                .draw();
+        } );
+    } );
+EOF
+    }
+
+    print <<EOF;
+} );
+</script>
+EOF
+
+    print "<table id=\"${id}\" class=\"display cell-border compact\" cellspacing=\"0\" width=\"100%\">\n";
+
+    print "<thead>\n";
+    print "<tr>\n";
+    foreach my $col (@$cols) {
+        print "<th>$col</th>\n";
+    }
+    print "</tr>\n";
+    print "</thead>\n";
+
+    if ($search_cols) {
+        print "<tfoot>\n";
+        print "<tr>\n";
+        foreach my $col (@$cols) {
+            print "<th>$col</th>\n";
+        }
+        print "</tr>\n";
+        print "</tfoot>\n";
+    }
+
+    print "<tbody>\n";
+}
+
+# Begin-Doc
+# Name: EndDTable
+# Type: method
+# Description: closes html structure for a dynamic table
+# Comments: opts has 'id' field only
+# Syntax: $obj->StartDTable(%opts)
+# End-Doc
+sub EndDTable {
+    my $self = shift;
+    my %opts = @_;
+    my $id   = $opts{id};
+
+    print "</tbody>\n";
+    print "</table>\n";
+
+    return if ( !$id );
+
+    print "<script type=\"text/javascript\" class=\"init\">\n";
+
+    print <<EOF;
+\$(document).ready(function() {
+    \$('#${id}').DataTable().draw();
+} );
+</script>
+EOF
+
 }
 
 1;
