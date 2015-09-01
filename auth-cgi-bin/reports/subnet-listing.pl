@@ -77,20 +77,15 @@ $html->StartDTable(
     source         => "/auth-cgi-bin/cgiwrap/netdb/reports/json-subnets.pl?${search}",
     pagesize       => 50,
     source_columns => [
-        { "data" => "name", width => "90" },
-        { "data" => "link_alloc_view" },
+        { "data" => "name",            width => "90" },
+        { "data" => "link_alloc_view", width => "30" },
         { "data" => "vlan" },
         { "data" => "template" },
         { "data" => "mask" },
         { "data" => "gateway" },
         { "data" => "description" }
     ],
-    source_columndefs => [
-        {   "targets"    => [1],
-            "visible"    => 0,
-            "searchable" => 1,
-        }
-    ],
+    source_columndefs => [ { "searchable" => 1, } ],
 );
 $html->EndDTable( id => "subnets" );
 
