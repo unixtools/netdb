@@ -234,6 +234,10 @@ while (1) {
 
                 # ignore this
             }
+            elsif ( $line =~ /reuse_lease: lease age.*unaltered/ ) {
+
+                # ignore this
+            }
             else {
                 print "Unable to handle log line: $line\n";
             }

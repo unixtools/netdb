@@ -476,8 +476,13 @@ while ( defined( my $line = <$checkh> ) ) {
     next if ( $line =~ /^Copyright /o );
     next if ( $line =~ /^All rights reserved/o );
     next if ( $line =~ /^For info, please visit/o );
+    next if ( $line =~ /^Config file:/o );
+    next if ( $line =~ /^Database file:/o );
+    next if ( $line =~ /^PID file:/o );
+
     last if ( $line =~ /If you did not get this software/o );
     $errcnt++;
+    print "ERROR SEEN: ";
     print $line;
 }
 close($checkh);
