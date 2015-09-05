@@ -18,6 +18,7 @@ use NetMaint::Leases;
 use NetMaint::DHCP;
 use Spirent::AppTemplate;
 use Local::HTMLImpersonate;
+use JSON;
 
 @ISA    = qw(Spirent::AppTemplate Exporter);
 @EXPORT = qw();
