@@ -16,11 +16,11 @@ use NetMaint::Util;
 use Data::Dumper;
 use NetMaint::Leases;
 use NetMaint::DHCP;
-use Spirent::AppTemplate;
+use Local::SiteTemplate;
 use Local::HTMLImpersonate;
 use JSON;
 
-@ISA    = qw(Spirent::AppTemplate Exporter);
+@ISA    = qw(Local::SiteTemplate Exporter);
 @EXPORT = qw();
 
 # Begin-Doc
@@ -36,12 +36,11 @@ sub new {
     my %opts  = @_;
 
     my $title = $opts{title} || "Network Maintenance Tool";
-    $title = "SpirentEng NetDB: " . $title;
-
+    $title = $NETDB_TITLE_PREFIX . ": " . $title;
 
     &HTMLImpersonate("netmgr-admin");
 
-    $tmp = new Spirent::AppTemplate(
+    $tmp = new Local::SiteTemplate(
         title => $title,
         style => <<EOSTYLE,
 #content { font-size: 12px; 
@@ -524,8 +523,7 @@ sub SearchLink_AnalyzeUser {
     my $self   = shift;
     my $userid = shift;
 
-    return "<a href=\"https://crowd.spirenteng.com/crowd/console/secure/user/view!default.action?directoryID=1310721&name=${userid}\">"
-        . "(Crowd User Info)</a></td>\n";
+    return &NetMaint::Config::SearchLink_AnalyzeUser($userid);
 }
 
 # Begin-Doc

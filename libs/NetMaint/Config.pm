@@ -27,6 +27,8 @@ sub import {
     }
 }
 
+our $NETDB_TITLE_PREFIX = "SpirentEng NetDB";
+
 our $NETDB_PRIV_DEFAULT = "netmgr-user";
 our $NETDB_PRIV_ADMIN   = "netmgr-admin";
 our $NETDB_PRIV_REPORTS = "netmgr-user";
@@ -41,5 +43,13 @@ our $NETDB_DNS_SERVERS  = ["netmgr.spirenteng.com"];
 our $NETDB_DHCP_SERVERS = [ "fc-dhcp-ito.spirenteng.com", "fc-dhcp-ent.spirenteng.com" ];
 
 our $NETDB_DISABLE_BACKLOG_REPORT = 1;
+
+sub SearchLink_AnalyzeUser
+{
+    my $userid = shift;
+
+    # This isn't valid at the moment
+    return "<a href=\"https://crowd.spirenteng.com/crowd/console/secure/user/view!default.action?directoryID=1310721&name=${userid}\">" . "(Crowd User Info)</a></td>\n";
+}
 
 1;
