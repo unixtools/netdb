@@ -8,11 +8,10 @@
 
 use strict;
 
-use lib "/local/perllib/libs";
-use lib "/local/spirentlib/libs";
+BEGIN { do "/local/netdb/libs/init.pl"; }
+
 use Local::HTMLUtil;
 use Local::PrivSys;
-use lib "/local/netdb/libs";
 
 use NetMaint::Config;
 require NetMaint::HTML;
