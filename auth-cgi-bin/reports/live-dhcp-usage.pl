@@ -20,6 +20,7 @@ require NetMaint::Util;
 require NetMaint::Network;
 require NetMaint::DB;
 require NetMaint::Logging;
+require NetMaint::Config;
 
 use Local::PrivSys;
 &PrivSys_RequirePriv("netmgr-user");
@@ -95,7 +96,7 @@ my $tmpinfo;
 my $ip;
 my %seen;
 
-foreach my $dhcpserver ( "fc-dhcp-ito.spirenteng.com", "fc-dhcp-ent.spirenteng.com" ) {
+foreach my $dhcpserver ( @$NETDB_DHCP_SERVERS ) {
     print "Processing $dhcpserver...\n";
     open( STDERR_SV, ">&STDERR" );
     open( STDERR,    ">/dev/null" );

@@ -40,7 +40,7 @@ our $NETDB_DEFAULT_NOTIFY = "nneul\@neulinger.org";
 
 our $NETDB_DB_HOST      = "netmgr.spirenteng.com";
 our $NETDB_DNS_SERVERS  = ["netmgr.spirenteng.com"];
-our $NETDB_DHCP_SERVERS = [ "fc-dhcp-ito.spirenteng.com", "fc-dhcp-ent.spirenteng.com" ];
+our $NETDB_DHCP_SERVERS = [ "fc-dhcp-ito.spirenteng.com" ];
 
 our $NETDB_DISABLE_BACKLOG_REPORT = 1;
 
