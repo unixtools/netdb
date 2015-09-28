@@ -6,11 +6,11 @@
 # Description: view information on current network connection
 # End-Doc
 
-use lib "/local/perllib/libs";
-use lib "/local/spirentlib/libs";
-use Local::HTMLUtil;
-use lib "/local/netdb/libs";
 use strict;
+
+BEGIN { do "/local/netdb/libs/init.pl"; }
+
+use Local::HTMLUtil;
 
 require NetMaint::HTML;
 require NetMaint::Hosts;

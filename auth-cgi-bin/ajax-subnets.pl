@@ -6,12 +6,11 @@
 # Description: simple callback script to return a list of subnets by searching name and/or description
 # End-Doc
 
-use lib "/local/perllib/libs";
-use lib "/local/spirentlib/libs";
+BEGIN { do "/local/netdb/libs/init.pl"; }
+
 use Local::HTMLUtil;
 use JSON;
 
-use lib "/local/netdb/libs";
 use NetMaint::Network;
 
 use strict;

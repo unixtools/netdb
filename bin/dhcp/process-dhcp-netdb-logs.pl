@@ -8,9 +8,8 @@
 
 use strict;
 
-use lib "/local/perllib/libs";
-use lib "/local/spirentlib/libs";
-use lib "/local/netdb/libs";
+BEGIN { do "/local/netdb/libs/init.pl"; }
+
 use Local::SetUID;
 use Getopt::Long;
 use NetMaint::Config;

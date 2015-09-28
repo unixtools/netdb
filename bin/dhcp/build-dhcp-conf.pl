@@ -6,9 +6,10 @@
 # Description: build dhcp config files
 # End-Doc
 
-use lib "/local/perllib/libs";
-use lib "/local/spirentlib/libs";
-use lib "/local/netdb/libs";
+use strict;
+
+BEGIN { do "/local/netdb/libs/init.pl"; }
+
 require NetMaint::DB;
 require NetMaint::Util;
 require NetMaint::Network;
@@ -16,8 +17,6 @@ require NetMaint::DHCP;
 use Digest::MD5 qw(md5_hex);
 use Local::AuthSrv;
 use Sys::Hostname;
-
-use strict;
 
 # This should not take 2 minutes
 alarm(120);

@@ -7,7 +7,6 @@
 # End-Doc
 
 use lib "/local/perllib/libs";
-use lib "/local/spirentlib/libs";
 use lib "/local/netdb/libs";
 require NetMaint::DNSZones;
 require NetMaint::Error;

@@ -8,9 +8,9 @@
 
 use strict;
 
-use lib "/local/umrperl/libs";
-use UMR::HTMLUtil;
-use lib "/local/netdb/libs";
+BEGIN { do "/local/netdb/libs/init.pl"; }
+
+use Local::HTMLUtil;
 
 require NetMaint::HTML;
 require NetMaint::Network;
@@ -18,7 +18,7 @@ require NetMaint::Logging;
 
 use JSON;
 
-use UMR::PrivSys;
+use Local::PrivSys;
 &PrivSys_RequirePriv("sysprog:netdb:reports");
 
 &HTMLGetRequest();

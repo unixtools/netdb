@@ -6,14 +6,13 @@
 # Description: generate the bind dns zone config files
 # End-Doc
 
-use lib "/local/perllib/libs";
-use lib "/local/spirentlib/libs";
-use lib "/local/netdb/libs";
+use strict;
+
+BEGIN { do "/local/netdb/libs/init.pl"; }
+
 use NetMaint::Config;
 require NetMaint::DNSZones;
 require NetMaint::Error;
-
-use strict;
 
 my $error = new NetMaint::Error;
 
