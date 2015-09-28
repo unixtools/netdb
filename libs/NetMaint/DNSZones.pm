@@ -137,7 +137,7 @@ sub GetSignableZones {
 sub GetThresholds {
     my $self = shift;
     my $db   = $self->{db};
-    my $res = {};
+    my $res  = {};
 
     my $cid;
     my $qry = "select zone,thresh_lines,thresh_size from dns_soa";
@@ -148,13 +148,13 @@ sub GetThresholds {
         return undef;
     }
 
-    while ( my ($zone,$lines,$size) = $db->SQL_FetchRow($cid) ) {
+    while ( my ( $zone, $lines, $size ) = $db->SQL_FetchRow($cid) ) {
         if ( $db->SQL_ErrorCode() ) {
             $error->set("sql error fetching zone threshold row");
             last;
         }
         $res->{$zone}->{lines} = $lines;
-        $res->{$zone}->{size} = $size;
+        $res->{$zone}->{size}  = $size;
     }
     if ( $db->SQL_ErrorCode() ) {
         $error->set("sql error fetching zone threshold row");

@@ -241,8 +241,8 @@ sub GetHostMetadataField {
 
     my $db = $self->_init_db();
 
-    my $hosts  = new NetMaint::Hosts;
-    my $access = new NetMaint::Access;
+    my $hosts   = new NetMaint::Hosts;
+    my $access  = new NetMaint::Access;
     my $view_ok = $access->CheckHostViewAccess( host => $host, action => "update" );
 
     if ( !$view_ok ) {
@@ -283,9 +283,8 @@ sub GetHostMetadataFieldAll {
     if ( $qf ne $field ) {
         die "Invalid field.";
     }
-    
-    if ( ! $viewpriv )
-    {
+
+    if ( !$viewpriv ) {
         die "For fetch All, must have view privilege code defined.";
     }
 
@@ -293,7 +292,7 @@ sub GetHostMetadataFieldAll {
         die "Permission denied to view metadata field.";
     }
 
-    my $res = $hosts->GetMetadataFieldAll($field );
+    my $res = $hosts->GetMetadataFieldAll($field);
 
     return $res;
 }

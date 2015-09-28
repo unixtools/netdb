@@ -220,8 +220,7 @@ sub CondenseIP {
     my $ip   = shift;
 
     # simple check - if it obviously doesn't look like an ip, exit
-    if ( $ip =~ /^(ens|eth|eno)\d+/o )
-    {
+    if ( $ip =~ /^(ens|eth|eno)\d+/o ) {
         return undef;
     }
 

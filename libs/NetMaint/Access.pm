@@ -75,11 +75,11 @@ sub GetAllRules {
     $qry = "select id,who,types,domains,subnets,flags,actions from access_rules";
     $cid = $db->SQL_OpenQuery($qry) || $db->SQL_Error($qry) && return undef;
     while ( my ( $id, $who, $types, $domains, $subnets, $flags, $actions ) = $db->SQL_FetchRow($cid) ) {
-        $who     =~ s/\s+//gio;
-        $types   =~ s/\s+//gio;
+        $who =~ s/\s+//gio;
+        $types =~ s/\s+//gio;
         $domains =~ s/\s+//gio;
         $subnets =~ s/\s+//gio;
-        $flags   =~ s/\s+//gio;
+        $flags =~ s/\s+//gio;
         $actions =~ s/\s+//gio;
 
         $rules->{$id} = {
@@ -169,11 +169,11 @@ sub GetRule {
     $db->SQL_CloseQuery($cid);
 
     if ( $qid == $id ) {
-        $who     =~ s/\s+//gio;
-        $types   =~ s/\s+//gio;
+        $who =~ s/\s+//gio;
+        $types =~ s/\s+//gio;
         $domains =~ s/\s+//gio;
         $subnets =~ s/\s+//gio;
-        $flags   =~ s/\s+//gio;
+        $flags =~ s/\s+//gio;
         $actions =~ s/\s+//gio;
 
         return {
@@ -218,10 +218,10 @@ sub LoadUserAccessData {
         || $db->SQL_Error($qry) && return undef;
     while ( my ( $userid, $type, $domain, $subnet, $flag, $action ) = $db->SQL_FetchRow($cid) ) {
         $userid =~ s/\s+//gio;
-        $type   =~ s/\s+//gio;
+        $type =~ s/\s+//gio;
         $domain =~ s/\s+//gio;
         $subnet =~ s/\s+//gio;
-        $flag   =~ s/\s+//gio;
+        $flag =~ s/\s+//gio;
         $action =~ s/\s+//gio;
 
         push( @{$ad}, [ $userid, $type, $domain, $subnet, $flag, $action ] );
@@ -255,8 +255,8 @@ sub GetHostNameType {
     }
 
     elsif ($host !~ /^[0-9a-z]+[0-9a-z-]*[0-9a-z]+\.[0-9a-z]+\.[a-z]+\.[a-z]+$/o
-        && $host !~ /^[0-9a-z]+[0-9a-z-]*[0-9a-z]+\.[a-z]+\.[a-z]+$/o &&
-        $host !~ /^[0-9]+\.[0-9a-z]+\.[a-z]+\.[a-z]+/o )
+        && $host !~ /^[0-9a-z]+[0-9a-z-]*[0-9a-z]+\.[a-z]+\.[a-z]+$/o
+        && $host !~ /^[0-9]+\.[0-9a-z]+\.[a-z]+\.[a-z]+/o )
     {
         return "invalidname";
     }
@@ -607,10 +607,10 @@ sub Check {
     foreach my $row ( @{$ad} ) {
         my ( $userid, $type, $domain, $subnet, $flag, $action ) = @{$row};
         next if ( $q_userid ne $userid && $userid ne "public" );
-        next if ( $q_type   && $q_type   ne $type   && $type   ne "*" );
+        next if ( $q_type   && $q_type ne $type     && $type ne "*" );
         next if ( $q_domain && $q_domain ne $domain && $domain ne "*" );
         next if ( $q_subnet && $q_subnet ne $subnet && $subnet ne "*" );
-        next if ( $q_flag   && $q_flag   ne $flag   && $flag   ne "*" );
+        next if ( $q_flag   && $q_flag ne $flag     && $flag ne "*" );
         next if ( $q_action && $q_action ne $action && $action ne "*" );
         return 1;
     }
@@ -643,6 +643,7 @@ sub ExpandRule {
     my @users = ();
     foreach my $whoent (@who) {
         if ( $whoent =~ /^\@(.*?)\s*$/o ) {
+
             # Not supported currently, ignore
         }
         elsif ( $whoent !~ /^\@/o ) {

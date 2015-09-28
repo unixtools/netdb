@@ -52,13 +52,13 @@ sub Log {
     # Don't log from this app, will generate far too much data
     return if ( $0 =~ /process-dhcp-netdb-logs.pl/o );
 
-    my $owner 
+    my $owner
         = $info{owner}
         || $main::rqpairs{owner}
         || $main::rqpairs{oldowner}
         || $main::rqpairs{newowner};
     my $action = $info{action} || $main::rqpairs{mode};
-    my $host 
+    my $host
         = $info{host}
         || $info{name}
         || $main::rqpairs{host}
@@ -66,7 +66,7 @@ sub Log {
         || $main::rqpairs{oldhost}
         || $main::rqpairs{newhost};
     my $ether = $info{ether} || $main::rqpairs{ether};
-    my $address 
+    my $address
         = $info{address}
         || $info{ip}
         || $main::rqpairs{ip}

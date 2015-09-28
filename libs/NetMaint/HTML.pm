@@ -526,7 +526,8 @@ sub SearchLink_AnalyzeUser {
     my $self   = shift;
     my $userid = shift;
 
-    return "<a href=\"https://crowd.spirenteng.com/crowd/console/secure/user/view!default.action?directoryID=1310721&name=${userid}\">"
+    return
+        "<a href=\"https://crowd.spirenteng.com/crowd/console/secure/user/view!default.action?directoryID=1310721&name=${userid}\">"
         . "(Crowd User Info)</a></td>\n";
 }
 
@@ -739,6 +740,7 @@ EOF
         print ',"scrollY": "', int($height) . 'px"' . "\n";
     }
     elsif ( defined($height) && !$height ) {
+
         # zero height requested, ignore
     }
     else {
