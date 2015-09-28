@@ -18,7 +18,7 @@ use Local::SimpleRPC;
 use RPC::NetDBAdmin;
 use strict;
 
-my $rpc = new Local::SimpleRPC::Server;
+my $rpc  = new Local::SimpleRPC::Server;
 my %opts = $rpc->Init();
 
 $rpc->RequirePriv("rpc:netdb:userops");
@@ -27,11 +27,11 @@ my $admin = new RPC::NetDBAdmin;
 
 my $res = $rpc->Try(
     sub {
-		my $host = $opts{host};
-		my $field = $opts{field};
-		my $value = $opts{value};
+        my $host  = $opts{host};
+        my $field = $opts{field};
+        my $value = $opts{value};
 
-        return $admin->SetHostMetadataField($host, $field, $value);
+        return $admin->SetHostMetadataField( $host, $field, $value );
     }
 );
 

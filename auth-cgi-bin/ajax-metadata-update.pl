@@ -66,9 +66,8 @@ if ( $editpriv && !$privs{$editpriv} ) {
     &fail("Permission denied updating field.");
 }
 
-my $res = $hosts->SetMetadataField($host, $field, $value);
-if ( $res )
-{
+my $res = $hosts->SetMetadataField( $host, $field, $value );
+if ($res) {
     &fail($res);
 }
 

@@ -26,7 +26,7 @@ use Local::PrivSys;
 &HTMLContentType();
 
 my $html = new NetMaint::HTML;
-my $log = new NetMaint::Logging;
+my $log  = new NetMaint::Logging;
 
 $log->Log();
 
@@ -67,7 +67,7 @@ while ( my ( $field, $label, $desc, $view, $edit, $schema, $ctime, $mtime ) = $d
 }
 
 $db->SQL_CloseQuery($cid);
-   
+
 $html->EndInnerTable();
 $html->EndBlockTable();
 

@@ -84,7 +84,7 @@ print "Done generating IP list.\n";
 my $ping_count       = 0;
 my $last_count_print = time;
 
-system("killall", "-KILL", "fping");
+system( "killall", "-KILL", "fping" );
 
 open( my $in, "/usr/sbin/fping -l -p 30000 -q 2>&1 <$tf |" );
 sleep(1);

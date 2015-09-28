@@ -40,8 +40,7 @@ zone "$zone" {
 };
 EOF
     print $out "\n";
-    if ( ! -e "/local/bind/data/slave/$zone" )
-    {
+    if ( !-e "/local/bind/data/slave/$zone" ) {
         print "Added new zone: $zone\n";
     }
 }
