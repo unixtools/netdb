@@ -145,12 +145,8 @@ if ( $privs{$NETDB_PRIV_REPORTS} ) {
     print "<td><a href=\"reports/cnames-by-target.pl\">CNames by Target</a></td>\n";
     $html->EndInnerRow();
     $html->StartInnerRow();
-    print "<td><a href=\"reports/active-hosts-dump.pl\">Active Hosts by Employee/Dept</a></td>\n";
-    print "<td><a href=\"reports/live-dhcp-usage.pl\">Live DHCP Usage</a></td>\n";
-    $html->EndInnerRow();
-
-    $html->StartInnerRow();
     print "<td><a href=\"reports/metadata-schemas.pl\">Metadata Schema Listing</a></td>\n";
+    print "<td><a href=\"reports/live-dhcp-usage.pl\">Live DHCP Usage</a></td>\n";
     $html->EndInnerRow();
 
     $html->EndInnerTable();
