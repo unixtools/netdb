@@ -39,6 +39,7 @@ sub new {
     my $title = $opts{title} || "Network Maintenance Tool";
     $title = "SpirentEng NetDB: " . $title;
 
+    &LogAPIUsage();
 
     &HTMLImpersonate("netmgr-admin");
 
