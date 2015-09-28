@@ -818,6 +818,8 @@ sub CreateHost {
 
     my ( $qry, $cid );
 
+    &LogAPIUsage();
+
     $log->Log(
         action => "attempting to create host",
         host   => $host,
