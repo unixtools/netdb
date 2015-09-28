@@ -8,10 +8,10 @@
 
 use strict;
 
-use lib "/local/perllib/libs";
+BEGIN { do "/local/netdb/libs/init.pl"; }
+
 use Local::HTMLUtil;
 use Local::PrivSys;
-use lib "/local/netdb/libs";
 
 use NetMaint::DB;
 require NetMaint::HTML;
