@@ -704,6 +704,8 @@ sub CreateHost {
     my %opts = @_;
     my ( $qry, $cid );
 
+    &LogAPIUsage();
+
     my $access = new NetMaint::Access;
     my $dhcp   = new NetMaint::DHCP;
     my $hosts  = new NetMaint::Hosts;
@@ -818,6 +820,8 @@ sub GetUtilityCNames {
     my $self   = shift;
     my @groups = @_;
 
+    &LogAPIUsage();
+
     foreach my $grp (@groups) {
         &PrivSys_QuietRequirePriv("netmgr-user");
     }
@@ -849,6 +853,8 @@ sub DeleteUtilityCNames {
     my $self  = shift;
     my @hosts = @_;
 
+    &LogAPIUsage();
+
     foreach my $host (@hosts) {
         $host = lc $host;
 
@@ -878,6 +884,8 @@ sub UpdateUtilityCName {
     my $self = shift;
     my $host = lc shift;
     my $tgt  = lc shift;
+
+    &LogAPIUsage();
 
     if ( $host =~ m|^([^.]+)\.([^.]+)\.spirenteng\.com$| ) {
         &PrivSys_QuietRequirePriv("netmgr-admin");
