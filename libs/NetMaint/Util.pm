@@ -10,10 +10,11 @@ use strict;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 
+use Local::UsageLogger;
 use Data::Dumper;
 use Local::ADSObject;
-use Socket;
 use NetAddr::IP;
+use Socket;
 
 require NetMaint::DB;
 
@@ -32,6 +33,8 @@ sub new {
     my $self  = shift;
     my $class = ref($self) || $self;
     my $tmp   = {};
+
+    &LogAPIUsage();
 
     return bless $tmp, $class;
 }

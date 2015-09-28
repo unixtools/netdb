@@ -10,6 +10,7 @@ use strict;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 
+use Local::UsageLogger;
 require NetMaint::DB;
 
 @ISA    = qw(Exporter);
@@ -39,6 +40,7 @@ sub new {
         $CACHE = {};
     }
 
+    &LogAPIUsage();
 
     return bless $tmp, $class;
 }

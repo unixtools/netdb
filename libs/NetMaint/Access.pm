@@ -40,6 +40,7 @@ sub new {
     $tmp->{access_data}        = [];
     $tmp->{access_data_loaded} = {};
 
+    &LogAPIUsage();
 
     return bless $tmp, $class;
 }

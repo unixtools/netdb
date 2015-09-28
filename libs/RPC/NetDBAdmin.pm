@@ -15,6 +15,7 @@ use strict;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 
+use Local::UsageLogger;
 use Local::PrivSys;
 use NetMaint::Register;
 use NetMaint::Hosts;

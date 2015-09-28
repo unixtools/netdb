@@ -12,6 +12,7 @@ use strict;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 
+use Local::UsageLogger;
 require NetMaint::DB;
 require NetMaint::Util;
 require NetMaint::DHCP;
@@ -41,6 +42,8 @@ sub new {
     $tmp->{dns}     = new NetMaint::DNS;
     $tmp->{touch}   = new NetMaint::LastTouch;
     $tmp->{dbcache} = new NetMaint::DBCache;
+
+    &LogAPIUsage();
 
     return bless $tmp, $class;
 }

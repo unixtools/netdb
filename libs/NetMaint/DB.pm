@@ -10,6 +10,7 @@ use strict;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 
+use Local::UsageLogger;
 use Local::MySQLObject;
 use Sys::Hostname;
 
@@ -33,6 +34,7 @@ our $DB;
 # Syntax: $maint = new NetMaint::DB()
 # End-Doc
 sub new {
+    &LogAPIUsage();
 
     if ( !$DB ) {
         my $hn = hostname;
