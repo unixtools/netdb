@@ -1,8 +1,9 @@
 use lib "/local/perllib/libs";
 use lib "/local/netdb/libs";
 
-if ( -e "/local/netdb/libs/siteinit.pl" ) {
-    do "/local/netdb/libs/siteinit.pl";
-}
+#
+# Below here is site specific
+#
+use lib "/local/spirentlib/libs";
 
 1;
