@@ -35,27 +35,13 @@ my $debug = 0;
 my $line;
 my %ip_to_sort;
 
-my @nets = qw(10.155.0 10.155.2 10.155.100 10.71.50);
+my @nets = qw(10.155.0 10.155.2 10.155.100);
 my $netpat = join( "|", map { quotemeta $_ } @nets );
 
 #
 # Load fnfr.com DNS
 #
 my %ip_to_dns = ();
-$debug && print "Scanning fnfr.com DNS\n";
-open( my $in, "/usr/bin/dig axfr fnfr.com \@localhost |" );
-while ( defined( $line = <$in> ) ) {
-    chomp($line);
-    $line = lc $line;
-    my @tmp = split( ' ', $line );
-    my $hn = $tmp[0];
-    $hn =~ s/\.$//g;
-
-    if ( $line =~ /\s+((${netpat}).\d+)$/o ) {
-        $ip_to_dns{$1}->{$hn} = 1;
-    }
-}
-close($in);
 
 $debug && print "Scanning spirenteng.com DNS\n";
 open( my $in, "dig axfr spirenteng.com \@localhost|" );
