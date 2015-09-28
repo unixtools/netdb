@@ -49,8 +49,7 @@ foreach my $zone ( sort(@zones) ) {
     my $target_size  = int( ( .75 * $size ) / 100 ) * 100;
     my $target_lines = int( ( .75 * $lines ) / 100 ) * 100;
 
-    if ( $lines < 250 )
-    {
+    if ( $lines < 250 ) {
         $target_lines = int( ( .75 * $lines ) / 10 ) * 10;
     }
 
@@ -66,12 +65,12 @@ foreach my $zone ( sort(@zones) ) {
     if ( $target_size != $thresh->{$zone}->{size} ) {
         my $qry = "update dns_soa set thresh_size=? where zone=?";
 
-        $db->SQL_ExecQuery($qry, $target_size, $zone) || $db->SQL_Error($qry . " ($target_size, $zone)");
+        $db->SQL_ExecQuery( $qry, $target_size, $zone ) || $db->SQL_Error( $qry . " ($target_size, $zone)" );
     }
     if ( $target_lines != $thresh->{$zone}->{lines} ) {
         my $qry = "update dns_soa set thresh_lines=? where zone=?";
 
-        $db->SQL_ExecQuery($qry, $target_lines, $zone) || $db->SQL_Error($qry . " ($target_lines, $zone)");
+        $db->SQL_ExecQuery( $qry, $target_lines, $zone ) || $db->SQL_Error( $qry . " ($target_lines, $zone)" );
     }
 }
 

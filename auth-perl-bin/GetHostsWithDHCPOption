@@ -23,7 +23,7 @@ my $rpc = new Local::SimpleRPC::Server();
 $rpc->Init();
 $rpc->RequirePriv("rpc:netdb:queryinfo");
 
-my $dhcp = new NetMaint::DHCP;
+my $dhcp    = new NetMaint::DHCP;
 my @options = $rpc->param("option");
 
 my %res_by_option = ();

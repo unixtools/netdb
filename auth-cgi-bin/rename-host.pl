@@ -80,12 +80,12 @@ if ( $info->{type} eq "cname" && $mode eq "hosttype" ) {
 
 my %host_types = (
     "device" => "Device Host",
-    "server"  => "Server",
+    "server" => "Server",
 );
 
 my %name_types = (
-    "ownername"     => "Owner Host Names [r##owner]",
-    "customname"    => "Custom Host Name [*.domain]",
+    "ownername"  => "Owner Host Names [r##owner]",
+    "customname" => "Custom Host Name [*.domain]",
 );
 
 if ( $mode eq "hosttype" ) {
@@ -223,7 +223,7 @@ elsif ( $mode eq "hostname" && $nametype eq "ownername" ) {
             )
             )
         {
-                print "<option>$domain\n";
+            print "<option>$domain\n";
         }
     }
     &HTMLEndSelect();
@@ -257,15 +257,14 @@ elsif ( $mode eq "hostname" && $nametype eq "customname" ) {
             )
             )
         {
-           print "<option>$domain\n";
+            print "<option>$domain\n";
         }
     }
     &HTMLEndSelect();
 
     my $defowner = $ENV{REMOTE_USER};
     if (   $type eq "server"
-        || $type eq "cname"
-        )
+        || $type eq "cname" )
     {
         $defowner = "netdb";
     }

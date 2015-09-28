@@ -46,6 +46,7 @@ foreach my $zone ( sort(@zones) ) {
     }
 
     my @notify = ();
+
     # ip address list
 
     print $out <<EOF;
@@ -55,22 +56,19 @@ zone "$zone" {
     check-names ignore;
 EOF
 
-    if ( scalar(@notify) > 0 )
-    {
+    if ( scalar(@notify) > 0 ) {
         print $out " also-notify {";
 
-    foreach my $ip ( @notify )
-    {
-        print $out " "x8, "$ip;\n";
-    }
+        foreach my $ip (@notify) {
+            print $out " " x 8, "$ip;\n";
+        }
 
         print $out " };\n";
-   }
+    }
 
-print $out <<EOF;
+    print $out <<EOF;
 };
 EOF
-
 
     print $out "\n";
 }

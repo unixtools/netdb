@@ -15,6 +15,7 @@ use strict;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 
+use Local::UsageLogger;
 use Local::PrivSys;
 use NetMaint::Register;
 use NetMaint::Hosts;
@@ -73,6 +74,8 @@ sub new {
     my $class = ref($self) || $self;
     my $tmp   = {};
 
+    &LogAPIUsage();
+
     bless $tmp, $class;
 
     return $tmp;
@@ -88,6 +91,8 @@ sub GetHostInfo {
     my $self = shift;
     my $host = lc shift;
     my ( $qry, $cid );
+
+    &LogAPIUsage();
 
     my $access = new NetMaint::Access;
     my $hosts  = new NetMaint::Hosts;
@@ -112,6 +117,8 @@ sub GetHostDescription {
     my $self = shift;
     my $host = lc shift;
     my ( $qry, $cid );
+
+    &LogAPIUsage();
 
     my $db = $self->_init_db();
 
@@ -143,6 +150,8 @@ sub SetHostDescription {
     my $desc = shift;
     my ( $qry, $cid );
 
+    &LogAPIUsage();
+
     my $db = $self->_init_db();
 
     my $access = new NetMaint::Access;
@@ -168,6 +177,8 @@ sub GetHostLocation {
     my $self = shift;
     my $host = lc shift;
     my ( $qry, $cid );
+
+    &LogAPIUsage();
 
     my $db = $self->_init_db();
 
@@ -199,6 +210,8 @@ sub SetHostLocation {
     my $loc  = shift;
     my ( $qry, $cid );
 
+    &LogAPIUsage();
+
     my $db = $self->_init_db();
 
     my $access = new NetMaint::Access;
@@ -228,7 +241,8 @@ sub GetHostMetadataField {
 
     my $db = $self->_init_db();
 
-    my $access = new NetMaint::Access;
+    my $hosts   = new NetMaint::Hosts;
+    my $access  = new NetMaint::Access;
     my $view_ok = $access->CheckHostViewAccess( host => $host, action => "update" );
 
     if ( !$view_ok ) {
@@ -269,9 +283,8 @@ sub GetHostMetadataFieldAll {
     if ( $qf ne $field ) {
         die "Invalid field.";
     }
-    
-    if ( ! $viewpriv )
-    {
+
+    if ( !$viewpriv ) {
         die "For fetch All, must have view privilege code defined.";
     }
 
@@ -279,7 +292,7 @@ sub GetHostMetadataFieldAll {
         die "Permission denied to view metadata field.";
     }
 
-    my $res = $hosts->GetMetadataFieldAll($field );
+    my $res = $hosts->GetMetadataFieldAll($field);
 
     return $res;
 }
@@ -334,6 +347,8 @@ sub AutoAllocateVMWareAddr {
     my $host = lc shift;
     my ( $qry, $cid );
 
+    &LogAPIUsage();
+
     my $db = $self->_init_db();
 
     my $access = new NetMaint::Access;
@@ -360,6 +375,8 @@ sub AddEther {
     my $host  = lc shift;
     my $ether = shift;
     my ( $qry, $cid );
+
+    &LogAPIUsage();
 
     my $db = $self->_init_db();
 
@@ -406,6 +423,8 @@ sub RemoveEther {
     my $ether = shift;
     my ( $qry, $cid );
 
+    &LogAPIUsage();
+
     my $db = $self->_init_db();
 
     my $access = new NetMaint::Access;
@@ -439,6 +458,8 @@ sub GetHostOptions {
     my $self = shift;
     my $host = lc shift;
     my ( $qry, $cid );
+
+    &LogAPIUsage();
 
     my $db = $self->_init_db();
 
@@ -475,6 +496,8 @@ sub GetAdminOptions {
     my $self = shift;
     my $host = lc shift;
     my ( $qry, $cid );
+
+    &LogAPIUsage();
 
     my $db = $self->_init_db();
 
@@ -513,6 +536,8 @@ sub AddHostOption {
     my $option = shift;
     my ( $qry, $cid );
 
+    &LogAPIUsage();
+
     my $access = new NetMaint::Access;
     my $dhcp   = new NetMaint::DHCP;
     my $hosts  = new NetMaint::Hosts;
@@ -547,6 +572,8 @@ sub RemoveHostOption {
     my $option = shift;
     my ( $qry, $cid );
 
+    &LogAPIUsage();
+
     my $access = new NetMaint::Access;
     my $dhcp   = new NetMaint::DHCP;
     my $hosts  = new NetMaint::Hosts;
@@ -574,6 +601,8 @@ sub AddAdminOption {
     my $host   = lc shift;
     my $option = shift;
     my ( $qry, $cid );
+
+    &LogAPIUsage();
 
     my $access = new NetMaint::Access;
     my $dhcp   = new NetMaint::DHCP;
@@ -613,6 +642,8 @@ sub RemoveAdminOption {
     my $option = shift;
     my ( $qry, $cid );
 
+    &LogAPIUsage();
+
     my $access = new NetMaint::Access;
     my $dhcp   = new NetMaint::DHCP;
     my $hosts  = new NetMaint::Hosts;
@@ -644,6 +675,8 @@ sub DeleteHost {
     my $host = lc shift;
     my ( $qry, $cid );
 
+    &LogAPIUsage();
+
     my $access   = new NetMaint::Access;
     my $hosts    = new NetMaint::Hosts;
     my $register = new NetMaint::Register;
@@ -670,6 +703,8 @@ sub CreateHost {
     my $self = shift;
     my %opts = @_;
     my ( $qry, $cid );
+
+    &LogAPIUsage();
 
     my $access = new NetMaint::Access;
     my $dhcp   = new NetMaint::DHCP;
@@ -785,6 +820,8 @@ sub GetUtilityCNames {
     my $self   = shift;
     my @groups = @_;
 
+    &LogAPIUsage();
+
     foreach my $grp (@groups) {
         &PrivSys_QuietRequirePriv("netmgr-user");
     }
@@ -816,6 +853,8 @@ sub DeleteUtilityCNames {
     my $self  = shift;
     my @hosts = @_;
 
+    &LogAPIUsage();
+
     foreach my $host (@hosts) {
         $host = lc $host;
 
@@ -845,6 +884,8 @@ sub UpdateUtilityCName {
     my $self = shift;
     my $host = lc shift;
     my $tgt  = lc shift;
+
+    &LogAPIUsage();
 
     if ( $host =~ m|^([^.]+)\.([^.]+)\.spirenteng\.com$| ) {
         &PrivSys_QuietRequirePriv("netmgr-admin");

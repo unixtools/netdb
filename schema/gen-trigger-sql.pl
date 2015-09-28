@@ -8,21 +8,19 @@
 use strict;
 
 my @tables = qw(
-dns_a
-dns_cname
-dns_ptr
-dns_mx
-dns_txt
-dns_aaaa
-dns_ns
-dns_srv
+    dns_a
+    dns_cname
+    dns_ptr
+    dns_mx
+    dns_txt
+    dns_aaaa
+    dns_ns
+    dns_srv
 );
 
 print "delimiter /\n";
 
-
-foreach my $table ( @tables )
-{
+foreach my $table (@tables) {
     print <<EOSQL;
 drop trigger ${table}_delete /
 

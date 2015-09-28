@@ -10,6 +10,7 @@ use strict;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 
+use Local::UsageLogger;
 use Local::HTMLUtil;
 use NetMaint::Config;
 use NetMaint::Util;
@@ -37,6 +38,8 @@ sub new {
 
     my $title = $opts{title} || "Network Maintenance Tool";
     $title = $NETDB_TITLE_PREFIX . ": " . $title;
+
+    &LogAPIUsage();
 
     &HTMLImpersonate("netmgr-admin");
 
@@ -735,6 +738,8 @@ EOF
         print ',"scrollY": "', int($height) . 'px"' . "\n";
     }
     elsif ( defined($height) && !$height ) {
+
+        # zero height requested, ignore
     }
     else {
         print ',"scrollY": "300px"' . "\n";

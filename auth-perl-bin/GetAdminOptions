@@ -24,7 +24,7 @@ $rpc->Init();
 
 $rpc->RequirePriv("rpc:netdb:userops");
 
-my $admin  = new RPC::NetDBAdmin;
+my $admin = new RPC::NetDBAdmin;
 
 my @hosts = $rpc->param("host");
 

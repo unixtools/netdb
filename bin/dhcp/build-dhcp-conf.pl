@@ -73,7 +73,7 @@ else {
     }
     $dhcp_clusters{all} = 1;
     @cluster_in_args = sort keys %dhcp_clusters;
-    $cluster_in_parms = join(",", ("?") x scalar(@cluster_in_args));
+    $cluster_in_parms = join( ",", ("?") x scalar(@cluster_in_args) );
 }
 
 print "Retrieving subnet dynamic ranges.\n";
@@ -138,7 +138,7 @@ print $tmpfh "\n";
 my $qry = "select distinct a.host,a.ip,b.ether from ip_alloc a,ethers b,subnets s 
         where a.host=b.name and a.subnet=s.subnet and s.dhcpcluster in ($cluster_in_parms)
         order by a.host,b.ether,a.ip";
-my $cid = $db->SQL_OpenQuery($qry, @cluster_in_args) || $db->SQL_Error($qry) && die;
+my $cid = $db->SQL_OpenQuery( $qry, @cluster_in_args ) || $db->SQL_Error($qry) && die;
 
 my %seen_ether = ();
 

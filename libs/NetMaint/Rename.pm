@@ -10,6 +10,7 @@ use strict;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 
+use Local::UsageLogger;
 require NetMaint::DB;
 require NetMaint::Util;
 require NetMaint::DHCP;
@@ -40,6 +41,7 @@ sub new {
     $tmp->{dhcp}  = new NetMaint::DHCP;
     $tmp->{dns}   = new NetMaint::DNS;
 
+    &LogAPIUsage();
 
     return bless $tmp, $class;
 }

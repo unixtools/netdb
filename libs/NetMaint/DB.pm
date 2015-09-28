@@ -10,6 +10,7 @@ use strict;
 
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
 
+use Local::UsageLogger;
 use Local::MySQLObject;
 use Sys::Hostname;
 
@@ -33,16 +34,17 @@ our $DB;
 # Syntax: $maint = new NetMaint::DB()
 # End-Doc
 sub new {
+    &LogAPIUsage();
 
     if ( !$DB ) {
         my $hn = hostname;
-        if ( $hn =~ /netmgr/ ) {
-            $DB = new Local::MySQLObject;
+        $DB = new Local::MySQLObject;
+
+        if ( lc($hn) eq lc($NETDB_DB_HOST) ) {
             $DB->SQL_OpenDatabase( "netdb", user => "netdb" )
                 || die "Couldn't open mysql DB!";
         }
         else {
-            $DB = new Local::MySQLObject;
             $DB->SQL_OpenDatabase( "netdb", user => "netdb", host => $NETDB_DB_HOST )
                 || die "Couldn't open mysql DB!";
         }

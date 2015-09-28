@@ -59,11 +59,11 @@ elsif ( $mode eq "add" ) {
     my $flags   = $rqpairs{flags};
     my $actions = $rqpairs{actions};
 
-    $who     =~ s/[,\s]+/,/gio;
-    $types   =~ s/[,\s]+/,/gio;
+    $who =~ s/[,\s]+/,/gio;
+    $types =~ s/[,\s]+/,/gio;
     $domains =~ s/[,\s]+/,/gio;
     $subnets =~ s/[,\s]+/,/gio;
-    $flags   =~ s/[,\s]+/,/gio;
+    $flags =~ s/[,\s]+/,/gio;
     $actions =~ s/[,\s]+/,/gio;
 
     if ( $who eq "" || $who eq "," ) {
@@ -104,11 +104,11 @@ foreach my $id ( sort { $a <=> $b } ( keys(%$info) ) ) {
     my $flags   = $info->{$id}->{flags}   || "&nbsp;";
     my $actions = $info->{$id}->{actions} || "&nbsp;";
 
-    $who     =~ s|,|<br/>\n|gio;
-    $types   =~ s|,|<br/>\n|gio;
+    $who =~ s|,|<br/>\n|gio;
+    $types =~ s|,|<br/>\n|gio;
     $domains =~ s|,|<br/>\n|gio;
     $subnets =~ s|,|<br/>\n|gio;
-    $flags   =~ s|,|<br/>\n|gio;
+    $flags =~ s|,|<br/>\n|gio;
     $actions =~ s|,|<br/>\n|gio;
 
     print "<td align=center><font size=-1><tt>$who</td>\n";

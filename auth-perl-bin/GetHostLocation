@@ -19,7 +19,7 @@ use Local::SimpleRPC;
 use RPC::NetDBAdmin;
 use strict;
 
-my $rpc = new Local::SimpleRPC::Server;
+my $rpc  = new Local::SimpleRPC::Server;
 my %opts = $rpc->Init();
 
 $rpc->RequirePriv("rpc:netdb:userops");
@@ -28,7 +28,7 @@ my $admin = new RPC::NetDBAdmin;
 
 my $res = $rpc->Try(
     sub {
-		my $host = $opts{host};
+        my $host = $opts{host};
 
         return $admin->GetHostLocation($host);
     }
