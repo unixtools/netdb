@@ -58,7 +58,7 @@ $error->check_and_die();
 
 print "Determining cluster list.\n";
 my $qry = "select clusters,peer,dhcprole from dhcp_servers where server=?";
-my ($clusters,$peerserver,$role) = $db->SQL_DoQuery( $qry, $server );
+my ( $clusters, $peer, $role ) = $db->SQL_DoQuery( $qry, $server );
 my %dhcp_clusters = ();
 my $cluster_in_parms;
 my @cluster_in_args;
@@ -66,11 +66,11 @@ if ( !$clusters ) {
     die "Unable to determine dhcp server clusters.";
 }
 else {
-    if ( $peerserver ) {
-    print "  Server Peer: $peerserver\n";
+    if ($peer) {
+        print "  Server Peer: $peer\n";
     }
-    if ( $role ) {
-    print "  Server Role: $role\n";
+    if ($role) {
+        print "  Server Role: $role\n";
     }
     print "  Server Clusters: $clusters\n";
     foreach my $c ( split( ' ', $clusters ) ) {
@@ -131,6 +131,47 @@ print $tmpfh "option domain-name-servers 10.40.50.20, 10.40.50.21;\n";
 print $tmpfh "next-server ${server};\n";
 print $tmpfh "ddns-update-style none;\n";
 print $tmpfh "authoritative;\n";
+
+my $omapi_key = &AuthSrv_Fetch( owner => "netdb", user => "dhcp_omapi", instance => "key" );
+if ($omapi_key) {
+    print $tmpfh "omapi-port 7911;\n";
+    print $tmpfh "omapi-key omapi_key;\n";
+    print $tmpfh "key omapi_key {\n";
+    print $tmpfh "  algorithm hmac-md5;\n";
+    print $tmpfh "  secret $omapi_key;\n";
+    print $tmpfh "}\n";
+}
+
+if ( $peer && $role eq "primary" ) {
+    print $tmpfh "failover peer \"failover-partner\" {\n";
+    print $tmpfh "  primary;\n";
+    print $tmpfh "  address $server;\n";
+    print $tmpfh "  port 519;\n";
+    print $tmpfh "  peer address $peer;\n";
+    print $tmpfh "  peer port 520;\n";
+    print $tmpfh "  max-response-delay 60;\n";
+    print $tmpfh "  max-unacked-updates 10;\n";
+    print $tmpfh "  mclt 3600;\n";
+    print $tmpfh "  split 128;\n";
+    print $tmpfh "  load balance max seconds 3;\n";
+    print $tmpfh "}\n";
+}
+elsif ( $peer && $role eq "secondary" ) {
+    print $tmpfh "failover peer \"failover-partner\" {\n";
+    print $tmpfh "  secondary;\n";
+    print $tmpfh "  address $server;\n";
+    print $tmpfh "  port 520;\n";
+    print $tmpfh "  peer address $peer;\n";
+    print $tmpfh "  peer port 519;\n";
+    print $tmpfh "  max-response-delay 60;\n";
+    print $tmpfh "  max-unacked-updates 10;\n";
+    print $tmpfh "  load balance max seconds 3;\n";
+    print $tmpfh "}\n";
+}
+elsif ($peer) {
+    warn "Peer specified but no operating mode.\n";
+    undef $peer;
+}
 
 print $tmpfh "\n";
 
@@ -400,6 +441,9 @@ foreach my $sn ( sort( keys(%$subnets) ) ) {
 
     if ( $#range_refs >= 0 ) {
         print $tmpfh " pool {\n";
+        if ($peer) {
+            print $tmpfh "  failover peer \"failover-partner\";\n";
+        }
         print $tmpfh "  deny dynamic bootp clients;\n";
 
         if ( $#ur_range_refs >= 0 ) {
@@ -431,6 +475,9 @@ foreach my $sn ( sort( keys(%$subnets) ) ) {
 
     if ( $#ur_range_refs >= 0 ) {
         print $tmpfh " pool {\n";
+        if ($peer) {
+            print $tmpfh "  failover peer \"failover-partner\";\n";
+        }
         print $tmpfh "  deny dynamic bootp clients;\n";
         print $tmpfh "  allow unknown clients;\n";
         print $tmpfh "  deny known clients;\n";
@@ -456,6 +503,7 @@ open( my $diffh, "LANG=C /usr/bin/diff --speed-large-files -u ${lastfname} ${fna
 my $diffcnt = 0;
 while ( defined( my $line = <$diffh> ) ) {
     $diffcnt++;
+    $line =~ s/(.*secret )(.*)(;.*)$/\1XXX-MASKED-XXX\3/go;
     print $line;
 }
 close($diffh);
