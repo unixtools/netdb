@@ -57,8 +57,8 @@ my $subnets = $net->GetSubnets();
 $error->check_and_die();
 
 print "Determining cluster list.\n";
-my $qry = "select clusters from dhcp_servers where server=?";
-my ($clusters) = $db->SQL_DoQuery( $qry, $server );
+my $qry = "select clusters,peer from dhcp_servers where server=?";
+my ($clusters,$peerserver) = $db->SQL_DoQuery( $qry, $server );
 my %dhcp_clusters = ();
 my $cluster_in_parms;
 my @cluster_in_args;
@@ -66,6 +66,9 @@ if ( !$clusters ) {
     die "Unable to determine dhcp server clusters.";
 }
 else {
+    if ( $peerserver ) {
+    print "  Server Peer: $peerserver\n";
+    }
     print "  Server Clusters: $clusters\n";
     foreach my $c ( split( ' ', $clusters ) ) {
         $dhcp_clusters{$c} = 1;
