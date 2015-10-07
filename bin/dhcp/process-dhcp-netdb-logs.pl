@@ -237,6 +237,13 @@ while (1) {
 
                 # ignore this
             }
+            elsif ($line =~ /balancing pool/
+                || $line =~ /balanced pool/
+                || $line !~ /failover peer/
+                || $line =~ /peer failover/o )
+            {
+                # ignore this
+            }
             else {
                 print "Unable to handle log line: $line\n";
             }
@@ -251,9 +258,7 @@ while (1) {
         my $elap = $etime - $stime;
         my $rate = $linecount / $elap;
 
-        printf
-            "Processed $base/$file at rate of %.1f lines/sec for $linecount lines.\n",
-            $rate;
+        printf "Processed $base/$file at rate of %.1f lines/sec for $linecount lines.\n", $rate;
 
         if ($onefile) {
             print "exiting, single file was requested.\n";
