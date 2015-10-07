@@ -532,6 +532,7 @@ while ( defined( my $line = <$checkh> ) ) {
     next if ( $line =~ /^Config file:/o );
     next if ( $line =~ /^Database file:/o );
     next if ( $line =~ /^PID file:/o );
+    next if ( $line =~ /Source compiled to use binary-leases/o );
 
     last if ( $line =~ /If you did not get this software/o );
     $errcnt++;
