@@ -33,7 +33,7 @@ our $NETDB_PRIV_DEFAULT = "netmgr-user";
 our $NETDB_PRIV_ADMIN   = "netmgr-admin";
 our $NETDB_PRIV_REPORTS = "netmgr-user";
 
-our $NETDB_DEFAULT_TTL = 900;
+our $NETDB_DEFAULT_TTL = 120;
 
 our $NETDB_MAIL_FROM      = "netdb\@spirenteng.com";
 our $NETDB_DEFAULT_NOTIFY = "nneul\@neulinger.org";
