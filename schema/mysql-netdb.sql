@@ -131,7 +131,8 @@ create table dns_a
  mtime datetime not null, 
  ctime datetime not null, 
  dynamic integer DEFAULT 0 not null, 
- visible varchar(1) DEFAULT 1 not null
+ visible varchar(1) DEFAULT 1 not null,
+ etime datetime
 );
 
 create index dns_a_address ON dns_a (address);
@@ -149,7 +150,8 @@ create table dns_aaaa
  mtime datetime not null, 
  ctime datetime not null, 
  dynamic integer DEFAULT 0 not null, 
- visible varchar(1) DEFAULT 1 not null
+ visible varchar(1) DEFAULT 1 not null,
+ etime datetime
 );
 
 create index dns_aaaa_address ON dns_aaaa (address);
@@ -167,7 +169,8 @@ create table dns_cname
  mtime datetime not null, 
  ctime datetime not null, 
  dynamic integer DEFAULT 0 not null, 
- visible varchar(1) DEFAULT 1 not null
+ visible varchar(1) DEFAULT 1 not null,
+ etime datetime
 );
 
 create index dns_cname_address ON dns_cname (address);
@@ -185,7 +188,8 @@ create table dns_mx
  mtime datetime not null, 
  ctime datetime not null, 
  dynamic integer DEFAULT 0 not null, 
- visible varchar(1) DEFAULT 1 not null
+ visible varchar(1) DEFAULT 1 not null,
+ etime datetime
 );
 
 create index dns_mx_address ON dns_mx (address);
@@ -203,7 +207,8 @@ create table dns_ns
  mtime datetime not null, 
  ctime datetime not null, 
  dynamic integer DEFAULT 0 not null, 
- visible varchar(1) DEFAULT 1 not null
+ visible varchar(1) DEFAULT 1 not null,
+ etime datetime
 );
 
 create index dns_ns_addr ON dns_ns (address);
@@ -221,7 +226,8 @@ create table dns_ptr
  ctime datetime not null, 
  dynamic integer DEFAULT 0 not null, 
  namesort integer DEFAULT 0 not null, 
- visible varchar(1) DEFAULT 1 not null
+ visible varchar(1) DEFAULT 1 not null,
+ etime datetime
 );
 
 create index dns_ptr_address ON dns_ptr (address);
@@ -265,7 +271,8 @@ create table dns_srv
  mtime datetime not null, 
  ctime datetime not null, 
  dynamic integer DEFAULT 0 not null, 
- visible varchar(1) DEFAULT 1 not null
+ visible varchar(1) DEFAULT 1 not null,
+ etime datetime
 );
 
 create index dns_srv_address ON dns_srv (address);
@@ -283,7 +290,8 @@ create table dns_txt
  mtime datetime not null, 
  ctime datetime not null, 
  dynamic integer DEFAULT 0 not null, 
- visible varchar(1) DEFAULT 1 not null
+ visible varchar(1) DEFAULT 1 not null,
+ etime datetime
 );
 
 create index dns_txt_name ON dns_txt (name);
@@ -299,7 +307,8 @@ create table dns_spf
  mtime datetime not null, 
  ctime datetime not null, 
  dynamic integer DEFAULT 0 not null, 
- visible varchar(1) DEFAULT 1 not null
+ visible varchar(1) DEFAULT 1 not null,
+ etime datetime
 );
 
 create index dns_spf_name ON dns_spf (name);

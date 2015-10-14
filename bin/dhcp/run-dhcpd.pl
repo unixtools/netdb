@@ -53,7 +53,8 @@ elsif ( !$childpid ) {
     exec(
         "/local/dhcp/sbin/dhcpd",          "-d",  "-cf",
         "/local/dhcp-root/etc/dhcpd.conf", "-lf", "/local/dhcp-root/etc/dhcpd.leases",
-        "-pf",                             "/local/dhcp-root/etc/dhcpd.pid"
+        "-pf",                             "/local/dhcp-root/etc/dhcpd.pid",
+#"eth1.637", "eth1.638", "eth1.639", "eth1.680", "eth2", "eth1.683"
     );
     exit(0);
 }
