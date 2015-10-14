@@ -161,16 +161,12 @@ sub RecordNewLease {
     # Clear any old dynamic registrations
     my @oldips = $self->GetCurLeases($ether);
 
-    #my $dynhostname = "dyn-ether-" . lc($ether) . ".device.spirenteng.com";
-
     my $daship = $ip;
     $daship =~ s/\./-/go;
-    my $dynhostname = "dhcp-${daship}.spirenteng.com";
 
     $debug && print "old ips = ", join( ", ", @oldips ), "\n";
     $dns->BlockUpdates();
 
-    $dns->Delete_Dynamic_ByHostFwdOnly($dynhostname);
     foreach my $oldip (@oldips) {
         $dns->Delete_Dynamic_ByIP($oldip);
     }
@@ -178,35 +174,18 @@ sub RecordNewLease {
     # Look up hostname from this ethernet addr
     my $hostname = $dhcp->SearchByEtherExact($ether);
     if ($hostname) {
-        $dns->Delete_Dynamic_ByHostFwdOnly( "tmp-" . $hostname );
         $dns->Delete_Dynamic_ByHostFwdOnly($hostname);
     }
 
     $debug && print "got hostname = $hostname\n";
 
-    # If this is an unknown host, we should still give it a usable name
-    # so that the mail relay is happy.
     my $cnt = 0;
-    if ( !$hostname ) {
-        $hostname = $dynhostname;
-    }
-    else {
+    if ( $hostname ) {
         $cnt = $dns->Count_Static_A_Records($hostname);
         $debug && print "static count = $cnt\n";
     }
 
-    #
-    # This is creating a record for 'dyn-$host' even when it doesn't need to
-    # Should fetch the A records, see if only one, and only if different put
-    # the lease in.
-    #
-
-    if ( $cnt > 0 ) {
-        my $tmphost = "dyn-$hostname";
-        $debug && print "using host = $tmphost\n";
-        $dns->Add_Dynamic_HostIP( $tmphost, $ip );
-    }
-    else {
+    if ( $hostname ) {
         $dns->Add_Dynamic_HostIP( $hostname, $ip );
     }
 
