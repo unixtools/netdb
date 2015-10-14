@@ -34,7 +34,15 @@ my $debug = 0;
 my $line;
 my %ip_to_sort;
 
-my @nets = qw(10.155.0 10.155.2 10.155.100);
+my @nets = ();
+my $qry  = "select distinct zone,min(namesort) from dns_ptr group by zone order by 2";
+my $cid  = $db->SQL_OpenQuery($qry);
+while ( my ($zone) = $db->SQL_FetchRow($cid) ) {
+    if ( $zone =~ m|(\d+)\.(\d+)\.(\d+)\.in-addr| ) {
+        push( @nets, "$3.$2.$1" );
+    }
+}
+$db->SQL_CloseQuery($cid);
 my $netpat = join( "|", map { quotemeta $_ } @nets );
 
 #
@@ -191,12 +199,19 @@ $html->StartInnerTable();
 
 my $lastskip = 0;
 my $prefix   = "";
+my $cnt      = 0;
 foreach my $ip ( sort { $ip_to_sort{$a} cmp $ip_to_sort{$b} } keys(%ip_to_sort) ) {
 
     my $newprefix = $ip;
     $newprefix =~ s/\.\d+$//g;
 
     if ( $newprefix ne $prefix ) {
+        if ($cnt) {
+            $html->StartInnerHeaderRow();
+            print "<td colspan=100% align=center><b>$cnt entries on $prefix</b></td>\n";
+            $html->EndInnerHeaderRow();
+        }
+
         $prefix = $newprefix;
         $html->StartInnerHeaderRow();
         print "<td align=center colspan=6><b>Network Prefix ($prefix)</td>\n";
@@ -208,6 +223,7 @@ foreach my $ip ( sort { $ip_to_sort{$a} cmp $ip_to_sort{$b} } keys(%ip_to_sort) 
         print "<td><b>Ping</td>";
         print "<td width=600><b>OS and Services</td>\n";
         $html->EndInnerHeaderRow();
+        $cnt = 0;
     }
 
     my $editprefix = "/auth-cgi-bin/cgiwrap/netdb/edit-host.pl?mode=view&host=";
@@ -252,6 +268,7 @@ foreach my $ip ( sort { $ip_to_sort{$a} cmp $ip_to_sort{$b} } keys(%ip_to_sort) 
     }
     $lastskip = 0;
 
+    $cnt++;
     $html->StartInnerRow();
     print "<td>$ip</td>\n";
     print "<td align=center>", $ip_to_alloctype{$ip}, "</td>\n";
@@ -296,6 +313,12 @@ foreach my $ip ( sort { $ip_to_sort{$a} cmp $ip_to_sort{$b} } keys(%ip_to_sort) 
     print "</td>\n";
 
     $html->EndInnerRow();
+}
+
+if ($cnt) {
+    $html->StartInnerHeaderRow();
+    print "<td colspan=100% align=center><b>$cnt entries on $prefix</b></td>\n";
+    $html->EndInnerHeaderRow();
 }
 
 $html->EndInnerTable();

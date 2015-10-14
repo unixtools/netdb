@@ -33,14 +33,15 @@ our $NETDB_PRIV_DEFAULT = "netmgr-user";
 our $NETDB_PRIV_ADMIN   = "netmgr-admin";
 our $NETDB_PRIV_REPORTS = "netmgr-user";
 
-our $NETDB_DEFAULT_TTL = 900;
+our $NETDB_DEFAULT_TTL = 120;
 
 our $NETDB_MAIL_FROM      = "netdb\@spirenteng.com";
 our $NETDB_DEFAULT_NOTIFY = "nneul\@neulinger.org";
 
 our $NETDB_DB_HOST      = "netmgr.spirenteng.com";
 our $NETDB_DNS_SERVERS  = ["netmgr.spirenteng.com"];
-our $NETDB_DHCP_SERVERS = [ "fc-dhcp-ito.spirenteng.com" ];
+# Why is this not pulling from database?!
+our $NETDB_DHCP_SERVERS = [ "ub-dhcp1-ito.spirenteng.com", "ub-dhcp2-ito.spirenteng.com" ];
 
 our $NETDB_DISABLE_BACKLOG_REPORT = 1;
 

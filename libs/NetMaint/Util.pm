@@ -22,6 +22,7 @@ require NetMaint::DB;
 @EXPORT = qw();
 
 our $arpa_zones;
+our $arpa_zones_tstamp;
 
 # Begin-Doc
 # Name: new
@@ -314,7 +315,7 @@ sub IPToARPAZone {
 
     my $arpa = $self->IPToARPA($ip);
 
-    if ( !$arpa_zones ) {
+    if ( !$arpa_zones || time - $arpa_zones_tstamp > 300 ) {
         my $db = new NetMaint::DB;
 
         my $qry = "select zone from dns_soa where zone like '%.in-addr.arpa'";
@@ -324,6 +325,8 @@ sub IPToARPAZone {
             $arpa_zones->{$zone} = 1;
         }
         $db->SQL_CloseQuery($cid);
+
+        $arpa_zones_tstamp = time;
     }
 
     my ( $a, $b, $c, $d, $rest ) = split( /\./, $arpa, 5 );

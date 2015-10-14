@@ -505,7 +505,8 @@ create table dhcp_servers
 (
  server varchar(100) not null,
  clusters varchar(100) not null default 'all',
- peer varchar(100)
+ peer varchar(100),
+ dhcprole varchar(20)
 );
 create unique index ds_s on dhcp_servers(server);
 
