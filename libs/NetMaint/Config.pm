@@ -45,6 +45,10 @@ our $NETDB_DHCP_SERVERS = [ "ub-dhcp1-ito.spirenteng.com", "ub-dhcp2-ito.spirent
 
 our $NETDB_DISABLE_BACKLOG_REPORT = 1;
 
+# Retain dhcp dns entries for this many seconds after release - to handle common case of
+# release,reboot,renew-with-same-ip without introducing an annoying cached NXDomain response
+our $NETDB_DHCP_HOLDOVER = 300;
+
 sub SearchLink_AnalyzeUser
 {
     my $userid = shift;

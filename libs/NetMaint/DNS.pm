@@ -813,6 +813,42 @@ sub Delete_Dynamic_ByIP {
 }
 
 # Begin-Doc
+# Name: Release_Dynamic_ByIP
+# Type: method
+# Description: Pre-expires any dynamic dns records for an IP addr, but does not actually delete them
+# Syntax: $obj->Release_Dynamic_ByIP($ip);
+# End-Doc
+sub Release_Dynamic_ByIP {
+    my $self    = shift;
+    my $ip      = shift;
+    my $db      = $self->{db};
+    my $dbcache = $self->{dbcache};
+    my $qry;
+    my $cid;
+    my $arpa;
+
+    my $util = $self->{util};
+
+    $ip   = $util->CondenseIP($ip);
+    $arpa = $util->IPToARPA($ip);
+
+    $qry = "update dns_a set etime=now() + interval ? second where dynamic=1 and address=?";
+    $cid = $dbcache->open($qry);
+    $db->SQL_ExecQuery( $cid, $NETDB_DHCP_HOLDOVER, $ip ) || $db->SQL_Error($qry);
+
+    $qry = "update dns_ptr set etime=now() + interval ? second where dynamic=1 and name=?";
+    $cid = $dbcache->open($qry);
+    $db->SQL_ExecQuery( $qry, $NETDB_DHCP_HOLDOVER, $arpa ) || $db->SQL_Error($qry);
+
+    $self->{log}->Log(
+        action => "set expiration for dynamic host/ip records",
+        ip     => $ip,
+    );
+
+    $self->TriggerUpdate();
+}
+
+# Begin-Doc
 # Name: Delete_Dynamic_ByHostFwdOnly
 # Type: method
 # Description: Deletes any dynamic dns records for an IP addr

@@ -349,7 +349,7 @@ sub Get_Zone_A_Records {
         return undef;
     }
 
-    $qry = "select name,ttl,address from dns_a where zone=? order by name,address";
+    $qry = "select name,ttl,address from dns_a where zone=? and (etime is null or etime < now()) order by name,address";
     unless ( $cid = $db->SQL_OpenBoundQuery($qry) ) {
         $db->SQL_Error($qry);
         $error->set("sql error opening query to fetch zone records");
@@ -402,7 +402,7 @@ sub Get_Zone_AAAA_Records {
         return undef;
     }
 
-    $qry = "select name,ttl,address from dns_aaaa where zone=? order by name,address";
+    $qry = "select name,ttl,address from dns_aaaa where zone=? and (etime is null or etime < now()) order by name,address";
     unless ( $cid = $db->SQL_OpenBoundQuery($qry) ) {
         $db->SQL_Error($qry);
         $error->set("sql error opening query to fetch zone records");
@@ -455,7 +455,7 @@ sub Get_Zone_CNAME_Records {
         return undef;
     }
 
-    $qry = "select name,ttl,address from dns_cname where zone=? order by name,address";
+    $qry = "select name,ttl,address from dns_cname where zone=? and (etime is null or etime < now()) order by name,address";
     unless ( $cid = $db->SQL_OpenBoundQuery($qry) ) {
         $db->SQL_Error($qry);
         $error->set("sql error opening query to fetch zone records");
@@ -509,7 +509,7 @@ sub Get_Zone_PTR_Records {
         return undef;
     }
 
-    $qry = "select name,ttl,address from dns_ptr where zone=? order by namesort,name,address";
+    $qry = "select name,ttl,address from dns_ptr where zone=? and (etime is null or etime < now()) order by namesort,name,address";
     unless ( $cid = $db->SQL_OpenBoundQuery($qry) ) {
         $db->SQL_Error($qry);
         $error->set("sql error opening query to fetch zone records");
@@ -563,7 +563,7 @@ sub Get_Zone_TXT_Records {
         return undef;
     }
 
-    $qry = "select ttl,name,txt from dns_txt where zone=? order by name";
+    $qry = "select ttl,name,txt from dns_txt where zone=? and (etime is null or etime < now()) order by name";
     unless ( $cid = $db->SQL_OpenBoundQuery($qry) ) {
         $db->SQL_Error($qry);
         $error->set("sql error opening query to fetch zone records");
@@ -617,7 +617,7 @@ sub Get_Zone_SPF_Records {
         return undef;
     }
 
-    $qry = "select ttl,name,spf from dns_spf where zone=? order by name";
+    $qry = "select ttl,name,spf from dns_spf where zone=? and (etime is null or etime < now()) order by name";
     unless ( $cid = $db->SQL_OpenBoundQuery($qry) ) {
         $db->SQL_Error($qry);
         $error->set("sql error opening query to fetch zone records");
@@ -671,7 +671,7 @@ sub Get_Zone_NS_Records {
         return undef;
     }
 
-    $qry = "select ttl,name,address from dns_ns where zone=? order by name,address";
+    $qry = "select ttl,name,address from dns_ns where zone=? and (etime is null or etime < now()) order by name,address";
     unless ( $cid = $db->SQL_OpenBoundQuery($qry) ) {
         $db->SQL_Error($qry);
         $error->set("sql error opening query to fetch zone records");
@@ -725,7 +725,7 @@ sub Get_Zone_MX_Records {
         return undef;
     }
 
-    $qry = "select ttl,name,priority,address from dns_mx where zone=? order by name,priority,address";
+    $qry = "select ttl,name,priority,address from dns_mx where zone=? and (etime is null or etime < now()) order by name,priority,address";
     unless ( $cid = $db->SQL_OpenBoundQuery($qry) ) {
         $db->SQL_Error($qry);
         $error->set("sql error opening query to fetch zone records");
@@ -783,7 +783,7 @@ sub Get_Zone_SRV_Records {
     $qry
         = "select ttl,name,priority,weight,port,address "
         . "from dns_srv where zone=?"
-        . " order by name,priority,weight,port,address";
+        . " and (etime is null or etime < now()) order by name,priority,weight,port,address";
     unless ( $cid = $db->SQL_OpenBoundQuery($qry) ) {
         $db->SQL_Error($qry);
         $error->set("sql error opening query to fetch zone records");
