@@ -19,7 +19,7 @@ require NetMaint::DHCP;
 require NetMaint::DNS;
 require NetMaint::LastTouch;
 require NetMaint::DBCache;
-require NetMaint::Config;
+use NetMaint::Config;
 
 use Time::HiRes qw(time);
 
