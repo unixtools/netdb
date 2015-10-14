@@ -254,9 +254,9 @@ sub RecordReleasedLease {
     $self->{touch}->UpdateLastTouch( ether => $ether, ip => $ip );
 
     if ( $NETDB_DHCP_HOLDOVER ) {
-        $dns->Delete_Dynamic_ByIP($ip);
-    } else {
         $dns->Release_Dynamic_ByIP($ip);
+    } else {
+        $dns->Delete_Dynamic_ByIP($ip);
     }
 }
 
