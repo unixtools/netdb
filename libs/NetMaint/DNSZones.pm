@@ -349,7 +349,7 @@ sub Get_Zone_A_Records {
         return undef;
     }
 
-    $qry = "select name,ttl,address from dns_a where zone=? and (etime is null or etime < now()) order by name,address";
+    $qry = "select name,ttl,address from dns_a where zone=? and (etime is null or etime > now()) order by name,address";
     unless ( $cid = $db->SQL_OpenBoundQuery($qry) ) {
         $db->SQL_Error($qry);
         $error->set("sql error opening query to fetch zone records");
