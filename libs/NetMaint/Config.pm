@@ -47,7 +47,7 @@ our $NETDB_DISABLE_BACKLOG_REPORT = 1;
 
 # Retain dhcp dns entries for this many seconds after release - to handle common case of
 # release,reboot,renew-with-same-ip without introducing an annoying cached NXDomain response
-our $NETDB_DHCP_HOLDOVER = 300;
+our $NETDB_DHCP_HOLDOVER = 600;
 
 sub SearchLink_AnalyzeUser
 {
