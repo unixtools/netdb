@@ -31,9 +31,6 @@ $log->Log();
 
 $html->PageHeader( title => "Subnet Visualizer" );
 
-print "<a href=\"?showall=on\">Show All Subnets</a> | ";
-print "<a href=\"?showall=off\">Show Server Subnets</a><p>";
-
 &HTMLStartForm( &HTMLScriptURL(), "GET" );
 
 my $net = new NetMaint::Network;
@@ -63,22 +60,10 @@ my $tree = {};
 
 # Generate list of base/starting subnets at top level of tree
 my %bases = ();
-$bases{"128.206.230.0/23"} = 1;
-$bases{"131.151.0.0/16"}   = 1;
-if ( $rqpairs{showall} eq "on" ) {
-    $bases{"192.55.114.0/24"}  = 1;
-    $bases{"192.65.97.0/24"}   = 1;
-    $bases{"207.160.128.0/24"} = 1;
-    foreach my $sn ( keys(%$subnets) ) {
-        if ( $sn =~ /^(10\.\d+)\./ ) {
-            $bases{ $1 . ".0.0/16" } = 1;
-        }
+foreach my $sn ( keys(%$subnets) ) {
+    if ( $sn =~ /^(10\.\d+)\./ ) {
+        $bases{ $1 . ".0.0/16" } = 1;
     }
-    $bases{"172.16.0.0/16"}    = 1;
-    $bases{"172.17.0.0/16"}    = 1;
-    $bases{"192.168.5.0/24"}   = 1;
-    $bases{"192.168.10.0/24"}  = 1;
-    $bases{"192.168.254.0/24"} = 1;
 }
 
 # Load tree starting point
