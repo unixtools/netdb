@@ -180,13 +180,19 @@ sub RecordNewLease {
     $debug && print "got hostname = $hostname\n";
 
     my $cnt = 0;
-    if ( $hostname ) {
+    if ($hostname) {
         $cnt = $dns->Count_Static_A_Records($hostname);
         $debug && print "static count = $cnt\n";
     }
 
-    if ( $hostname ) {
+    if ( $cnt > 0 ) {
+        $debug && print "ignoring dns update since static addresses assigned\n";
+    }
+    elsif ( $hostname ) {
         $dns->Add_Dynamic_HostIP( $hostname, $ip );
+    }
+    else {
+        $debug && print "ignoring dns update with no mapped host\n";
     }
 
     # Release dns and trigger queued updates
@@ -233,9 +239,10 @@ sub RecordReleasedLease {
 
     $self->{touch}->UpdateLastTouch( ether => $ether, ip => $ip );
 
-    if ( $NETDB_DHCP_HOLDOVER ) {
+    if ($NETDB_DHCP_HOLDOVER) {
         $dns->Release_Dynamic_ByIP($ip);
-    } else {
+    }
+    else {
         $dns->Delete_Dynamic_ByIP($ip);
     }
 }
