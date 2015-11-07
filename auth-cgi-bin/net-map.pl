@@ -144,36 +144,34 @@ $db->SQL_CloseQuery($cid);
 my %ip_to_os    = ();
 my %ip_to_ports = ();
 
-foreach my $net (@nets) {
-    $debug && print "Loading NMAP scan of ${net}\n";
-    open( my $in, "data/nmap-${net}.out" );
-    while ( defined( my $line = <$in> ) ) {
-        my $host;
-        if ( $line =~ /Host: (${net}.\d+)/ ) {
-            $host = $1;
-        }
+$debug && print "Loading NMAP scan data\n";
+open( my $in, "/local/netmap/combined.txt" );
+while ( defined( my $line = <$in> ) ) {
+    my $host;
+    if ( $line =~ /Host: (\d+\.\d+\.\d+.\d+)/ ) {
+        $host = $1;
+    }
 
-        if ( $line =~ /Host: (${net}.\d+).*OS:\s+(.*?)\t/ ) {
-            $host = $1;
-            $ip_to_os{$host} = $2;
-        }
+    if ( $line =~ /Host: (\d+\.\d+\.\d+.\d+).*OS:\s+(.*?)\t/ ) {
+        $host = $1;
+        $ip_to_os{$host} = $2;
+    }
 
-        if ( $line =~ /Ports: (.*)/ ) {
-            my @services = ();
-            my @match = split( /,/, $1 );
-            foreach my $match (@match) {
-                my @tmp = split( '/', $match );
-                if ( $tmp[1] eq "open" ) {
-                    push( @services, $tmp[4] );
-                }
+    if ( $line =~ /Ports: (.*)/ ) {
+        my @services = ();
+        my @match = split( /,/, $1 );
+        foreach my $match (@match) {
+            my @tmp = split( '/', $match );
+            if ( $tmp[1] eq "open" ) {
+                push( @services, $tmp[4] );
             }
-            $ip_to_ports{$host} = join( ", ", @services );
-
         }
+        $ip_to_ports{$host} = join( ", ", @services );
 
     }
-    close($in);
+
 }
+close($in);
 
 #
 # Generate report
