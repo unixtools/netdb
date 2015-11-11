@@ -1,6 +1,3 @@
 #!/bin/sh -x
 
 /local/netdb/bin/dns-master/build-dns-zones.pl
-sleep 5
-/local/netmap/gen-html.pl
-/local/dnsimple/sync.pl spirenteng.com
