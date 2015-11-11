@@ -91,21 +91,6 @@ foreach my $net (@nets) {
     close($in);
 }
 
-#
-# Load ping status
-#
-#fping -c 3 -q -g 10.155.2.0/24
-# 10.155.2.206 : xmt/rcv/%loss = 3/3/0%, min/avg/max = 0.58/3.16/6.08
-
-my %ip_to_ping = ();
-
-my $qry = "select distinct ip from last_ping_ip where unix_timestamp(now())-unix_timestamp(tstamp) < 120";
-my $cid = $db->SQL_OpenQuery($qry) || $db->SQL_Error($qry) && die;
-while ( my ($ip) = $db->SQL_FetchRow($cid) ) {
-    $ip_to_ping{$ip} = "YES";
-}
-$db->SQL_CloseQuery($cid);
-
 my %ip_to_alloc;
 my $qry = "select ip,host,type from ip_alloc where host is not null";
 my $cid = $db->SQL_OpenQuery($qry) || $db->SQL_Error($qry) && die;
@@ -143,9 +128,10 @@ $db->SQL_CloseQuery($cid);
 #
 my %ip_to_os    = ();
 my %ip_to_ports = ();
+my %ip_to_ping = ();
 
 $debug && print "Loading NMAP scan data\n";
-open( my $in, "/local/netmap/combined.txt" );
+open( my $in, "/local/netmap/nmap-combined.txt" );
 while ( defined( my $line = <$in> ) ) {
     my $host;
     if ( $line =~ /Host: (\d+\.\d+\.\d+.\d+)/ ) {
@@ -170,6 +156,20 @@ while ( defined( my $line = <$in> ) ) {
 
     }
 
+}
+close($in);
+
+$debug && print "Loading Ping scan data\n";
+open( my $in, "/local/netmap/ping-combined.txt" );
+while ( defined( my $line = <$in> ) ) {
+    my $host;
+    if ( $line =~ /^(\d+\.\d+\.\d+.\d+)\s*:/ ) {
+        $host = $1;
+    }
+
+    if ( $line =~ m|min/avg/max|o ) {
+        $ip_to_ping{$host} = "Yes";
+    }
 }
 close($in);
 
