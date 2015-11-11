@@ -1,3 +1,5 @@
 #!/bin/sh -x
 
 /local/netdb/bin/dns-master/build-dns-zones.pl
+
+nc --recv-only --idle-timeout 1 127.0.0.1 2406
