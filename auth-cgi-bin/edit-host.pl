@@ -76,16 +76,11 @@ elsif ( $mode eq "search" ) {
         &DisplaySearchForms();
     }
     else {
-        &HTMLStartForm( "edit-host.pl", "GET" );
-        &HTMLHidden( "mode", "view" );
-        print "Matching hosts: ";
-        &HTMLStartSelect( "host", 1 );
-        foreach my $hn (@hosts) {
-            print "<option>$hn\n";
+        my @list;
+        foreach my $host ( sort @hosts ) {
+            push( @list, [ $host, $host ] );
         }
-        &HTMLEndSelect();
-        &HTMLSubmit("Edit Host");
-        &HTMLEndForm();
+        &PrintEditList(@list);
     }
 }
 elsif ( $mode eq "view" )    # display the host, exact match only
@@ -1567,6 +1562,75 @@ sub DisplaySearchForms {
     print "<p/>\n";
 
     print "<a href=\"create-host.pl\">Create a new host</a>\n";
+}
+
+# Begin-Doc
+# Name: PrintViewList
+# Description: display table of matching hosts and/or auto-redirect if single match
+# Syntax: &PrintViewList(@hosts)
+# End-Doc
+sub PrintEditList {
+    my @hosts = @_;
+    my $cnt   = 0;
+
+    if ( $#hosts < 0 ) {
+        print "<h3>No matches found.</h3>\n";
+        return;
+    }
+
+    &HTMLStartForm( "edit-host.pl", "GET" );
+    &HTMLHidden( "mode", "view" );
+
+    print "Matching hosts: ";
+    &HTMLStartSelect( "host", 1 );
+    foreach my $row (@hosts) {
+        my ( $host, $label ) = @{$row};
+        print "<option value=\"$host\">$label\n";
+        $cnt++;
+    }
+    if ( $cnt >= 999 ) {
+        print "<option value=\"\"> - list may be incomplete, max records reached -\n";
+    }
+    &HTMLEndSelect();
+    &HTMLSubmit("Edit Host");
+    &HTMLEndForm();
+
+    print "<p/>\n";
+
+    $html->StartBlockTable( "Matching Hosts", 750 );
+    $html->StartInnerTable( "Hostname", "Ethernet Address", "Options" );
+
+    foreach my $row (@hosts) {
+        my ( $host, $label ) = @{$row};
+
+        $html->StartInnerRow();
+        print "<td>$label</td>\n";
+
+        print "<td><tt>";
+        my @ethers = sort( $dhcp->GetEthers($host) );
+        my $elist  = $util->FormatEtherList(@ethers);
+        $elist =~ s|\, |<br/>\n|gio;
+        print $elist;
+        print "</td>\n";
+
+        print "<td>";
+        print "<a href=\"view-host.pl?host=${host}\">View Details</a> | ";
+        print "<a href=\"edit-host.pl?host=${host}&mode=view\">Edit Host</a> | ";
+        print "<a href=\"edit-host.pl?host=${host}&mode=deletehost\">Delete Host</a> | ";
+        print "Visit Host: <a href=\"http://${host}\">http</a> <a href=\"https://${host}\">https</a>";
+        print "</td>\n";
+        $html->EndInnerRow();
+    }
+
+    if ( $cnt >= 999 ) {
+        $html->StartInnerRow();
+        print "<td colspan=3>Maximum matches listed, try a narrower search.</td>\n";
+        $html->EndInnerRow();
+    }
+
+    $html->EndInnerTable();
+    $html->EndBlockTable();
+
 }
 
 $html->PageFooter();
