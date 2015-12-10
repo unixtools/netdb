@@ -37,21 +37,24 @@ if ( $mode eq "" ) {
     print "<p/>\n";
     &HTMLStartForm( &HTMLScriptURL(), "GET" );
     &HTMLHidden( "mode", "report" );
-    print "Number of Requests: ";
-    &HTMLInputText( "requests", 10, 150 );
-    print " requests.<br/>\n";
+    print "Report clients with over ";
+    &HTMLInputText( "requests", 5, 1500 );
+    print " requests in ";
+    &HTMLInputText( "days", 3, 7 );
+    print " days.<br/>\n";
     &HTMLSubmit("Search");
     &HTMLEndForm();
 }
 elsif ( $mode eq "report" ) {
     my $db       = new NetMaint::DB;
     my $requests = int( $rqpairs{requests} );
+    my $days     = int( $rqpairs{days} );
 
     $html->StartMailWrapper("DHCP Excessive Requests (Threshold $requests)");
 
     $html->StartBlockTable("DHCP Excessive Requests (Threshold $requests)");
 
-    $html->StartInnerTable( "Type", "Ether", "IP", "Count", "7-Day Count", "Timestamp" );
+    $html->StartInnerTable( "Type", "Ether", "IP", "Count", "$days-Day Count", "Timestamp" );
 
     my $qry
         = "select type, ether, ip, count(*) cnt, max(tstamp) from dhcp_acklog "
@@ -62,11 +65,11 @@ elsif ( $mode eq "report" ) {
     my $cid = $db->SQL_OpenQuery($qry) || $db->SQL_Error($qry) && die;
 
     my $qry2
-        = "select count(*) from dhcp_acklog where type=? and ether=? and ip=? and tstamp > date_sub(now(),interval 7 day)";
+        = "select count(*) from dhcp_acklog where type=? and ether=? and ip=? and tstamp > date_sub(now(),interval $days day)";
     my $cid2 = $db->SQL_OpenBoundQuery($qry2) || $db->SQL_Error($qry2) && die;
 
     my $qry3
-        = "select count(*) from dhcp_acklog where type=? and ether=? and ip is null and tstamp > date_sub(now(),interval 7 day)";
+        = "select count(*) from dhcp_acklog where type=? and ether=? and ip is null and tstamp > date_sub(now(),interval $days day)";
     my $cid3 = $db->SQL_OpenBoundQuery($qry3) || $db->SQL_Error($qry3) && die;
 
     while ( my ( $type, $ether, $ip, $cnt, $tstamp ) = $db->SQL_FetchRow($cid) ) {
