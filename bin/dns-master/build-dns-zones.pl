@@ -48,6 +48,8 @@ if ( ref($thresh) ne "HASH" ) {
     die "Could not retrieve thresholds.\n";
 }
 
+my @errors = ();
+
 foreach my $zone ( sort(@zones) ) {
     my $fname     = "${base}/${zone}";
     my $lastfname = "${lastbase}/${zone}";
@@ -152,12 +154,14 @@ foreach my $zone ( sort(@zones) ) {
     close($checkh);
     my $errorstat = $?;
     if ( !$saw_serial ) {
-        print "  Zone failed test load (Status: $errorstat).\n";
+        print "  Zone ($zone) failed test load (Status: $errorstat).\n";
+        push( @errors, "Zone ($zone) failed test load (Status: $errorstat)" );
         unlink( $fname . ".tmp" );
         next;
     }
     elsif ( $errorstat != 0 ) {
-        print "  Zone failed syntax check (Status: $errorstat)\n";
+        print "  Zone ($zone) failed syntax check (Status: $errorstat)\n";
+        push( @errors, "Zone ($zone) failed test load (Status: $errorstat)" );
         unlink( $fname . ".tmp" );
         next;
     }
@@ -175,9 +179,11 @@ foreach my $zone ( sort(@zones) ) {
     my @stat = stat("${fname}.tmp");
     if ( $stat[7] < $thresh->{$zone}->{size} ) {
         print "Zone ($zone) file too small (", $stat[7], " bytes). Not installing new version.\n";
+        push( @errors, "Zone ($zone) file too small (" . $stat[7] . " bytes). Not installing new version." );
     }
     elsif ( $linecount < $thresh->{$zone}->{lines} ) {
         print "Zone($zone) file too small (", $linecount, " lines). Not installing new version.\n";
+        push( @errors, "Zone($zone) file too small (" . $linecount . " lines). Not installing new version." );
     }
     else {
         print "Zone file acceptable. Installing new version.\n";
@@ -244,6 +250,7 @@ foreach my $zone ( sort(@zones) ) {
         }
         else {
             print "Failed to get results of signing, skipping update of signed zone.\n";
+            push( @errors, "Failed to get results of signing, skipping update of signed zone." );
             next;
         }
     }
@@ -253,4 +260,31 @@ foreach my $zone ( sort(@zones) ) {
 if ( $zones_updated > 0 ) {
     print "Triggering named reload.\n";
     system( "/local/bind/sbin/rndc", "reload" );
+}
+
+if ( scalar(@errors) > 0 ) {
+    print "Errors encountered during build:\n";
+    foreach my $err (@errors) {
+        print $err, "\n";
+    }
+
+    my @ts  = stat("/local/config/notify.last");
+    my $age = time - $ts[9];
+
+    if ( $age > 120 ) {
+        open( my $out, ">/local/config/notify.last" );
+        print $out time;
+        close($out);
+
+        print "Sending build failure message.\n";
+        open( my $mail, "|/usr/sbin/sendmail -t" );
+        print $mail "To: $NETDB_DNS_NOTIFY\n";
+        print $mail "From: $NETDB_NOTIFY_FROM\n";
+        print $mail "Subject: DNS config build failure.\n";
+        print $mail "\n\n";
+        foreach my $err (@errors) {
+            print $mail $err, "\n";
+        }
+        close($mail);
+    }
 }

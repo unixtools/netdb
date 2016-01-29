@@ -35,11 +35,15 @@ our $NETDB_PRIV_REPORTS = "netmgr-user";
 
 our $NETDB_DEFAULT_TTL = 120;
 
-our $NETDB_MAIL_FROM      = "netdb\@spirenteng.com";
-our $NETDB_DEFAULT_NOTIFY = "nneul\@neulinger.org";
+our $NETDB_MAIL_FROM = "netdb\@spirenteng.com";
 
-our $NETDB_DB_HOST      = "netmgr.spirenteng.com";
-our $NETDB_DNS_SERVERS  = ["netmgr.spirenteng.com"];
+our $NETDB_NOTIFY_FROM    = "netdb\@spirenteng.com";
+our $NETDB_DEFAULT_NOTIFY = "nneul\@neulinger.org";
+our $NETDB_DNS_NOTIFY     = "nneul\@neulinger.org";
+
+our $NETDB_DB_HOST     = "netmgr.spirenteng.com";
+our $NETDB_DNS_SERVERS = ["netmgr.spirenteng.com"];
+
 # Why is this not pulling from database?!
 our $NETDB_DHCP_SERVERS = [ "ub-dhcp1-ito.spirenteng.com", "ub-dhcp2-ito.spirenteng.com" ];
 
@@ -49,14 +53,15 @@ our $NETDB_DISABLE_BACKLOG_REPORT = 1;
 # release,reboot,renew-with-same-ip without introducing an annoying cached NXDomain response
 
 # For spirent, just change to 1d holdover, even though this is completely wrong to rely on
-our $NETDB_DHCP_HOLDOVER = 24*60*60;
+our $NETDB_DHCP_HOLDOVER = 24 * 60 * 60;
 
-sub SearchLink_AnalyzeUser
-{
+sub SearchLink_AnalyzeUser {
     my $userid = shift;
 
     # This isn't valid at the moment
-    return "<a href=\"https://crowd.spirenteng.com/crowd/console/secure/user/view!default.action?directoryID=1310721&name=${userid}\">" . "(Crowd User Info)</a></td>\n";
+    return
+        "<a href=\"https://crowd.spirenteng.com/crowd/console/secure/user/view!default.action?directoryID=1310721&name=${userid}\">"
+        . "(Crowd User Info)</a></td>\n";
 }
 
 1;
