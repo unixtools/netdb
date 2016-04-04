@@ -2,3 +2,5 @@
 5 0-23/6 * * * /local/netdb/bin/dns-master/clean-tables.pl 2>&1 | /usr/bin/logger -t netdb-clean
 #
 0-59/5 * * * * /local/netdb/bin/dns-master/expand-all-access-rules.pl 2>&1 | /usr/bin/logger -t netdb-access-rules
+#
+28 0-23/6 * * * /local/netdb/bin/dns-master/refresh-thresholds.pl 2>&1 | /usr/bin/logger -t refresh-thresholds
