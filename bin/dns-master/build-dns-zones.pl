@@ -13,14 +13,30 @@ BEGIN { do "/local/netdb/libs/init.pl"; }
 use NetMaint::Config;
 require NetMaint::DNSZones;
 require NetMaint::Error;
+require NetMaint::DB;
 
 my $error = new NetMaint::Error;
 
 my $dnszones = new NetMaint::DNSZones;
 
+my $db = new NetMaint::DB;
+
+my $force = 0;
+if ( $ARGV[0] eq "--force" || $ARGV[0] eq "-force" ) {
+    $force++;
+}
+if ( -e "/local/config/data/force" ) {
+    $force++;
+    unlink("/local/config/data/force");
+}
+if ( -e "/local/bind/data/force" ) {
+    $force++;
+    unlink("/local/bind/data/force");
+}
+
 # Get list of zones
 my @zones;
-if ( $ARGV[0] eq "-force" ) {
+if ($force) {
     $error->clear();
     $dnszones->UpdateAllSOA();    # make sure serial numbers are incremented
     $error->check_and_die();
@@ -128,7 +144,7 @@ foreach my $zone ( sort(@zones) ) {
     }
 
     if ( $diffcnt == 0 ) {
-        if ( $ARGV[0] ne "-force" ) {
+        if ( !$force ) {
             print "  No changes found. Not installing new version.\n";
             unlink("${fname}.tmp");
             next;
@@ -188,6 +204,9 @@ foreach my $zone ( sort(@zones) ) {
     else {
         print "Zone file acceptable. Installing new version.\n";
         rename( $fname . ".tmp", $fname );
+
+        my $qry = "update dns_soa set last_lines=?,last_size=? where zone=?";
+        $db->SQL_ExecQuery( $qry, $linecount, $stat[7], $zone ) || $db->SQL_Error($qry);
 
         my $bindbase = "/local/bind/data/source";
         my $realfile = $bindbase . "/" . $zone;
