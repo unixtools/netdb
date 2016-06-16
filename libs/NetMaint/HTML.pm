@@ -99,6 +99,10 @@ sub PageHeader {
         print " - ";
         print "<a href=\"/auth-cgi-bin/cgiwrap/netdb/net-map.pl\">DNS/IP Listing</a>\n";
         print " - ";
+        print "<a href=\"/auth-cgi-bin/cgiwrap/netdb/letsencrypt.pl\">LetsEncrypt (iTE/Vel)</a>\n";
+        print " - ";
+        print "<a href=\"/auth-cgi-bin/cgiwrap/netdb/letsencrypt-generic.pl\">LetsEncrypt (Generic)</a>\n";
+        print " - ";
         print "<a href=\"/vm-map.html\">VM Listing</a>\n";
         print "</td></tr>\n";
 

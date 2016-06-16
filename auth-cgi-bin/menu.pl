@@ -69,6 +69,14 @@ $html->StartInnerRow();
 print "<td><a href=\"/auth-cgi-bin/cgiwrap/vmcontrol/vm-list-byhost.pl\">Display Lab VM Inventory</a></td>\n";
 $html->EndInnerRow();
 
+$html->StartInnerRow();
+print "<td><a href=\"letsencrypt.pl\">LetsEncrypt Certs (iTE/Vel)</a></td>\n";
+$html->EndInnerRow();
+
+$html->StartInnerRow();
+print "<td><a href=\"letsencrypt-generic.pl\">LetsEncrypt Certs (Generic)</a></td>\n";
+$html->EndInnerRow();
+
 $html->EndInnerTable();
 $html->EndBlockTable();
 
