@@ -253,7 +253,9 @@ create table dns_soa
  visible varchar(1) DEFAULT 1 not null,
  signzone varchar(1) DEFAULT 0 not null,
  thresh_size integer not null,
- thresh_lines integer not null
+ thresh_lines integer not null,
+ last_size integer default 0 not null,
+ last_lines integer default 0 not null
 );
 
 create unique index dns_soa_zone ON dns_soa (zone);
