@@ -37,6 +37,44 @@ IO::Socket::SSL::set_ctx_defaults(
     SSL_verify_mode     => 0,
 );
 
+&HTMLStartForm( &HTMLScriptURL, "POST" );
+&HTMLHidden( "mode", "install" );
+
+$html->StartBlockTable( "Certificate Request", 800 );
+$html->StartInnerTable();
+
+$html->StartInnerHeaderRow();
+print "<td colspan=100%>Currently supported only for iTE/Velocity instances</td>\n";
+$html->EndInnerHeaderRow();
+
+$html->StartInnerRow();
+print "<td>Hostname:</td>\n";
+print "<td>";
+&HTMLInputText( "host", 50, $rqpairs{host} );
+print "</td>\n";
+$html->EndInnerRow();
+
+$html->StartInnerRow();
+print "<td>Admin Password: (admin by default)</td>\n";
+print "<td>";
+&HTMLInputPassword( "password", 20, $rqpairs{password} ? $rqpairs{password} : "admin" );
+print "</td>\n";
+$html->EndInnerRow();
+
+$html->StartInnerRow();
+print "<td colspan=100% align=center>";
+&HTMLSubmit("Request and Install");
+print " ";
+&HTMLReset();
+print "</td>\n";
+$html->EndInnerRow();
+
+$html->EndInnerTable();
+$html->EndBlockTable();
+&HTMLEndForm();
+
+print "<p>\n";
+
 if ( $mode eq "install" ) {
     $host = lc $host;
     if ( $host !~ /\./ ) {
@@ -125,58 +163,20 @@ if ( $mode eq "install" ) {
     my $info;
     eval { $info = decode_json($resp); };
     if ( !$info ) {
-        $html->ErrorExit("Received invalid json: " . $res->as_string);
+        $html->ErrorExit( "Received invalid json: " . $res->as_string );
     }
 
-    if (0)
-    {
-    $html->StartBlockTable("Appliance Config Output", 800);
-    print "<pre>\n";
-    my $json = new JSON;
-    print $json->pretty->canonical->encode($info);
-    print "</pre>\n";
-    $html->EndBlockTable();
+    if (0) {
+        $html->StartBlockTable( "Appliance Config Output", 800 );
+        print "<pre>\n";
+        my $json = new JSON;
+        print $json->pretty->canonical->encode($info);
+        print "</pre>\n";
+        $html->EndBlockTable();
     }
 
     print "<b>Appliance updated with new cert info, apply config or reboot to have it take effect.</b><br>\n";
     print "<b>Certificate is good for 90 days from issuance. Come back here after 60 days to renew.</b><br>\n";
 }
-
-print "<p>\n";
-
-&HTMLStartForm( &HTMLScriptURL, "POST" );
-&HTMLHidden( "mode", "install" );
-
-$html->StartBlockTable( "Certificate Request", 800 );
-$html->StartInnerTable();
-
-$html->StartInnerHeaderRow();
-print "<td colspan=100%>Currently supported only for iTE/Velocity instances</td>\n";
-$html->EndInnerHeaderRow();
-
-$html->StartInnerRow();
-print "<td>Hostname:</td>\n";
-print "<td>";
-&HTMLInputText( "host", 50, $rqpairs{host} );
-print "</td>\n";
-$html->EndInnerRow();
-
-$html->StartInnerRow();
-print "<td>Admin Password: (admin by default)</td>\n";
-print "<td>";
-&HTMLInputPassword( "password", 20, $rqpairs{password} ? $rqpairs{password} : "admin" );
-print "</td>\n";
-$html->EndInnerRow();
-
-$html->StartInnerRow();
-print "<td colspan=100% align=center>";
-&HTMLSubmit("Request and Install");
-print " ";
-&HTMLReset();
-print "</td>\n";
-$html->EndInnerRow();
-
-$html->EndInnerTable();
-$html->EndBlockTable();
 
 $html->PageFooter();
