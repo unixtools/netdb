@@ -1,2 +1,9 @@
 .ssh
 .local
+.Xauthority
+.bash_history
+.lesshst
+.viminfo
+.nedit
+tftp
+tmp/
