@@ -1,0 +1,174 @@
+{
+   "additionalProperties" : false,
+   "defaultProperties" : [],
+   "description" : "Configuration elements used to configure automated installations of systems team maintained OS installs",
+   "properties" : {
+      "common" : {
+         "additionalProperties" : false,
+         "description" : "Properties common to all host types",
+         "properties" : {
+            "patch_group" : {
+               "additionalProperties" : false,
+               "default" : "production",
+               "enum" : [
+                  "production-1",
+                  "production-2",
+                  "production-3",
+                  "early-adopter",
+                  "early-adopter-1",
+                  "early-adopter-2",
+                  "early-adopter-3",
+                  "other",
+                  "special",
+                  "pre-test"
+               ],
+               "title" : "Patch Group [patch_group]",
+               "type" : "string"
+            }
+         },
+         "propertyOrder" : 1,
+         "required" : [
+            "patch_group"
+         ],
+         "title" : "Common Info",
+         "type" : "object"
+      },
+      "unix" : {
+         "additionalProperties" : false,
+         "description" : "Parameters specific to Unix style hosts",
+         "properties" : {
+            "backup_config" : {
+               "format" : "table",
+               "items" : {
+                  "format" : "text",
+                  "title" : "entries",
+                  "type" : "string"
+               },
+               "propertyOrder" : 80,
+               "title" : "Sysbkup Config [backup_config]",
+               "type" : "array"
+            },
+            "comments" : {
+               "format" : "textarea",
+               "propertyOrder" : 90,
+               "title" : "Comments [comments]",
+               "type" : "string"
+            },
+            "cron_config" : {
+               "format" : "table",
+               "items" : {
+                  "format" : "text",
+                  "title" : "entries",
+                  "type" : "string"
+               },
+               "propertyOrder" : 30,
+               "title" : "Cron Config [cron_config]",
+               "type" : "array"
+            },
+            "kernel_config_runtime" : {
+               "format" : "textarea",
+               "propertyOrder" : 100,
+               "title" : "Kernel Config [kernel_config_runtime]",
+               "type" : "string"
+            },
+            "monit_config" : {
+               "format" : "table",
+               "items" : {
+                  "format" : "text",
+                  "title" : "entries",
+                  "type" : "string"
+               },
+               "propertyOrder" : 225,
+               "title" : "Monit Config [monit_config]",
+               "type" : "array"
+            },
+            "os" : {
+               "default" : "unknown",
+               "enum" : [
+                  "fedora-20",
+                  "oel-5",
+                  "unknown"
+               ],
+               "minLength" : 4,
+               "propertyOrder" : 10,
+               "title" : "OS Type [os]",
+               "type" : "string"
+            },
+            "passwd_config" : {
+               "format" : "table",
+               "items" : {
+                  "format" : "text",
+                  "title" : "entries",
+                  "type" : "string"
+               },
+               "propertyOrder" : 40,
+               "title" : "Password Config [passwd_config]",
+               "type" : "array"
+            },
+            "post_config" : {
+               "format" : "textarea",
+               "propertyOrder" : 95,
+               "title" : "Post Config [post_config]",
+               "type" : "string"
+            },
+            "rdist_config" : {
+               "format" : "table",
+               "items" : {
+                  "format" : "text",
+                  "title" : "entries",
+                  "type" : "string"
+               },
+               "propertyOrder" : 90,
+               "title" : "RDist Config [rdist_config]",
+               "type" : "array"
+            },
+            "sudo_config" : {
+               "format" : "table",
+               "items" : {
+                  "format" : "text",
+                  "title" : "entries",
+                  "type" : "string"
+               },
+               "propertyOrder" : 40,
+               "title" : "SUDO Config [sudo_config]",
+               "type" : "array"
+            },
+            "virtual_config" : {
+               "format" : "tabs",
+               "items" : {
+                  "additionalProperties" : false,
+                  "properties" : {
+                     "description" : {
+                        "propertyOrder" : 1,
+                        "type" : "string"
+                     },
+                     "hostname" : {
+                        "propertyOrder" : 2,
+                        "type" : "string"
+                     },
+                     "interface" : {
+                        "propertyOrder" : 3,
+                        "type" : "string"
+                     }
+                  },
+                  "required" : [
+                     "hostname",
+                     "interface"
+                  ],
+                  "title" : "Virtual",
+                  "type" : "object"
+               },
+               "propertyOrder" : 200,
+               "title" : "Virtual Network Config [virtual_config]",
+               "type" : "array"
+            }
+         },
+         "propertyOrder" : 2,
+         "title" : "Unix Host",
+         "type" : "object"
+      }
+   },
+   "title" : "Systems Host Info",
+   "type" : "object"
+}
+

@@ -1,0 +1,92 @@
+{
+   "defaultProperties" : [],
+   "properties" : {
+      "age" : {
+         "maximum" : 99,
+         "minimum" : 18,
+         "type" : "integer"
+      },
+      "favorite_color" : {
+         "format" : "color",
+         "title" : "favorite color",
+         "type" : "string"
+      },
+      "gender" : {
+         "enum" : [
+            "male",
+            "female"
+         ],
+         "type" : "string"
+      },
+      "location" : {
+         "properties" : {
+            "city" : {
+               "type" : "string"
+            },
+            "citystate" : {
+               "description" : "This is generated automatically from the previous two fields",
+               "template" : "{{city}}, {{state}}",
+               "type" : "string",
+               "watch" : {
+                  "city" : "location.city",
+                  "state" : "location.state"
+               }
+            },
+            "state" : {
+               "type" : "string"
+            }
+         },
+         "title" : "Location",
+         "type" : "object"
+      },
+      "name" : {
+         "description" : "First and Last name",
+         "minLength" : 4,
+         "type" : "string"
+      },
+      "pets" : {
+         "format" : "table",
+         "items" : {
+            "properties" : {
+               "name" : {
+                  "type" : "string"
+               },
+               "type" : {
+                  "enum" : [
+                     "cat",
+                     "dog",
+                     "bird",
+                     "reptile",
+                     "snake",
+                     "other"
+                  ],
+                  "type" : "string"
+               }
+            },
+            "title" : "Pet",
+            "type" : "object"
+         },
+         "title" : "Pets",
+         "type" : "array",
+         "uniqueItems" : true
+      },
+      "postition" : {
+         "properties" : {
+            "salary" : {
+               "type" : "number"
+            },
+            "supervisor" : {
+               "type" : "string"
+            },
+            "title" : {
+               "type" : "string"
+            }
+         },
+         "title" : "Position",
+         "type" : "object"
+      }
+   },
+   "title" : "Sandbox",
+   "type" : "object"
+}
+
