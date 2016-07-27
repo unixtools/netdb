@@ -1,8 +1,8 @@
 .bash_history
 .lesshst
-.local
+.local/
 .nedit
-.ssh
+.ssh/
 tftp
 tmp/
 .viminfo
