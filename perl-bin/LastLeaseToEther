@@ -13,26 +13,29 @@ End-Doc
 =cut
 
 use strict;
+use CGI::Fast;
 
 BEGIN { do "/local/netdb/libs/init.pl"; }
 
 use Local::SimpleRPC;
 use RPC::NetDBUser;
 
-my $rpc = new Local::SimpleRPC::Server;
-$rpc->Init();
+while ( my $cgi = CGI::Fast->new ) {
+    my $rpc = new Local::SimpleRPC::Server( cgi => $cgi );
+    $rpc->Init();
 
-my $admin = new RPC::NetDBUser;
-my @ips   = $rpc->param("ip");
+    my $admin = new RPC::NetDBUser;
+    my @ips   = $rpc->multi_param("ip");
 
-my %res_by_ip = ();
-foreach my $ip (@ips) {
-    my $ether = $rpc->Try(
-        sub {
-            return $admin->LastLeaseToEther($ip);
-        }
-    );
-    $res_by_ip{$ip} = $ether;
+    my %res_by_ip = ();
+    foreach my $ip (@ips) {
+        my $ether = $rpc->Try(
+            sub {
+                return $admin->LastLeaseToEther($ip);
+            }
+        );
+        $res_by_ip{$ip} = $ether;
+    }
+
+    $rpc->FinishReturn( {%res_by_ip} );
 }
-
-$rpc->Finish( {%res_by_ip} );

@@ -3,10 +3,10 @@
 =pod
 
 Begin-Doc
-Name: AddHostOption
+Name: GetAdminLock
 Type: RPC Perl Script
-Location: Adds a host option to the host
-CGI-Parameters: key is 'host' value is hostname, key is 'option'
+Location: Gets admin lock status for a host
+CGI-Parameters: key is 'host' value is hostname
 SimpleRPC-Return: none
 End-Doc
 
@@ -30,10 +30,9 @@ while ( my $cgi = CGI::Fast->new ) {
 
     my $res = $rpc->Try(
         sub {
-            my $host   = $opts{host};
-            my $option = $opts{option};
+            my $host = $opts{host};
 
-            return $admin->AddHostOption( $host, $option );
+            return { $host => $admin->GetAdminLock($host) };
         }
     );
 

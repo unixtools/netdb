@@ -13,29 +13,32 @@ End-Doc
 =cut
 
 use strict;
+use CGI::Fast;
 
 BEGIN { do "/local/netdb/libs/init.pl"; }
 
 use Local::SimpleRPC;
 use RPC::NetDBAdmin;
 
-my $rpc = new Local::SimpleRPC::Server( pretty => 1 );
-$rpc->Init();
+while ( my $cgi = CGI::Fast->new ) {
+    my $rpc = new Local::SimpleRPC::Server( pretty => 1 );
+    $rpc->Init();
 
-$rpc->RequirePriv("rpc:netdb:userops");
+    $rpc->RequirePriv("rpc:netdb:userops");
 
-my $admin = new RPC::NetDBAdmin;
+    my $admin = new RPC::NetDBAdmin;
 
-my @hosts = $rpc->param("host");
+    my @hosts = $rpc->multi_param("host");
 
-my %res_by_host = ();
-foreach my $host (@hosts) {
-    my $res = $rpc->Try(
-        sub {
-            return $admin->GetAdminOptions($host);
-        }
-    );
-    $res_by_host{$host} = $res;
+    my %res_by_host = ();
+    foreach my $host (@hosts) {
+        my $res = $rpc->Try(
+            sub {
+                return $admin->GetAdminOptions($host);
+            }
+        );
+        $res_by_host{$host} = $res;
+    }
+
+    $rpc->FinishReturn( {%res_by_host} );
 }
-
-$rpc->Finish( {%res_by_host} );

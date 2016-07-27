@@ -13,21 +13,24 @@ End-Doc
 =cut
 
 use strict;
+use CGI::Fast;
 
 BEGIN { do "/local/netdb/libs/init.pl"; }
 
 use Local::SimpleRPC;
 use RPC::NetDBUser;
 
-my $rpc = new Local::SimpleRPC::Server;
-$rpc->Init();
+while ( my $cgi = CGI::Fast->new ) {
+    my $rpc = new Local::SimpleRPC::Server( cgi => $cgi );
+    $rpc->Init();
 
-my $admin = new RPC::NetDBUser;
+    my $admin = new RPC::NetDBUser;
 
-my $res = $rpc->Try(
-    sub {
-        return $admin->GetVLANs();
-    }
-);
+    my $res = $rpc->Try(
+        sub {
+            return $admin->GetVLANs();
+        }
+    );
 
-$rpc->Finish($res);
+    $rpc->FinishReturn($res);
+}

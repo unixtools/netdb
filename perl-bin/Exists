@@ -13,26 +13,29 @@ End-Doc
 =cut
 
 use strict;
+use CGI::Fast;
 
 BEGIN { do "/local/netdb/libs/init.pl"; }
 
 use Local::SimpleRPC;
 use RPC::NetDBUser;
 
-my $rpc = new Local::SimpleRPC::Server;
-$rpc->Init();
+while ( my $cgi = CGI::Fast->new ) {
+    my $rpc = new Local::SimpleRPC::Server( cgi => $cgi );
+    $rpc->Init();
 
-my $admin = new RPC::NetDBUser;
-my @hosts = $rpc->param("host");
+    my $admin = new RPC::NetDBUser;
+    my @hosts = $rpc->multi_param("host");
 
-my %res_by_host = ();
-foreach my $host (@hosts) {
-    my $res = $rpc->Try(
-        sub {
-            return $admin->ValidFQDN($host);
-        }
-    );
-    $res_by_host{$host} = $res;
+    my %res_by_host = ();
+    foreach my $host (@hosts) {
+        my $res = $rpc->Try(
+            sub {
+                return $admin->ValidFQDN($host);
+            }
+        );
+        $res_by_host{$host} = $res;
+    }
+
+    $rpc->FinishReturn( {%res_by_host} );
 }
-
-$rpc->Finish( {%res_by_host} );

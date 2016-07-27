@@ -13,27 +13,30 @@ End-Doc
 =cut
 
 use strict;
+use CGI::Fast;
 
 BEGIN { do "/local/netdb/libs/init.pl"; }
 
 use Local::SimpleRPC;
 use RPC::NetDBAdmin;
 
-my $rpc = new Local::SimpleRPC::Server();
-$rpc->Init();
-$rpc->RequirePriv("rpc:netdb:queryinfo");
+while ( my $cgi = CGI::Fast->new ) {
+    my $rpc = new Local::SimpleRPC::Server();
+    $rpc->Init();
+    $rpc->RequirePriv("rpc:netdb:queryinfo");
 
-my $dhcp    = new NetMaint::DHCP;
-my @options = $rpc->param("option");
+    my $dhcp    = new NetMaint::DHCP;
+    my @options = $rpc->multi_param("option");
 
-my %res_by_option = ();
-foreach my $option (@options) {
-    my $res = $rpc->Try(
-        sub {
-            return $dhcp->SearchByDHCPOption($option);
-        }
-    );
-    $res_by_option{$option} = $res;
+    my %res_by_option = ();
+    foreach my $option (@options) {
+        my $res = $rpc->Try(
+            sub {
+                return $dhcp->SearchByDHCPOption($option);
+            }
+        );
+        $res_by_option{$option} = $res;
+    }
+
+    $rpc->FinishReturn( {%res_by_option} );
 }
-
-$rpc->Finish( {%res_by_option} );
