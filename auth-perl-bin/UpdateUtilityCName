@@ -21,7 +21,7 @@ use Local::SimpleRPC;
 use RPC::NetDBAdmin;
 
 while ( my $cgi = CGI::Fast->new ) {
-    my $rpc    = new Local::SimpleRPC::Server;
+    my $rpc = new Local::SimpleRPC::Server( cgi => $cgi );
     my @params = $rpc->Init();
 
     $rpc->RequirePriv("rpc:netdb:userops");
