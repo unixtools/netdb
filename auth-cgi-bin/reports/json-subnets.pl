@@ -19,7 +19,7 @@ require NetMaint::Logging;
 use JSON;
 
 use Local::PrivSys;
-&PrivSys_RequirePriv("sysprog:netdb:reports");
+&PrivSys_RequirePriv("netmgr-user");
 
 &HTMLGetRequest();
 &HTMLContentType("application/json");
