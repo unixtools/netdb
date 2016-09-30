@@ -158,7 +158,7 @@ if ( $mode eq "install" ) {
         }
     };
 
-    if ( $rqpairs{RESTART} eq "on" ) {
+    if ( $rqpairs{restart} eq "on" ) {
         $reqinfo->{attributes}->{"ONESHOT_AUTO_REBOOT"}   = "yes";
         $reqinfo->{attributes}->{"ONESHOT_STOP_SERVICES"} = "yes";
     }
