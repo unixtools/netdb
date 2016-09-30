@@ -62,6 +62,13 @@ print "</td>\n";
 $html->EndInnerRow();
 
 $html->StartInnerRow();
+print "<td>Restart System: </td>\n";
+print "<td>";
+&HTMLCheckbox("restart");
+print "</td>\n";
+$html->EndInnerRow();
+
+$html->StartInnerRow();
 print "<td colspan=100% align=center>";
 &HTMLSubmit("Request and Install");
 print " ";
@@ -150,6 +157,12 @@ if ( $mode eq "install" ) {
             "SSL_X509_KEYFILE"  => $key_txt
         }
     };
+
+    if ( $rqpairs{RESTART} eq "on" ) {
+        $reqinfo->{attributes}->{"ONESHOT_AUTO_REBOOT"}   = "yes";
+        $reqinfo->{attributes}->{"ONESHOT_STOP_SERVICES"} = "yes";
+    }
+
     my $reqjson = encode_json($reqinfo);
 
     my $req = HTTP::Request->new( POST => "https://$host/configapi" );
