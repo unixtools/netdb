@@ -56,10 +56,10 @@ if ( $mode eq "request" ) {
     #
 
     $html->StartBlockTable( "LetsEncrypt Request", 800 );
-    my $base = "/local/letsencrypt/letsencrypt.sh";
+    my $base = "/local/letsencrypt/dehydrated";
     chdir($base) || $html->ErrorExit("Failed to change dir");
     print "<pre>\n";
-    system( "./letsencrypt.sh", "-c", "-d", $host );
+    system( "./dehydrated", "-c", "-d", $host );
     print "</pre>\n";
     $html->EndBlockTable();
 

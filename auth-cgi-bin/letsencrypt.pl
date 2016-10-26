@@ -64,7 +64,7 @@ $html->EndInnerRow();
 $html->StartInnerRow();
 print "<td>Restart System: </td>\n";
 print "<td>";
-&HTMLCheckbox("restart");
+&HTMLCheckbox("restart", 1);
 print "</td>\n";
 $html->EndInnerRow();
 
@@ -118,10 +118,10 @@ if ( $mode eq "install" ) {
     }
 
     $html->StartBlockTable( "LetsEncrypt Request", 800 );
-    my $base = "/local/letsencrypt/letsencrypt.sh";
+    my $base = "/local/letsencrypt/dehydrated";
     chdir($base) || $html->ErrorExit("Failed to change dir");
     print "<pre>\n";
-    system( "./letsencrypt.sh", "-c", "-d", $host );
+    system( "./dehydrated", "-c", "-d", $host );
     print "</pre>\n";
     $html->EndBlockTable();
 
