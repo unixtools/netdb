@@ -49,12 +49,16 @@ elsif ( !$childpid ) {
     close(STDIN);
     open( STDERR, ">&STDOUT" );
 
+    my @interfaces;
+    if ( $ENV{NETDB_DHCP_INTERFACES} ) {
+        @interfaces = split( /[\,\;:\s]+/, $ENV{NETDB_DHCP_INTERFACES} );
+    }
+
     $ENV{MALLOC_CHECK_} = "0";
     exec(
-        "/local/dhcp/sbin/dhcpd",          "-d",  "-cf",
-        "/local/dhcp-root/etc/dhcpd.conf", "-lf", "/local/dhcp-root/etc/dhcpd.leases",
-        "-pf",                             "/local/dhcp-root/etc/dhcpd.pid",
-#"eth1.637", "eth1.638", "eth1.639", "eth1.680", "eth2", "eth1.683"
+        "/local/dhcp/sbin/dhcpd", "-d", "-cf", "/local/dhcp-root/etc/dhcpd.conf",
+        "-lf", "/local/dhcp-root/etc/dhcpd.leases",
+        "-pf", "/local/dhcp-root/etc/dhcpd.pid", @interfaces
     );
     exit(0);
 }
