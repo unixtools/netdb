@@ -17,7 +17,6 @@ require NetMaint::Network;
 require NetMaint::Logging;
 
 use Local::PrivSys;
-&PrivSys_RequirePriv("netmgr-user");
 
 &HTMLGetRequest();
 &HTMLContentType();
@@ -26,6 +25,8 @@ my $html = new NetMaint::HTML;
 my $log  = new NetMaint::Logging;
 
 $log->Log();
+
+$html->RequirePriv("netmgr-user");
 
 $html->PageHeader( title => "Subnet Listing" );
 

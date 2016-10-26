@@ -102,7 +102,7 @@ sub TriggerUpdate {
 
     foreach my $server (@$NETDB_DHCP_SERVERS) {
         my $sock = IO::Socket::INET->new(
-            Timeout  => 2,
+            Timeout  => $NETDB_DHCP_TRIGGER_TIMEOUT,
             PeerAddr => "${server}:2405",
             Proto    => "tcp"
         );
