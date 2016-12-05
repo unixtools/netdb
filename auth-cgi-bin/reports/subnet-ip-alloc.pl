@@ -57,6 +57,8 @@ elsif ( $mode eq "report" ) {
     my $dns    = new NetMaint::DNS;
     my $subnet = $rqpairs{subnet};
 
+    print "<b>Note: Italicized hostnames are dynamic registrations</b><p>\n";
+
     $html->StartMailWrapper("Subnet IP Allocation $subnet");
     $html->StartBlockTable("Subnet IP Allocation $subnet");
     $html->StartInnerTable( "IP", "Allocation", "Host" );
@@ -71,8 +73,18 @@ elsif ( $mode eq "report" ) {
         print "<td>$ip</td>\n";
         print "<td>", $info{type}, "</td>\n";
 
+        my @hosts = ();
         if ( $info{host} ) {
-            print "<td>", $html->SearchLink_Host( $info{host} ), "</td>\n";
+            push( @hosts, $html->SearchLink_Host( $info{host} ) );
+        }
+        my @dns = $dns->Search_A_Records_Address_Exact($ip);
+        foreach my $rec (@dns) {
+            next if ( $rec->{name} eq $info{host} );
+            push( @hosts, "<i>" . $html->SearchLink_Host( $rec->{name} ) . "</i>" );
+        }
+
+        if ( scalar(@hosts) > 0 ) {
+            print "<td>", join( ", ", @hosts ), "</td>\n";
         }
         else {
             print "<td>&nbsp;</td>\n";
