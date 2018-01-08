@@ -261,7 +261,20 @@ sub Format_Zone_Record {
         my $name = $rec->{name};
         my $txt  = $rec->{txt};
         my $ttl  = int( $rec->{ttl} ) || "";
-        return "${name}. $ttl IN TXT \"${txt}\"";
+
+        if ( length($txt) < 250 ) {
+            return "${name}. $ttl IN TXT \"${txt}\"";
+        } else {
+            my $out = "${name}. $ttl IN TXT";
+            my $tmpbuf = $txt;
+            while ( length($tmpbuf) > 0 )
+            {
+                my $tbuf = substr($tmpbuf, 0, 250);
+                $tmpbuf = substr($tmpbuf, 250);
+                $out .= " \"${tbuf}\"";
+            }
+            return $out;
+        }
     }
     elsif ( $type eq "SPF" ) {
         my $name = $rec->{name};
