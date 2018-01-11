@@ -96,7 +96,7 @@ foreach my $zone ( sort(@zones) ) {
         @types = ( "SOA", "NS", "PTR" );
     }
     else {
-        @types = ( "SOA", "NS", "SRV", "TXT", "SPF", "A", "AAAA", "MX", "CNAME" );
+        @types = ( "SOA", "NS", "SRV", "TXT", "A", "AAAA", "MX", "CNAME" );
     }
 
     my %counts = ();

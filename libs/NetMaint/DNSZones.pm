@@ -263,12 +263,6 @@ sub Format_Zone_Record {
         my $ttl  = int( $rec->{ttl} ) || "";
         return "${name}. $ttl IN TXT \"${txt}\"";
     }
-    elsif ( $type eq "SPF" ) {
-        my $name = $rec->{name};
-        my $spf  = $rec->{spf};
-        my $ttl  = int( $rec->{ttl} ) || "";
-        return "${name}. $ttl IN SPF \"${spf}\"";
-    }
     elsif ( $type eq "CNAME" ) {
         my $name    = $rec->{name};
         my $address = $rec->{address};
@@ -317,9 +311,6 @@ sub Get_Zone_Records {
     }
     elsif ( $type eq "TXT" ) {
         return $self->Get_Zone_TXT_Records($zone);
-    }
-    elsif ( $type eq "SPF" ) {
-        return $self->Get_Zone_SPF_Records($zone);
     }
     elsif ( $type eq "CNAME" ) {
         return $self->Get_Zone_CNAME_Records($zone);
@@ -591,60 +582,6 @@ sub Get_Zone_TXT_Records {
                 name       => $name,
                 ttl        => $ttl,
                 txt        => $txt,
-            }
-        );
-    }
-
-    return $recs;
-}
-
-# Begin-Doc
-# Name: Get_Zone_SPF_Records
-# Type: method
-# Description: Returns array of SPF records in a zone
-# Syntax: @records = $obj->Get_Zone_SPF_Records($zone);
-# End-Doc
-sub Get_Zone_SPF_Records {
-    my $self = shift;
-    my $zone = shift;
-
-    my $db = $self->{db};
-
-    my ( $qry, $cid );
-    my $recs = [];
-
-    if ( !$zone || ( lc $zone ne $zone ) ) {
-        return undef;
-    }
-
-    $qry = "select ttl,name,spf from dns_spf where zone=? and (etime is null or etime > now()) order by name";
-    unless ( $cid = $db->SQL_OpenBoundQuery($qry) ) {
-        $db->SQL_Error($qry);
-        $error->set("sql error opening query to fetch zone records");
-        return undef;
-    }
-    unless ( $db->SQL_ExecQuery( $cid, $zone ) ) {
-        $db->SQL_Error($qry);
-        $error->set("sql error opening query to fetch zone records");
-        return undef;
-    }
-
-    my $allrows = $db->SQL_FetchAllRows($cid);
-    if ( $db->SQL_ErrorCode() ) {
-        $error->set("sql error while fetching zone records");
-    }
-    $db->SQL_CloseQuery($cid);
-
-    foreach my $rref (@$allrows) {
-        my ( $ttl, $name, $spf ) = @$rref;
-
-        push(
-            @$recs,
-            {   recordtype => "SPF",
-                zone       => $zone,
-                name       => $name,
-                ttl        => $ttl,
-                spf        => $spf,
             }
         );
     }
