@@ -62,6 +62,13 @@ print "</td>\n";
 $html->EndInnerRow();
 
 $html->StartInnerRow();
+print "<td>Combined Cert for All Hosts: </td>\n";
+print "<td>";
+&HTMLCheckbox( "joint", $rqpairs{joint} );
+print "</td>\n";
+$html->EndInnerRow();
+
+$html->StartInnerRow();
 print "<td>Restart System: </td>\n";
 print "<td>";
 &HTMLCheckbox( "restart", $rqpairs{restart} );
@@ -86,13 +93,11 @@ if ( $mode eq "install" ) {
     my $ua = new LWP::UserAgent;
     $ua->timeout(3);
 
-    foreach my $host ( split( ' ', $rqpairs{host} ) ) {
-        $host = lc $host;
+    my @hosts;
+    foreach my $host ( split( /\s+/, lc $rqpairs{host} ) ) {
         if ( $host !~ /\./ ) {
             $host .= ".spirenteng.com";
         }
-        print "<h3>Working on $host</h3>\n";
-
         if ( $host !~ /\.spirenteng\.com/ ) {
             $html->ErrorWarn("Supported only for .spirenteng.com hostnames.");
             next;
@@ -101,50 +106,48 @@ if ( $mode eq "install" ) {
             $html->ErrorWarn("Host ($host) does not resolve, cannot proceed.");
             next;
         }
+        push( @hosts, $host );
+    }
 
-        my $reqinfo = {
-            "action"     => "get",
-            "attributes" => [ "SSL_X509_CERTFILE", "SSL_TRUST_CERTS", "SSL_X509_CHAIN", "SSL_X509_KEYFILE" ]
-        };
-        my $reqjson = encode_json($reqinfo);
+    my @host_sets = ();
+    if ( $rqpairs{"joint"} eq "on" ) {
+        @host_sets = ( [@hosts] );
+    }
+    else {
+        @host_sets = ( map { [$_] } @hosts );
+    }
 
-        my $req = HTTP::Request->new( POST => "https://$host/configapi" );
-        $req->content_type("application/json");
-        $req->authorization_basic( "admin", $adminpw );
-        $req->content($reqjson);
-
-        my $res  = $ua->request($req);
-        my $resp = $res->content();
-
-        my $info;
-        eval { $info = decode_json($resp); };
-        if ( !$info ) {
-            $html->ErrorWarn("Received invalid json: $resp\n");
-            next;
-        }
+    foreach my $hostset (@host_sets) {
+        my $firsthost = $hostset->[0];
+        print "<h3>Working on ", join( ", ", @$hostset ), "</h3>\n";
 
         $html->StartBlockTable( "LetsEncrypt Request", 800 );
         my $base = "/local/letsencrypt/dehydrated";
         chdir($base) || $html->ErrorExit("Failed to change dir");
         print "<pre>\n";
-        system( "./dehydrated", "-c", "-d", $host );
+
+        my @cmd = ( "./dehydrated", "-c" );
+        foreach my $host (@$hostset) {
+            push( @cmd, "-d" => $host );
+        }
+        system(@cmd);
         print "</pre>\n";
         $html->EndBlockTable();
 
-        if ( !-e "$base/certs/$host/cert.pem" ) {
+        if ( !-e "$base/certs/$firsthost/cert.pem" ) {
             $html->ErrorWarn("Failed to obtain cert - if you see a rateLimited error, try again in a few hours");
             next;
         }
 
-        open( my $in, "$base/certs/$host/cert.pem" );
+        open( my $in, "$base/certs/$firsthost/cert.pem" );
         my $cert_txt = join( "", <$in> );
         close($in);
 
-        open( my $in, "$base/certs/$host/chain.pem" );
+        open( my $in, "$base/certs/$firsthost/chain.pem" );
         my $chain_txt = join( "", <$in> );
         close($in);
 
-        open( my $in, "$base/certs/$host/privkey.pem" );
+        open( my $in, "$base/certs/$firsthost/privkey.pem" );
         my $key_txt = join( "", <$in> );
         close($in);
 
@@ -165,39 +168,63 @@ if ( $mode eq "install" ) {
             }
         };
 
-        if ( $rqpairs{restart} eq "on" ) {
-            $reqinfo->{attributes}->{"ONESHOT_AUTO_REBOOT"}   = "yes";
-            $reqinfo->{attributes}->{"ONESHOT_STOP_SERVICES"} = "yes";
+        foreach my $host (@$hostset) {
+            my $reqinfo = {
+                "action"     => "get",
+                "attributes" => [ "SSL_X509_CERTFILE", "SSL_TRUST_CERTS", "SSL_X509_CHAIN", "SSL_X509_KEYFILE" ]
+            };
+            my $reqjson = encode_json($reqinfo);
+
+            my $req = HTTP::Request->new( POST => "https://$host/configapi" );
+            $req->content_type("application/json");
+            $req->authorization_basic( "admin", $adminpw );
+            $req->content($reqjson);
+
+            my $res  = $ua->request($req);
+            my $resp = $res->content();
+
+            my $info;
+            eval { $info = decode_json($resp); };
+            if ( !$info ) {
+                $html->ErrorWarn("Received invalid json: $resp\n");
+                next;
+            }
+
+            if ( $rqpairs{restart} eq "on" ) {
+                $reqinfo->{attributes}->{"ONESHOT_AUTO_REBOOT"}   = "yes";
+                $reqinfo->{attributes}->{"ONESHOT_STOP_SERVICES"} = "yes";
+            }
+
+            my $reqjson = encode_json($reqinfo);
+
+            my $req = HTTP::Request->new( POST => "https://$host/configapi" );
+            $req->content_type("application/json");
+            $req->authorization_basic( "admin", $adminpw );
+            $req->content($reqjson);
+
+            my $res  = $ua->request($req);
+            my $resp = $res->content();
+
+            my $info;
+            eval { $info = decode_json($resp); };
+            if ( !$info ) {
+                $html->ErrorWarn( "Received invalid json: " . $res->as_string );
+                next;
+            }
+
+            if (0) {
+                $html->StartBlockTable( "Appliance Config Output", 800 );
+                print "<pre>\n";
+                my $json = new JSON;
+                print $json->pretty->canonical->encode($info);
+                print "</pre>\n";
+                $html->EndBlockTable();
+            }
+
+            print
+                "<b>Appliance $host updated with new cert info, apply config or reboot to have it take effect.</b><br>\n";
+            print "<b>Certificate is good for 90 days from issuance. Come back here after 60 days to renew.</b><br>\n";
         }
-
-        my $reqjson = encode_json($reqinfo);
-
-        my $req = HTTP::Request->new( POST => "https://$host/configapi" );
-        $req->content_type("application/json");
-        $req->authorization_basic( "admin", $adminpw );
-        $req->content($reqjson);
-
-        my $res  = $ua->request($req);
-        my $resp = $res->content();
-
-        my $info;
-        eval { $info = decode_json($resp); };
-        if ( !$info ) {
-            $html->ErrorWarn( "Received invalid json: " . $res->as_string );
-            next;
-        }
-
-        if (0) {
-            $html->StartBlockTable( "Appliance Config Output", 800 );
-            print "<pre>\n";
-            my $json = new JSON;
-            print $json->pretty->canonical->encode($info);
-            print "</pre>\n";
-            $html->EndBlockTable();
-        }
-
-        print "<b>Appliance updated with new cert info, apply config or reboot to have it take effect.</b><br>\n";
-        print "<b>Certificate is good for 90 days from issuance. Come back here after 60 days to renew.</b><br>\n";
     }
     print "<p>\n";
 }
