@@ -132,4 +132,29 @@ $html->EndInnerRow();
 $html->EndInnerTable();
 $html->EndBlockTable();
 
+$html->StartBlockTable("Recently Generated -- please reuse exactly if possible", 800);
+$html->StartInnerTable("Time", "Hosts");
+
+open(my $in, "/local/letsencrypt/gen-cached-recent-certs.pl|");
+my $recent = join("", <$in>);
+close($in);
+
+my $rinfo = decode_json($recent);
+
+foreach my $result ( @{ $rinfo } )
+{
+    $html->StartInnerRow();
+    print "<td>\n";
+    print scalar(gmtime($result->{tstamp})) . " UTC";
+    print "</td>\n";
+    print "<td>\n";
+    my $hosts = join(" ", @{ $result->{hosts} });
+    print "<a href=\"?joint=on&host=$hosts\">$hosts</a>\n";
+    print "</td>\n";
+    $html->EndInnerRow();
+}
+
+$html->EndInnerTable();
+$html->EndBlockTable();
+
 $html->PageFooter();
