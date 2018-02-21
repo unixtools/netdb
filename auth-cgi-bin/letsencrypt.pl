@@ -266,8 +266,9 @@ foreach my $result ( @{ $rinfo } )
     print scalar(gmtime($result->{tstamp})) . " UTC";
     print "</td>\n";
     print "<td>\n";
-    my $hosts = join(" ", @{ $result->{hosts} });
-    print "<a href=\"?joint=on&host=$hosts\">$hosts</a>\n";
+    my $hosts_print = join("<br>\n", @{ $result->{hosts} });
+    my $hosts = join("+", @{ $result->{hosts} });
+    print "<a href=\"?joint=on&host=$hosts\">$hosts_print</a>\n";
     print "</td>\n";
     $html->EndInnerRow();
 }
