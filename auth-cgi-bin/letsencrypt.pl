@@ -134,6 +134,8 @@ if ( $mode eq "install" ) {
         print "</pre>\n";
         $html->EndBlockTable();
 
+        print "Retrieving cert content for ($firsthost).<p>\n";
+
         if ( !-e "$base/certs/$firsthost/cert.pem" ) {
             $html->ErrorWarn("Failed to obtain cert - if you see a rateLimited error, try again in a few hours");
             next;
@@ -158,17 +160,33 @@ if ( $mode eq "install" ) {
         # For now - later merge with existing
         my $new_trust = $root_txt;
 
-        my $reqinfo = {
-            "action"     => "set",
-            "attributes" => {
-                "SSL_X509_CERTFILE" => $cert_txt,
-                "SSL_TRUST_CERTS"   => $new_trust,
-                "SSL_X509_CHAIN"    => $chain_txt,
-                "SSL_X509_KEYFILE"  => $key_txt
-            }
-        };
-
         foreach my $host (@$hostset) {
+            my $reqinfo = {
+                "action"     => "set",
+                "attributes" => {
+                    "SSL_X509_CERTFILE" => $cert_txt,
+                    "SSL_TRUST_CERTS"   => $new_trust,
+                    "SSL_X509_CHAIN"    => $chain_txt,
+                    "SSL_X509_KEYFILE"  => $key_txt
+                }
+            };
+            my $reqjson = encode_json($reqinfo);
+
+            my $req = HTTP::Request->new( POST => "https://$host/configapi" );
+            $req->content_type("application/json");
+            $req->authorization_basic( "admin", $adminpw );
+            $req->content($reqjson);
+
+            my $res  = $ua->request($req);
+            my $resp = $res->content();
+
+            my $info;
+            eval { $info = decode_json($resp); };
+            if ( !$info ) {
+                $html->ErrorWarn("Received invalid json installing certs: $resp\n");
+                next;
+            }
+
             my $reqinfo = {
                 "action"     => "get",
                 "attributes" => [ "SSL_X509_CERTFILE", "SSL_TRUST_CERTS", "SSL_X509_CHAIN", "SSL_X509_KEYFILE" ]
@@ -216,7 +234,7 @@ if ( $mode eq "install" ) {
                 $html->StartBlockTable( "Appliance Config Output", 800 );
                 print "<pre>\n";
                 my $json = new JSON;
-                print $json->pretty->canonical->encode($info);
+                my $txt = $json->pretty->canonical->encode($info);
                 print "</pre>\n";
                 $html->EndBlockTable();
             }
