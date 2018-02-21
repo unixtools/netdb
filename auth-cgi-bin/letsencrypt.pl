@@ -65,6 +65,8 @@ $html->StartInnerRow();
 print "<td>Combined Cert for All Hosts: </td>\n";
 print "<td>";
 &HTMLCheckbox( "joint", $rqpairs{joint} );
+print " ";
+print "<b>If you are generating certs for a set of instances, please use this when possible to reduce number of certificates requested.</b>\n";
 print "</td>\n";
 $html->EndInnerRow();
 
