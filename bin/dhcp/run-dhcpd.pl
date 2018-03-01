@@ -5,6 +5,7 @@ use strict;
 BEGIN { do "/local/netdb/libs/init.pl"; }
 
 use Local::SetUID;
+use Time::HiRes qw(sleep);
 
 $| = 1;
 umask(022);
@@ -27,8 +28,14 @@ while ( chomp( my $line = <$psfh> ) ) {
     if ( $line =~ /dhcpd.*dhcpd.conf/ && $tmp[1] != $$ ) {
         print "Killing: $line\n";
         kill 15, $tmp[1];
-        select undef, undef, undef, .25;
-        kill 9, $tmp[1];
+
+        # Short delay to minimize time dhcp is unavailable
+        sleep(0.25);
+
+        my $res = kill 9, $tmp[1];
+        if ( $res > 0 ) {
+            print "ERROR: DHCPd was found still running after SIGTERM, required SIGKILL.\n";
+        }
     }
 }
 close($psfh);
