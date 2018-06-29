@@ -1,3 +1,5 @@
 #!/bin/sh -x
 
 /local/dnsimple/sync.pl spirenteng.com
+
+sleep 15

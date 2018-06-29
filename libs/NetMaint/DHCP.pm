@@ -100,7 +100,7 @@ sub TriggerUpdate {
 
     $log->Log( action => "triggered dhcp update" );
 
-    foreach my $server (@$NETDB_DHCP_SERVERS) {
+    foreach my $server ( $self->GetDHCPServers() ) {
         my $sock = IO::Socket::INET->new(
             Timeout  => $NETDB_DHCP_TRIGGER_TIMEOUT,
             PeerAddr => "${server}:2405",
@@ -114,6 +114,34 @@ sub TriggerUpdate {
             print "Unable to update server ($server) $!.\n";
         }
     }
+}
+
+# Begin-Doc
+# Name: GetDHCPServers
+# Type: method
+# Description: Returns list of dhcp servers
+# Syntax: @servers = $obj->GetDHCPServers();
+# End-Doc
+sub GetDHCPServers {
+    my $self = shift;
+
+    my $db      = $self->{db};
+    my $dbcache = $self->{dbcache};
+
+    my ( $qry, $cid );
+
+    $qry = "select distinct server from dhcp_servers order by server";
+    $cid = $dbcache->open($qry);
+
+    $db->SQL_ExecQuery($cid)
+        || $db->SQL_Error($qry) && return undef;
+
+    my @servers;
+    while ( my ($server) = $db->SQL_FetchRow($cid) ) {
+        push( @servers, $server );
+    }
+
+    return @servers;
 }
 
 # Begin-Doc

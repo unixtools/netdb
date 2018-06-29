@@ -18,6 +18,7 @@ require NetMaint::HTML;
 require NetMaint::Util;
 require NetMaint::Network;
 require NetMaint::DB;
+require NetMaint::DHCP;
 require NetMaint::Logging;
 require NetMaint::Config;
 
@@ -95,7 +96,8 @@ my $tmpinfo;
 my $ip;
 my %seen;
 
-foreach my $dhcpserver ( @$NETDB_DHCP_SERVERS ) {
+my $dhcp = new NetMaint::DHCP;
+foreach my $dhcpserver ( $dhcp->GetDHCPServers() ) {
     print "Processing $dhcpserver...\n";
     open( STDERR_SV, ">&STDERR" );
     open( STDERR,    ">/dev/null" );

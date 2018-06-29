@@ -44,9 +44,6 @@ our $NETDB_DNS_NOTIFY     = "nneul\@neulinger.org";
 our $NETDB_DB_HOST     = "netmgr.spirenteng.com";
 our $NETDB_DNS_SERVERS = ["netmgr.spirenteng.com"];
 
-# Why is this not pulling from database?!
-our $NETDB_DHCP_SERVERS = [ "ub-dhcp1-ito.spirenteng.com", "ub-dhcp2-ito.spirenteng.com", "ub-plano-lab-router.spirenteng.com" ];
-
 our $NETDB_DHCP_TRIGGER_TIMEOUT = 4;
 
 our $NETDB_DISABLE_BACKLOG_REPORT = 1;
