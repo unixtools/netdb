@@ -278,6 +278,8 @@ sub GetHostMetadataFieldAll {
 
     my $db = $self->_init_db();
 
+    my $hosts   = new NetMaint::Hosts;
+
     $qry = "select field,viewpriv from metadata_fields where field=?";
     my ( $qf, $viewpriv ) = $db->SQL_DoQuery( $qry, $field );
     if ( $qf ne $field ) {
@@ -312,6 +314,7 @@ sub SetHostMetadataField {
 
     my $db = $self->_init_db();
 
+    my $hosts   = new NetMaint::Hosts;
     my $access = new NetMaint::Access;
     my $edit_ok = $access->CheckHostEditAccess( host => $host, action => "update" );
 
