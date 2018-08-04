@@ -24,7 +24,7 @@ while ( my $cgi = CGI::Fast->new ) {
     my $rpc = new Local::SimpleRPC::Server( cgi => $cgi );
     $rpc->Init();
 
-    $rpc->RequirePriv("rpc:netdb:userops");
+    $rpc->RequirePriv("netmgr-user");
 
     my $admin = new RPC::NetDBAdmin;
     my @hosts = $rpc->multi_param("host");
