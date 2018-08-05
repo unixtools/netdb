@@ -333,8 +333,7 @@ create table hosts
  adminlock integer, 
  purge_date datetime, 
  purge_date_updated datetime, 
- admin_comments varchar(250), 
- vulnstatus varchar(50)
+ admin_comments varchar(250)
 );
 
 create index hosts_adminlock ON hosts (adminlock);
@@ -534,3 +533,10 @@ create table ignored_ethers
 
 create unique index ignored_ethers_eth ON ignored_ethers (ether);
 create index ignored_ethers_ts ON ignored_ethers (tstamp);
+
+--- Schema definition for TABLE SOA_CHECK_SERVERS
+create table soa_check_servers
+(
+  server varchar(50) not null
+);
+create unique index server on soa_check_servers(server);
